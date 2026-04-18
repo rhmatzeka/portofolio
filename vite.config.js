@@ -6,19 +6,20 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'framer-motion': ['framer-motion']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor'
+            }
+            if (id.includes('framer-motion')) {
+              return 'framer-motion'
+            }
+          }
         }
       }
     },
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    }
+    minify: 'esbuild',
+    chunkSizeWarningLimit: 1000
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'framer-motion']
