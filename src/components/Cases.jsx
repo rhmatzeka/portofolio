@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { createPortal } from 'react-dom'
 import './Cases.css'
 
@@ -78,6 +78,64 @@ const projects = [
   }
 ]
 
+const ProjectCard = memo(({ project, onClick }) => (
+  <motion.div 
+    className="case-card" 
+    variants={itemUp}
+    onClick={onClick}
+  >
+    <div className="case-image">
+      <img 
+        src={project.image} 
+        alt={project.title}
+        loading="lazy"
+        decoding="async"
+      />
+      <div className="case-overlay"></div>
+    </div>
+    
+    <div className="case-card-content">
+      <div className="case-header-section">
+        <h3>{project.title}</h3>
+        <span className="case-tech">{project.tech}</span>
+      </div>
+      
+      <p>{project.desc}</p>
+      
+      <div className="case-stack">
+        {project.stack.map((tech, idx) => (
+          <span key={idx} className="stack-badge">{tech}</span>
+        ))}
+      </div>
+      
+      <div className="case-links">
+        <a 
+          href={project.github} 
+          className="case-link-btn"
+          onClick={(e) => e.stopPropagation()}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+          </svg>
+          Code
+        </a>
+        <a 
+          href={project.demo} 
+          className="case-link-btn primary"
+          onClick={(e) => e.stopPropagation()}
+        >
+          Live Demo
+          <span className="arrow">↗</span>
+        </a>
+      </div>
+    </div>
+  </motion.div>
+))
+
+ProjectCard.displayName = 'ProjectCard'
+
 const Cases = () => {
   const [selectedProject, setSelectedProject] = useState(null)
 
@@ -111,55 +169,11 @@ const Cases = () => {
 
         <motion.div className="cases-grid" variants={containerVariants}>
           {projects.map((project) => (
-            <motion.div 
-              key={project.id} 
-              className="case-card" 
-              variants={itemUp}
+            <ProjectCard 
+              key={project.id}
+              project={project}
               onClick={() => setSelectedProject(project)}
-            >
-              <div className="case-image">
-                <img src={project.image} alt={project.title} />
-                <div className="case-overlay"></div>
-              </div>
-              
-              <div className="case-card-content">
-                <div className="case-header-section">
-                  <h3>{project.title}</h3>
-                  <span className="case-tech">{project.tech}</span>
-                </div>
-                
-                <p>{project.desc}</p>
-                
-                <div className="case-stack">
-                  {project.stack.map((tech, idx) => (
-                    <span key={idx} className="stack-badge">{tech}</span>
-                  ))}
-                </div>
-                
-                <div className="case-links">
-                  <a 
-                    href={project.github} 
-                    className="case-link-btn"
-                    onClick={(e) => e.stopPropagation()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                    </svg>
-                    Code
-                  </a>
-                  <a 
-                    href={project.demo} 
-                    className="case-link-btn primary"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Live Demo
-                    <span className="arrow">↗</span>
-                  </a>
-                </div>
-              </div>
-            </motion.div>
+            />
           ))}
         </motion.div>
 
@@ -197,7 +211,12 @@ const Cases = () => {
               </button>
 
               <div className="modal-image">
-                <img src={selectedProject.image} alt={selectedProject.title} />
+                <img 
+                  src={selectedProject.image} 
+                  alt={selectedProject.title}
+                  loading="eager"
+                  decoding="async"
+                />
               </div>
 
               <div className="modal-body">

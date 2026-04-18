@@ -1,10 +1,9 @@
 import React from 'react'
+import { memo } from 'react'
 import './Navbar.css'
 
-const Navbar = ({ isScrolled }) => {
+const Navbar = memo(({ isScrolled }) => {
   const navItems = ['Home', 'About', 'Projects', 'Contact']
-  
-  console.log('Navbar isScrolled:', isScrolled)
   
   return (
     <nav className={`navbar fixed-nav ${isScrolled ? 'scrolled' : ''}`}>
@@ -20,6 +19,8 @@ const Navbar = ({ isScrolled }) => {
       <a href="#contact" className="nav-button" style={{textDecoration: 'none'}}>Let's Talk!</a>
     </nav>
   )
-}
+})
+
+Navbar.displayName = 'Navbar'
 
 export default Navbar

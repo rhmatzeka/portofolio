@@ -19,6 +19,7 @@
   justify-content: center;
   align-items: center;
   position: relative;
+  contain: layout style paint;
 }
 
 .section-content {
@@ -44,6 +45,7 @@
   pointer-events: auto;
   transform: scale(1.5);
   transform-origin: center center;
+  will-change: transform;
 }
 
 .hero-section::after {

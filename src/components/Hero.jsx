@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { memo } from 'react'
 import './Hero.css'
 
 const containerVariants = {
@@ -20,7 +21,7 @@ const itemRight = {
   in: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
 }
 
-const Hero = () => {
+const Hero = memo(() => {
   return (
     <motion.div 
       className="hero-wrapper"
@@ -59,6 +60,8 @@ const Hero = () => {
       </div>
     </motion.div>
   )
-}
+})
+
+Hero.displayName = 'Hero'
 
 export default Hero

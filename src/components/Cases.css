@@ -7,6 +7,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  contain: layout style paint;
 }
 
 .cases-header {
@@ -47,6 +48,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  will-change: transform;
+  contain: layout style paint;
 }
 
 .case-card::before {
@@ -83,6 +86,7 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
+  will-change: transform;
 }
 
 .case-card:hover .case-image img {
