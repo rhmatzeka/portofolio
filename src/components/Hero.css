@@ -1,0 +1,253 @@
+.hero-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 3rem;
+  pointer-events: none;
+}
+
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+  pointer-events: none;
+}
+
+.hero-title {
+  font-size: clamp(4rem, 6vw, 7rem); 
+  font-weight: 600;
+  line-height: 1.05;
+  color: white;
+  letter-spacing: -2px;
+  margin: 0;
+  text-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #00d1ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-tags {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.tag {
+  color: #00d1ff; 
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.sep {
+  color: rgba(255,255,255,0.2);
+  font-weight: 300;
+}
+
+.hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  pointer-events: none;
+}
+
+.hero-desc {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.2rem;
+  line-height: 1.7;
+  margin: 0;
+  font-weight: 400;
+  max-width: 600px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+}
+
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
+}
+
+.btn-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(0, 209, 255, 0.1);
+  border: 1px solid #00d1ff;
+  color: white;
+  padding: 0.5rem 0.5rem 0.5rem 1.8rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 209, 255, 0.2);
+  pointer-events: auto;
+}
+
+.btn-glow:hover {
+  background: rgba(0, 209, 255, 0.2);
+  box-shadow: 0 0 30px rgba(0, 209, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.plus-circle {
+  width: 40px;
+  height: 40px;
+  background-color: #00d1ff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-glow:hover .plus-circle {
+  transform: rotate(90deg) scale(1.1);
+}
+
+@media (max-width: 992px) {
+  .hero-wrapper {
+    gap: 2.5rem;
+  }
+  
+  .hero-title {
+    font-size: clamp(3rem, 8vw, 5rem);
+  }
+  
+  .hero-tags {
+    gap: 1rem;
+  }
+  
+  .tag {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-wrapper {
+    gap: 2rem;
+  }
+  
+  .hero-left {
+    gap: 2rem;
+  }
+  
+  .hero-title {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+    letter-spacing: -1px;
+  }
+  
+  .hero-tags {
+    gap: 0.8rem;
+  }
+  
+  .tag {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+  }
+  
+  .sep {
+    display: none;
+  }
+  
+  .hero-actions {
+    gap: 1rem;
+  }
+  
+  .btn-ghost, .btn-glow {
+    padding: 0.9rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .btn-glow {
+    padding: 0.4rem 0.4rem 0.4rem 1.5rem;
+  }
+  
+  .plus-circle {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-wrapper {
+    gap: 1.5rem;
+  }
+  
+  .hero-left {
+    gap: 1.5rem;
+  }
+  
+  .hero-title {
+    font-size: clamp(2rem, 12vw, 3rem);
+  }
+  
+  .hero-tags {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .tag {
+    font-size: 0.65rem;
+  }
+  
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.8rem;
+  }
+  
+  .btn-ghost, .btn-glow {
+    width: 100%;
+    justify-content: center;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.85rem;
+  }
+  
+  .btn-glow {
+    padding: 0.4rem 0.4rem 0.4rem 1.2rem;
+  }
+  
+  .plus-circle {
+    width: 32px;
+    height: 32px;
+  }
+}
