@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import Hero from './components/Hero'
 import Navbar from './components/Navbar'
+import Loading from './components/Loading'
 import './App.css'
 
 // Lazy load components that are below the fold
@@ -10,8 +11,17 @@ const Contact = lazy(() => import('./components/Contact'))
 const Footer = lazy(() => import('./components/Footer'))
 
 function App() {
-  const [loading, setLoading] = useState(true)
+  const [pageLoading, setPageLoading] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    // Simulate initial page load
+    const timer = setTimeout(() => {
+      setPageLoading(false)
+    }, 2000)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     let ticking = false
@@ -46,6 +56,8 @@ function App() {
 
   return (
     <div className="app">
+      {pageLoading && <Loading />}
+      
       <Navbar isScrolled={isScrolled} />
       
       <div className="page-container">
@@ -54,16 +66,10 @@ function App() {
             src='https://my.spline.design/boxeshover-Lw87Wz6KymIMZ7hVhu7wmUyQ/' 
             frameBorder='0' 
             className="spline-iframe"
-            onLoad={() => setLoading(false)}
             allow="fullscreen"
             loading="lazy"
             title="3D Background Animation"
           />
-          {loading && (
-            <div className="loading">
-              <p>Loading 3D Scene...</p>
-            </div>
-          )}
           <div className="section-content">
             <Hero />
           </div>
