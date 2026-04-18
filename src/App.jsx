@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import Hero from './components/Hero'
 import About from './components/About'
-import SplineTransition from './components/SplineTransition'
 import Cases from './components/Cases'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
@@ -63,8 +62,6 @@ function App() {
             <About />
           </div>
         </section>
-        
-        <SplineTransition />
         
         <section id="projects" className="full-section">
           <div className="section-content">

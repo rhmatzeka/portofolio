@@ -17,7 +17,16 @@ const itemRight = {
   in: { opacity: 1, x: 0, transition: { duration: 0.7, ease: 'easeOut' } }
 }
 
-const stack = ['React', 'Next.js', 'Solidity', 'Node.js', 'Figma', 'JavaScript', 'PostgreSQL', 'MySQL']
+const stack = [
+  { name: 'React', url: 'https://react.dev' },
+  { name: 'Next.js', url: 'https://nextjs.org' },
+  { name: 'Solidity', url: 'https://soliditylang.org' },
+  { name: 'Node.js', url: 'https://nodejs.org' },
+  { name: 'Figma', url: 'https://figma.com' },
+  { name: 'JavaScript', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript' },
+  { name: 'PostgreSQL', url: 'https://postgresql.org' },
+  { name: 'MySQL', url: 'https://mysql.com' }
+]
 
 const About = () => {
   return (
@@ -67,7 +76,15 @@ const About = () => {
           <span className="stack-label">Tech Stack</span>
           <div className="stack-tags">
             {stack.map(tech => (
-              <span key={tech} className="stack-tag">{tech}</span>
+              <a 
+                key={tech.name} 
+                href={tech.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="stack-tag"
+              >
+                {tech.name}
+              </a>
             ))}
           </div>
         </div>
