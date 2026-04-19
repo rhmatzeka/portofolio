@@ -124,8 +124,7 @@
   }
 
   .nav-right {
-    transform: scale(0.92);
-    transform-origin: right center;
+    flex: 0 0 auto;
   }
 }
 
@@ -155,6 +154,6 @@
   }
 
   .nav-right {
-    transform: scale(0.84);
+    flex: 0 0 auto;
   }
 }
