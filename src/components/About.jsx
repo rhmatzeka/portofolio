@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import avatar from '../assets/images/k.jpg'
+import ScrollFrameScene from './ScrollFrameScene'
 import './About.css'
 
 const containerVariants = {
@@ -106,6 +107,8 @@ const About = () => {
 
         </motion.div>
       </div>
+
+      <ScrollFrameScene />
 
       <motion.div className="stack-marquee" variants={itemRight}>
         <span className="stack-label stack-marquee-label">Tech Stack</span>

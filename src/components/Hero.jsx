@@ -37,10 +37,8 @@ const Hero = memo(() => {
         </motion.h1>
         
         <motion.div variants={itemLeft} className="hero-tags">
-          <span className="tag">BLOCKCHAIN</span> <span className="sep">\</span>
-          <span className="tag">WEB DEV</span> <span className="sep">\</span>
-          <span className="tag">UI/UX</span> <span className="sep">\</span>
-          <span className="tag">AI</span>
+          <span className="tag">WEB3 DEVELOPER</span> <span className="sep">\</span>
+          <span className="tag">UI/UX</span>
         </motion.div>
       </div>
 
