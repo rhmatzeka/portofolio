@@ -35,6 +35,9 @@
   background: rgba(0, 209, 255, 0.15);
   box-shadow: 0 5px 15px rgba(0, 209, 255, 0.2);
 }
+
+/* Connected State */
+.wallet-connected-row {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
