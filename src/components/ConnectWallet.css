@@ -15,6 +15,7 @@
   transition: all 0.3s ease;
   font-family: inherit;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .connect-wallet-btn:hover {
@@ -373,11 +374,16 @@
 /* Responsive */
 @media (max-width: 768px) {
   .connect-wallet-btn {
-    width: auto;
+    width: 100%;
+    min-height: 48px;
     justify-content: center;
+    padding: 0.9rem 1.4rem;
+    text-align: center;
   }
 
   .connect-wallet-btn.compact {
+    width: auto;
+    min-height: 0;
     min-width: 7.4rem;
     padding: 0.55rem 0.85rem;
     font-size: 0.78rem;
