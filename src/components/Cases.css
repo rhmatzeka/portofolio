@@ -353,37 +353,71 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  overflow-y: auto;
 }
 
 .modal-content {
   position: relative;
   width: 100%;
-  max-width: 700px;
-  max-height: 85vh;
-  background: rgba(20, 20, 20, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
+  max-width: 860px;
+  background: rgba(12, 12, 12, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
   overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 209, 255, 0.1);
+  display: flex;
+  flex-direction: row;
+  max-height: 85vh;
+}
+
+/* Left - Image */
+.modal-image {
+  width: 45%;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.modal-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 209, 255, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Right - Content */
+.modal-body {
+  flex: 1;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
   overflow-y: auto;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
 }
 
 .modal-close {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 34px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -395,84 +429,70 @@
 }
 
 .modal-close:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   transform: rotate(90deg);
 }
 
 .modal-close svg {
-  width: 20px;
-  height: 20px;
-}
-
-.modal-image {
-  width: 100%;
-  height: 250px;
-  overflow: hidden;
-}
-
-.modal-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.modal-body {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
 }
 
 .modal-tech {
   color: #00d1ff;
-  font-size: 0.75rem;
-  letter-spacing: 2px;
-  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
 .modal-title {
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 1.8rem;
+  font-weight: 700;
   color: white;
   margin: 0;
   line-height: 1.2;
 }
 
 .modal-description {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.7;
   margin: 0;
+  flex: 1;
 }
 
 .modal-stack h3 {
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 0.8rem 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin: 0 0 0.7rem 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .modal-stack-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
 
 .modal-stack-badge {
-  background: rgba(0, 209, 255, 0.1);
-  border: 1px solid rgba(0, 209, 255, 0.3);
-  color: #00d1ff;
-  padding: 0.4rem 1rem;
+  background: rgba(0, 209, 255, 0.08);
+  border: 1px solid rgba(0, 209, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.3rem 0.9rem;
   border-radius: 50px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 
 .modal-actions {
   display: flex;
   gap: 0.8rem;
-  margin-top: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
 }
 
 .modal-btn {
@@ -480,38 +500,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
-  padding: 0.9rem 1.5rem;
-  border-radius: 50px;
-  font-size: 0.95rem;
-  font-weight: 500;
+  gap: 0.5rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
   text-decoration: none;
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: transparent;
-  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .modal-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
 }
 
 .modal-btn.primary {
-  background: rgba(0, 209, 255, 0.1);
-  border-color: #00d1ff;
-  color: #00d1ff;
+  background: linear-gradient(135deg, #00d1ff 0%, #0099cc 100%);
+  border-color: transparent;
+  color: white;
 }
 
 .modal-btn.primary:hover {
-  background: rgba(0, 209, 255, 0.2);
-  box-shadow: 0 10px 30px rgba(0, 209, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 209, 255, 0.4);
+  transform: translateY(-2px);
 }
 
 .modal-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 .modal-btn .arrow {
@@ -526,14 +546,17 @@
 @media (max-width: 768px) {
   .modal-overlay {
     padding: 1rem;
+    align-items: flex-end;
   }
   
   .modal-content {
-    max-width: 100%;
+    flex-direction: column;
     max-height: 90vh;
+    border-radius: 20px 20px 0 0;
   }
   
   .modal-image {
+    width: 100%;
     height: 200px;
   }
   
@@ -543,34 +566,19 @@
   }
   
   .modal-title {
-    font-size: 1.6rem;
-  }
-  
-  .modal-description {
-    font-size: 0.9rem;
+    font-size: 1.5rem;
   }
   
   .modal-actions {
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-  
-  .modal-close {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .modal-close svg {
-    width: 18px;
-    height: 18px;
+    flex-direction: row;
   }
 }
 
 @media (max-width: 480px) {
   .modal-overlay {
-    padding: 0.5rem;
+    padding: 0;
   }
-  
+
   .modal-image {
     height: 160px;
   }
@@ -580,21 +588,15 @@
   }
   
   .modal-title {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
   
   .modal-description {
     font-size: 0.85rem;
-    line-height: 1.5;
   }
   
-  .modal-stack-badge {
-    font-size: 0.75rem;
-    padding: 0.35rem 0.8rem;
-  }
-  
-  .modal-btn {
-    padding: 0.8rem 1.2rem;
-    font-size: 0.85rem;
+  .modal-actions {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }

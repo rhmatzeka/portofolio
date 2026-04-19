@@ -24,33 +24,22 @@ function App() {
   }, [])
 
   useEffect(() => {
-    let ticking = false
-    let lastScrollY = 0
-    
+    let rafId = null
+
     const handleScroll = () => {
-      const scrollY = window.scrollY
-      
-      // Only update if scroll position changed significantly (reduces re-renders)
-      if (Math.abs(scrollY - lastScrollY) < 10) return
-      
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setIsScrolled(scrollY > 100)
-          lastScrollY = scrollY
-          ticking = false
-        })
-        ticking = true
-      }
+      if (rafId) return
+      rafId = window.requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 80)
+        rafId = null
+      })
     }
 
-    // Check on mount
-    setIsScrolled(window.scrollY > 100)
-
-    // Add listener with passive for better performance
+    setIsScrolled(window.scrollY > 80)
     window.addEventListener('scroll', handleScroll, { passive: true })
     
     return () => {
       window.removeEventListener('scroll', handleScroll)
+      if (rafId) cancelAnimationFrame(rafId)
     }
   }, [])
 

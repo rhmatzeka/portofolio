@@ -1,4 +1,7 @@
 import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
+import ConnectWallet from './ConnectWallet'
 import './Contact.css'
 
 const containerVariants = {
@@ -16,6 +19,33 @@ const itemUp = {
 }
 
 const Contact = () => {
+  const [showTipModal, setShowTipModal] = useState(false)
+  const [selectedCrypto, setSelectedCrypto] = useState('ETH')
+  const [copiedAddress, setCopiedAddress] = useState(false)
+
+  const walletAddresses = {
+    ETH: '0x8988140cEF5A825f39929c60c97173ec5a2eF27D',
+    BTC: 'bc1qyxfw58xn08qydxcmspq4cjjmq63v2wqh29eh2l',
+    SOL: '6oga2odADjQcFdyiyt7fqxP3XERsmj1ZkUAw3wdPqFk'
+  }
+
+  const copyToClipboard = (address) => {
+    console.log('Copying address:', address)
+    navigator.clipboard.writeText(address)
+    setCopiedAddress(true)
+    setTimeout(() => setCopiedAddress(false), 2000)
+  }
+
+  const handleTabClick = (crypto) => {
+    console.log('Tab clicked:', crypto)
+    setSelectedCrypto(crypto)
+  }
+
+  const handleCloseModal = () => {
+    console.log('Close modal clicked')
+    setShowTipModal(false)
+  }
+
   return (
     <motion.div 
       className="contact-container"
@@ -28,7 +58,7 @@ const Contact = () => {
       <div className="contact-content">
         <motion.div className="contact-left" variants={itemUp}>
           <h1 className="contact-title">Let's Build<br/>Something <span className="gradient-text">Amazing</span></h1>
-          <p className="contact-subtitle">Got a project in mind? Whether it's Web3, UI/UX, or full-stack development — I'd love to hear about it.</p>
+          <p className="contact-subtitle">Got a project in mind? Whether it's Web3, UI/UX, or fullstack development I'd love to hear about it.</p>
           
           <div className="contact-info">
             <a href="mailto:matsganz@gmail.com" className="contact-info-item">
@@ -54,6 +84,17 @@ const Contact = () => {
               </svg>
               <span>linkedin.com/in/rahmatekasatria</span>
             </a>
+          </div>
+
+          {/* Crypto Buttons Row */}
+          <div className="crypto-buttons-row">
+            <button className="crypto-tip-btn" onClick={() => setShowTipModal(true)}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              Crypto Tip
+            </button>
+            <ConnectWallet />
           </div>
         </motion.div>
 
@@ -82,6 +123,96 @@ const Contact = () => {
           </form>
         </motion.div>
       </div>
+
+      {/* Crypto Tip Modal */}
+      {showTipModal && (
+        <motion.div 
+          className="tip-modal-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={handleCloseModal}
+        >
+          <motion.div 
+            className="tip-modal-content"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              console.log('Modal content clicked')
+            }}
+          >
+            <button className="tip-modal-close" onClick={handleCloseModal} type="button">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+
+            <h2 className="tip-modal-title">Send a Crypto Tip 💰</h2>
+            <p className="tip-modal-subtitle">Choose your preferred currency</p>
+
+            {/* Crypto Tabs */}
+            <div className="tip-crypto-tabs">
+              {Object.keys(walletAddresses).map((crypto) => (
+                <button
+                  key={crypto}
+                  className={`tip-crypto-tab ${selectedCrypto === crypto ? 'active' : ''}`}
+                  onClick={() => handleTabClick(crypto)}
+                  type="button"
+                >
+                  {crypto}
+                </button>
+              ))}
+            </div>
+
+            {/* Selected Wallet Display */}
+            <div className="tip-wallet-display">
+              <div className="tip-qr-code">
+                <QRCodeSVG 
+                  value={walletAddresses[selectedCrypto]}
+                  size={140}
+                  level="H"
+                  includeMargin={true}
+                  bgColor="#000000"
+                  fgColor="#00d1ff"
+                />
+              </div>
+
+              <div className="tip-address-section">
+                <label className="tip-address-label">Wallet Address</label>
+                <div className="tip-address-box">
+                  <code>{walletAddresses[selectedCrypto]}</code>
+                </div>
+                <button 
+                  className="tip-copy-button"
+                  onClick={() => copyToClipboard(walletAddresses[selectedCrypto])}
+                >
+                  {copiedAddress ? (
+                    <>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      Copy Address
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <p className="tip-modal-footer">Thank you for your support! 🙏</p>
+          </motion.div>
+        </motion.div>
+      )}
     </motion.div>
   )
 }

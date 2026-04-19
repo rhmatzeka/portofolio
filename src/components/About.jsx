@@ -53,8 +53,8 @@ const About = () => {
         <p className="about-bio">
           A budding developer passionate about blockchain and web development.
           Started from scratch, now proficient in modern frameworks.
-          I love late-night coding, futuristic UI/UX, and AI experimentation.
-          My goal is to become a full-stack dev at a major tech company.
+          I love latenight coding, futuristic UI/UX, and AI experimentation.
+          My goal is to become a fullstack dev at a major tech company.
         </p>
 
         <div className="about-stats">

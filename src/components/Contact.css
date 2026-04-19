@@ -6,7 +6,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
 }
 
 .contact-content {
@@ -15,6 +14,7 @@
   width: 100%;
   max-width: 1200px;
   align-items: flex-start;
+  pointer-events: auto;
 }
 
 .contact-left {
@@ -234,5 +234,278 @@
   
   .contact-info-item {
     font-size: 0.9rem;
+  }
+}
+
+
+/* Crypto Buttons Row */
+.crypto-buttons-row {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+/* Crypto Tip Button */
+.crypto-tip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.4rem;
+  background: linear-gradient(135deg, #00d1ff 0%, #0099cc 100%);
+  border: none;
+  border-radius: 50px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 20px rgba(0, 209, 255, 0.3);
+  font-family: inherit;
+}
+
+.crypto-tip-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 209, 255, 0.4);
+}
+
+/* Tip Modal */
+.tip-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  pointer-events: auto;
+}
+
+.tip-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  max-height: 80vh;
+  background: rgba(20, 20, 20, 0.98);
+  border: 1px solid rgba(0, 209, 255, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 25px 50px rgba(0, 209, 255, 0.2);
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+.tip-modal-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+.tip-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+.tip-modal-close svg {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.tip-modal-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.3rem 0;
+  text-align: center;
+  padding-right: 2rem;
+}
+
+.tip-modal-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  margin: 0 0 1.2rem 0;
+  font-size: 0.85rem;
+}
+
+/* Crypto Tabs */
+.tip-crypto-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.4rem;
+  border-radius: 10px;
+  pointer-events: auto;
+}
+
+.tip-crypto-tab {
+  flex: 1;
+  padding: 0.7rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.tip-crypto-tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tip-crypto-tab.active {
+  background: rgba(0, 209, 255, 0.2);
+  color: #00d1ff;
+}
+
+/* Wallet Display */
+.tip-wallet-display {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.tip-qr-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(0, 209, 255, 0.05);
+  border: 2px solid rgba(0, 209, 255, 0.3);
+  border-radius: 12px;
+}
+
+.tip-qr-code svg {
+  border-radius: 8px;
+}
+
+.tip-address-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.tip-address-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tip-address-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.9rem;
+  overflow-x: auto;
+}
+
+.tip-address-box code {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8rem;
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+}
+
+.tip-copy-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.9rem;
+  background: linear-gradient(135deg, #00d1ff 0%, #0099cc 100%);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tip-copy-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 209, 255, 0.4);
+}
+
+.tip-modal-footer {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  margin-top: 1.2rem;
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .crypto-tip-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.95rem;
+    padding: 0.9rem 1.8rem;
+  }
+
+  .tip-modal-overlay {
+    padding: 1rem;
+  }
+
+  .tip-modal-content {
+    padding: 1.5rem;
+    max-width: 95%;
+  }
+
+  .tip-modal-title {
+    font-size: 1.3rem;
+  }
+
+  .tip-crypto-tab {
+    font-size: 0.85rem;
+    padding: 0.6rem;
+  }
+
+  .tip-qr-code {
+    padding: 1rem;
+  }
+
+  .tip-qr-code svg {
+    width: 120px !important;
+    height: 120px !important;
+  }
+
+  .tip-address-box code {
+    font-size: 0.7rem;
+  }
+
+  .tip-copy-button {
+    font-size: 0.9rem;
+    padding: 0.8rem;
   }
 }
