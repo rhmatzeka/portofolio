@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import Hero from './components/Hero'
 import Navbar from './components/Navbar'
 import Loading from './components/Loading'
-import muImage from './assets/images/MU.jpg'
 import './App.css'
 
 // Lazy load components that are below the fold
@@ -14,9 +13,7 @@ const Footer = lazy(() => import('./components/Footer'))
 function App() {
   const [pageLoading, setPageLoading] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [showMuImage, setShowMuImage] = useState(false)
   const [showSpline, setShowSpline] = useState(false)
-  const muHideTimer = useRef(null)
 
   useEffect(() => {
     // Simulate initial page load
@@ -74,16 +71,6 @@ function App() {
       if (rafId) return
       rafId = window.requestAnimationFrame(() => {
         setIsScrolled(window.scrollY > 80)
-        setShowMuImage(true)
-
-        if (muHideTimer.current) {
-          clearTimeout(muHideTimer.current)
-        }
-
-        muHideTimer.current = setTimeout(() => {
-          setShowMuImage(false)
-        }, 1050)
-
         rafId = null
       })
     }
@@ -94,21 +81,12 @@ function App() {
     return () => {
       window.removeEventListener('scroll', handleScroll)
       if (rafId) cancelAnimationFrame(rafId)
-      if (muHideTimer.current) clearTimeout(muHideTimer.current)
     }
   }, [])
 
   return (
     <div className="app">
       {pageLoading && <Loading />}
-      <img
-        src={muImage}
-        alt="MU"
-        className={`mu-scroll-image ${showMuImage ? 'is-visible' : ''}`}
-        aria-hidden="true"
-        loading="lazy"
-        decoding="async"
-      />
       
       <Navbar isScrolled={isScrolled} />
       

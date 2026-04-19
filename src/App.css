@@ -10,30 +10,6 @@
   overflow-x: hidden;
 }
 
-.mu-scroll-image {
-  position: fixed;
-  left: 0;
-  bottom: clamp(1rem, 4vw, 3rem);
-  z-index: 80;
-  width: clamp(260px, 38vw, 560px);
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 28px;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.5), 0 0 34px rgba(218, 41, 28, 0.28);
-  filter: saturate(1.08) contrast(1.05);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(calc(-100% - 4rem)) rotate(-8deg) scale(0.94);
-  transition: opacity 90ms ease, transform 950ms cubic-bezier(0.15, 0.85, 0.25, 1);
-  will-change: transform, opacity;
-}
-
-.mu-scroll-image.is-visible {
-  opacity: 1;
-  transform: translateX(calc(100vw + 4rem)) rotate(5deg) scale(1);
-}
-
 .full-section {
   width: 100%;
   min-height: 100svh;
@@ -142,13 +118,6 @@
     padding: 4.5rem 1rem 2.25rem;
   }
 
-  .mu-scroll-image {
-    width: 240px;
-    left: 0;
-    bottom: 1rem;
-    border-radius: 20px;
-  }
-  
   .hero-section .spline-iframe {
     display: block;
     transform: scale(1.08) translateZ(0);
@@ -182,12 +151,6 @@
   to {
     opacity: 1;
     transform: scale(1.08) translateY(0) translateZ(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mu-scroll-image {
-    display: none;
   }
 }
 
