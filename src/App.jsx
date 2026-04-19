@@ -1,7 +1,8 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import Hero from './components/Hero'
 import Navbar from './components/Navbar'
 import Loading from './components/Loading'
+import muImage from './assets/images/MU.jpg'
 import './App.css'
 
 // Lazy load components that are below the fold
@@ -13,14 +14,57 @@ const Footer = lazy(() => import('./components/Footer'))
 function App() {
   const [pageLoading, setPageLoading] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [showMuImage, setShowMuImage] = useState(false)
+  const [showSpline, setShowSpline] = useState(false)
+  const muHideTimer = useRef(null)
 
   useEffect(() => {
     // Simulate initial page load
     const timer = setTimeout(() => {
       setPageLoading(false)
-    }, 2000)
+    }, 700)
 
     return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const desktop = window.matchMedia('(min-width: 769px)')
+
+    const scheduleSpline = () => {
+      setShowSpline(false)
+
+      if (reducedMotion.matches) return undefined
+
+      const load = () => setShowSpline(true)
+      const timeout = desktop.matches ? 1200 : 800
+      const idleId = 'requestIdleCallback' in window
+        ? window.requestIdleCallback(load, { timeout })
+        : window.setTimeout(load, timeout)
+
+      return () => {
+        if ('cancelIdleCallback' in window) {
+          window.cancelIdleCallback(idleId)
+        } else {
+          window.clearTimeout(idleId)
+        }
+      }
+    }
+
+    let cancelLoad = scheduleSpline()
+    const handleChange = () => {
+      if (cancelLoad) cancelLoad()
+      cancelLoad = scheduleSpline()
+    }
+
+    desktop.addEventListener('change', handleChange)
+    reducedMotion.addEventListener('change', handleChange)
+
+    return () => {
+      if (cancelLoad) cancelLoad()
+      desktop.removeEventListener('change', handleChange)
+      reducedMotion.removeEventListener('change', handleChange)
+    }
   }, [])
 
   useEffect(() => {
@@ -30,6 +74,16 @@ function App() {
       if (rafId) return
       rafId = window.requestAnimationFrame(() => {
         setIsScrolled(window.scrollY > 80)
+        setShowMuImage(true)
+
+        if (muHideTimer.current) {
+          clearTimeout(muHideTimer.current)
+        }
+
+        muHideTimer.current = setTimeout(() => {
+          setShowMuImage(false)
+        }, 1050)
+
         rafId = null
       })
     }
@@ -40,25 +94,36 @@ function App() {
     return () => {
       window.removeEventListener('scroll', handleScroll)
       if (rafId) cancelAnimationFrame(rafId)
+      if (muHideTimer.current) clearTimeout(muHideTimer.current)
     }
   }, [])
 
   return (
     <div className="app">
       {pageLoading && <Loading />}
+      <img
+        src={muImage}
+        alt="MU"
+        className={`mu-scroll-image ${showMuImage ? 'is-visible' : ''}`}
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+      />
       
       <Navbar isScrolled={isScrolled} />
       
       <div className="page-container">
         <section id="home" className="full-section hero-section">
-          <iframe 
-            src='https://my.spline.design/boxeshover-Lw87Wz6KymIMZ7hVhu7wmUyQ/' 
-            frameBorder='0' 
-            className="spline-iframe"
-            allow="fullscreen"
-            loading="lazy"
-            title="3D Background Animation"
-          />
+          {showSpline && (
+            <iframe
+              src="https://my.spline.design/boxeshover-Lw87Wz6KymIMZ7hVhu7wmUyQ/"
+              frameBorder="0"
+              className="spline-iframe"
+              allow="fullscreen"
+              loading="lazy"
+              title="3D Background Animation"
+            />
+          )}
           <div className="section-content">
             <Hero />
           </div>

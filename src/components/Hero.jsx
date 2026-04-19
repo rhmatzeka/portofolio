@@ -46,7 +46,7 @@ const Hero = memo(() => {
 
       <div className="hero-right">
         <motion.div variants={itemRight} className="hero-actions">
-          <a href="#cases" className="btn-ghost">View Projects</a>
+          <a href="#projects" className="btn-ghost">View Projects</a>
           <a href="#contact" className="btn-glow">
             Let's Talk
             <span className="plus-circle">

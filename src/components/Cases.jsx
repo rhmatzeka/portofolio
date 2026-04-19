@@ -1,35 +1,74 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, memo } from 'react'
 import { createPortal } from 'react-dom'
+import nationchainImage from '../assets/images/nationchain-preview.jpg'
+import walletEthereumImage from '../assets/images/WalletEthereum.jpeg'
+import simRestoImage from '../assets/images/arjiresto-preview.jpg'
+import banbukStoreImage from '../assets/images/banbukstore-preview.jpg'
 import './Cases.css'
 
 const containerVariants = {
   initial: { opacity: 0 },
   in: { 
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.1 }
+    transition: { staggerChildren: 0.14, delayChildren: 0.12 }
   },
   out: { opacity: 0, transition: { duration: 0.3 } }
 }
 
 const itemUp = {
-  initial: { opacity: 0, y: 30 },
-  in: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  initial: { opacity: 0, y: 44, scale: 0.96, filter: 'blur(8px)' },
+  in: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: 'blur(0px)',
+    transition: { duration: 0.72, ease: [0.16, 1, 0.3, 1] }
+  }
 }
 
 const modalVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
+  hidden: { opacity: 0, scale: 0.92, y: 24, filter: 'blur(8px)' },
   visible: { 
     opacity: 1, 
     scale: 1,
-    transition: { duration: 0.3, ease: "easeOut" }
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.36, ease: [0.16, 1, 0.3, 1] }
   },
   exit: { 
     opacity: 0, 
-    scale: 0.8,
+    scale: 0.96,
+    y: 16,
+    filter: 'blur(6px)',
     transition: { duration: 0.2 }
   }
 }
+
+const stackIcons = {
+  CSS: 'https://cdn.simpleicons.org/css/663399',
+  Ethers: 'https://cdn.simpleicons.org/ethereum/627EEA',
+  'Ethers.js': 'https://cdn.simpleicons.org/ethereum/627EEA',
+  JavaScript: 'https://cdn.simpleicons.org/javascript/F7DF1E',
+  MySQL: 'https://cdn.simpleicons.org/mysql/4479A1',
+  PHP: 'https://cdn.simpleicons.org/php/777BB4',
+  React: 'https://cdn.simpleicons.org/react/61DAFB',
+  'React Native': 'https://cdn.simpleicons.org/react/61DAFB',
+  Solidity: 'https://cdn.simpleicons.org/solidity/FFFFFF',
+  TypeScript: 'https://cdn.simpleicons.org/typescript/3178C6',
+  'Web3.js': 'https://cdn.simpleicons.org/web3dotjs/F16822'
+}
+
+const StackBadge = ({ tech, className = '' }) => (
+  <span className={`stack-badge ${className}`}>
+    {stackIcons[tech] && (
+      <span className="stack-badge-icon">
+        <img src={stackIcons[tech]} alt="" loading="lazy" />
+      </span>
+    )}
+    {tech}
+  </span>
+)
 
 const projects = [
   { 
@@ -39,7 +78,8 @@ const projects = [
     desc: 'A decentralized blockchain platform for national identity and governance systems with secure smart contracts.',
     fullDesc: 'NationChain is a comprehensive blockchain solution designed for national-level identity management and governance. Built with Solidity smart contracts, it provides secure, transparent, and immutable record-keeping for government services. The platform features decentralized identity verification, voting systems, and document management with end-to-end encryption.',
     stack: ['Solidity', 'Web3.js', 'React'],
-    image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80',
+    image: nationchainImage,
+    imageVariant: 'desktop-shot',
     github: 'https://github.com/rhmatzeka/nationchain',
     demo: '#'
   },
@@ -50,29 +90,32 @@ const projects = [
     desc: 'Mobile cryptocurrency wallet app for Ethereum with secure transaction management and multi-chain support.',
     fullDesc: 'A feature-rich mobile wallet application built with React Native for managing Ethereum and ERC-20 tokens. Includes biometric authentication, QR code scanning, transaction history, real-time price tracking, and support for multiple networks including mainnet and testnets. Implements secure key storage using device encryption.',
     stack: ['React Native', 'Ethers.js', 'TypeScript'],
-    image: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&q=80',
+    image: walletEthereumImage,
+    imageVariant: 'phone-shot',
     github: 'https://github.com/rhmatzeka/MobileAppsWalletEthereum',
     demo: '#'
   },
   { 
     id: 3, 
-    title: 'KPBanbuk Store', 
-    tech: 'FULLSTACK \\ ECOMMERCE', 
-    desc: 'Modern e-commerce platform with inventory management, payment gateway integration, and admin dashboard.',
-    fullDesc: 'Full-stack e-commerce solution built with Next.js and Node.js. Features include product catalog with search and filters, shopping cart, secure checkout with multiple payment options, order tracking, inventory management, and comprehensive admin dashboard with analytics. Optimized for SEO and performance.',
-    stack: ['Next.js', 'Node.js', 'PostgreSQL'],
-    image: 'https://images.unsplash.com/photo-1557821552-17105176677c?w=800&q=80',
-    github: 'https://github.com/rhmatzeka/KPBanbukStore',
+    title: 'Arji Resto', 
+    tech: 'WEB \\ RESTAURANT', 
+    desc: 'Restaurant website with menu browsing, location info, contact flow, and reservation-focused landing experience.',
+    fullDesc: 'Arji Resto is a modern restaurant website designed to showcase food and beverage offerings with a clean landing page, menu navigation, location details, contact access, and reservation entry points. The interface focuses on strong food visuals, simple navigation, and a polished customer-facing experience.',
+    stack: ['React', 'CSS', 'JavaScript'],
+    image: simRestoImage,
+    imageVariant: 'desktop-shot',
+    github: 'https://github.com/rhmatzeka/SIMResto.git',
     demo: '#'
   },
   { 
     id: 4, 
-    title: 'CVBanbuk Store', 
-    tech: 'WEB \\ ECOMMERCE', 
-    desc: 'Company profile and online store for CVBanbuk with product catalog and order management system.',
-    fullDesc: 'Corporate website and e-commerce platform for CVBanbuk company. Combines company profile, product showcase, and online ordering system. Built with React frontend and PHP backend with MySQL database. Features responsive design, product categories, customer reviews, and admin panel for content management.',
+    title: 'Banbuk Store', 
+    tech: 'WEB \\ CATALOG', 
+    desc: 'Product catalog platform for CV Banbuk Mandiri Jaya with inquiry and payment-ready customer flow.',
+    fullDesc: 'Banbuk Store is a company profile and product catalog platform for CV Banbuk Mandiri Jaya. It presents the business with a polished landing page, catalog browsing flow, inquiry entry points, and payment-ready interactions for a professional customer experience.',
     stack: ['React', 'MySQL', 'PHP'],
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+    image: banbukStoreImage,
+    imageVariant: 'desktop-shot',
     github: 'https://github.com/rhmatzeka/CVBanbukStore',
     demo: '#'
   }
@@ -84,10 +127,19 @@ const ProjectCard = memo(({ project, onClick }) => (
     variants={itemUp}
     onClick={onClick}
   >
-    <div className="case-image">
+    <div className={`case-image ${project.imageVariant || ''}`}>
+      <img
+        src={project.image}
+        alt=""
+        className="case-image-backdrop"
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+      />
       <img 
         src={project.image} 
         alt={project.title}
+        className="case-image-main"
         loading="lazy"
         decoding="async"
       />
@@ -104,7 +156,7 @@ const ProjectCard = memo(({ project, onClick }) => (
       
       <div className="case-stack">
         {project.stack.map((tech, idx) => (
-          <span key={idx} className="stack-badge">{tech}</span>
+          <StackBadge key={idx} tech={tech} />
         ))}
       </div>
       
@@ -158,8 +210,7 @@ const Cases = () => {
         className="cases-container"
         variants={containerVariants}
         initial="initial"
-        whileInView="in"
-        viewport={{ once: true, amount: 0.3 }}
+        animate="in"
         exit="out"
       >
         <div className="cases-header">
@@ -210,10 +261,19 @@ const Cases = () => {
                 </svg>
               </button>
 
-              <div className="modal-image">
+              <div className={`modal-image ${selectedProject.imageVariant || ''}`}>
+                <img
+                  src={selectedProject.image}
+                  alt=""
+                  className="modal-image-backdrop"
+                  aria-hidden="true"
+                  loading="eager"
+                  decoding="async"
+                />
                 <img 
                   src={selectedProject.image} 
                   alt={selectedProject.title}
+                  className="modal-image-main"
                   loading="eager"
                   decoding="async"
                 />
@@ -228,7 +288,7 @@ const Cases = () => {
                   <h3>Tech Stack</h3>
                   <div className="modal-stack-tags">
                     {selectedProject.stack.map((tech, idx) => (
-                      <span key={idx} className="modal-stack-badge">{tech}</span>
+                      <StackBadge key={idx} tech={tech} className="modal-stack-badge" />
                     ))}
                   </div>
                 </div>

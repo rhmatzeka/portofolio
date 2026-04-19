@@ -82,7 +82,7 @@
   border-radius: 20px;
   padding: 2.5rem;
   pointer-events: auto;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
 }
 
 .contact-form {
@@ -277,8 +277,8 @@
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 10000;
   display: flex;
   align-items: center;
@@ -507,5 +507,28 @@
   .tip-copy-button {
     font-size: 0.9rem;
     padding: 0.8rem;
+  }
+}
+
+@media (hover: none) {
+  .contact-info-item:hover,
+  .form-button:hover,
+  .crypto-tip-btn:hover,
+  .tip-copy-button:hover,
+  .tip-modal-close:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-info-item,
+  .form-input,
+  .form-textarea,
+  .form-button,
+  .crypto-tip-btn,
+  .tip-copy-button,
+  .tip-modal-close,
+  .tip-crypto-tab {
+    transition: none;
   }
 }

@@ -48,6 +48,7 @@
   gap: 2.5rem;
   margin: 0;
   padding: 0;
+  min-width: 0;
 }
 
 .navbar.scrolled .nav-links {
@@ -93,6 +94,12 @@
   .navbar.fixed-nav {
     padding: 1rem 1.2rem;
     gap: 0.8rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .navbar.fixed-nav::-webkit-scrollbar {
+    display: none;
   }
 
   .navbar.fixed-nav.scrolled {
@@ -103,6 +110,9 @@
 
   .nav-links {
     gap: 0.9rem;
+    flex: 1;
+    justify-content: center;
+    min-width: max-content;
   }
 
   .navbar.scrolled .nav-links {
@@ -111,6 +121,11 @@
 
   .nav-link {
     font-size: 0.8rem;
+  }
+
+  .nav-right {
+    transform: scale(0.92);
+    transform-origin: right center;
   }
 }
 
@@ -137,5 +152,9 @@
 
   .nav-link {
     font-size: 0.75rem;
+  }
+
+  .nav-right {
+    transform: scale(0.84);
   }
 }

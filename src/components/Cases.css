@@ -7,7 +7,6 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  contain: layout style paint;
 }
 
 .cases-header {
@@ -31,10 +30,11 @@
 
 .cases-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 1.2rem;
   width: 100%;
   max-width: 1400px;
+  align-items: stretch;
 }
 
 .case-card {
@@ -48,7 +48,6 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  will-change: transform;
   contain: layout style paint;
 }
 
@@ -77,20 +76,71 @@
 .case-image {
   position: relative;
   width: 100%;
-  height: 140px;
+  height: 170px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 209, 255, 0.18), transparent 34%),
+    linear-gradient(135deg, rgba(10, 18, 22, 0.98), rgba(3, 6, 9, 0.98));
+  padding: 0.75rem;
 }
 
 .case-image img {
+  display: block;
+}
+
+.case-image-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+  filter: blur(10px) saturate(1.08);
+  transform: scale(1.12);
+}
+
+.case-image-main {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
-  will-change: transform;
 }
 
-.case-card:hover .case-image img {
-  transform: scale(1.1);
+.case-image.desktop-shot .case-image-main {
+  height: auto;
+  max-height: 86%;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.case-image.phone-shot {
+  background:
+    radial-gradient(circle at 50% 14%, rgba(255, 55, 95, 0.24), transparent 28%),
+    linear-gradient(135deg, #111326, #080912);
+}
+
+.case-image.phone-shot .case-image-main {
+  width: auto;
+  max-width: 46%;
+  max-height: 94%;
+  object-fit: contain;
+  border-radius: 18px;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.case-card:hover .case-image-main {
+  will-change: transform;
+  transform: scale(1.05);
+}
+
+.case-card:hover .case-image.phone-shot .case-image-main {
+  transform: scale(1.04) translateY(-3px);
 }
 
 .case-overlay {
@@ -156,13 +206,37 @@
 }
 
 .stack-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 28px;
   background: rgba(0, 209, 255, 0.1);
-  border: 1px solid rgba(0, 209, 255, 0.2);
+  border: 1px solid rgba(0, 209, 255, 0.24);
   color: rgba(255, 255, 255, 0.8);
-  padding: 0.25rem 0.7rem;
+  padding: 0.25rem 0.7rem 0.25rem 0.35rem;
   border-radius: 50px;
   font-size: 0.7rem;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.stack-badge-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+
+.stack-badge-icon img {
+  width: 13px;
+  height: 13px;
+  display: block;
+  object-fit: contain;
 }
 
 /* Links */
@@ -260,17 +334,18 @@
     font-size: 1rem;
   }
   
-  .cases-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.2rem;
-  }
-  
   .case-image {
-    height: 160px;
+    height: 180px;
   }
 }
 
 @media (max-width: 768px) {
+  .cases-container,
+  .case-card {
+    opacity: 1;
+    visibility: visible;
+  }
+
   .section-title {
     font-size: 2.5rem;
   }
@@ -284,12 +359,28 @@
   }
   
   .cases-grid {
-    grid-template-columns: 1fr;
     gap: 1rem;
   }
   
   .case-image {
-    height: 160px;
+    aspect-ratio: 16 / 9;
+    height: 210px;
+    padding: 0;
+  }
+
+  .case-image.desktop-shot .case-image-main {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+    object-fit: cover;
+    box-shadow: none;
+  }
+
+  .case-image.phone-shot .case-image-main {
+    max-width: 36%;
+    border-radius: 18px;
+    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(255, 255, 255, 0.14);
   }
   
   .case-card h3 {
@@ -311,7 +402,7 @@
   }
   
   .case-card-content {
-    padding: 1.2rem;
+    padding: 1rem;
   }
   
   .case-card h3 {
@@ -327,12 +418,28 @@
   }
   
   .case-image {
-    height: 160px;
+    height: 190px;
+  }
+
+  .case-image.phone-shot .case-image-main {
+    max-width: 46%;
   }
   
   .stack-badge {
     font-size: 0.65rem;
-    padding: 0.2rem 0.6rem;
+    min-height: 26px;
+    padding: 0.2rem 0.55rem 0.2rem 0.3rem;
+  }
+
+  .stack-badge-icon {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+  }
+
+  .stack-badge-icon img {
+    width: 12px;
+    height: 12px;
   }
   
   .case-link-btn {
@@ -354,8 +461,8 @@
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -383,13 +490,56 @@
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 209, 255, 0.18), transparent 34%),
+    linear-gradient(135deg, rgba(10, 18, 22, 0.98), rgba(3, 6, 9, 0.98));
 }
 
 .modal-image img {
+  display: block;
+}
+
+.modal-image-backdrop {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
+  opacity: 0.18;
+  filter: blur(10px) saturate(1.05);
+  transform: scale(1.1);
+}
+
+.modal-image-main {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 24px 46px rgba(0, 0, 0, 0.44), 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.modal-image.desktop-shot .modal-image-main {
+  height: auto;
+  object-fit: contain;
+}
+
+.modal-image.phone-shot {
+  background:
+    radial-gradient(circle at 50% 16%, rgba(255, 55, 95, 0.24), transparent 30%),
+    linear-gradient(135deg, #111326, #080912);
+}
+
+.modal-image.phone-shot .modal-image-main {
+  width: auto;
+  max-width: 78%;
+  object-fit: contain;
+  border-radius: 24px;
 }
 
 .modal-image::after {
@@ -479,13 +629,20 @@
 }
 
 .modal-stack-badge {
-  background: rgba(0, 209, 255, 0.08);
-  border: 1px solid rgba(0, 209, 255, 0.2);
-  color: rgba(255, 255, 255, 0.8);
-  padding: 0.3rem 0.9rem;
-  border-radius: 50px;
+  min-height: 32px;
+  padding: 0.3rem 0.9rem 0.3rem 0.4rem;
   font-size: 0.8rem;
-  font-weight: 500;
+}
+
+.modal-stack-badge .stack-badge-icon {
+  width: 22px;
+  height: 22px;
+  flex-basis: 22px;
+}
+
+.modal-stack-badge .stack-badge-icon img {
+  width: 14px;
+  height: 14px;
 }
 
 .modal-actions {
@@ -558,6 +715,24 @@
   .modal-image {
     width: 100%;
     height: 200px;
+    padding: 0;
+  }
+
+  .modal-image.desktop-shot .modal-image-main {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    object-fit: cover;
+    box-shadow: none;
+  }
+
+  .modal-image.phone-shot {
+    height: 260px;
+    padding: 1rem;
+  }
+
+  .modal-image.phone-shot .modal-image-main {
+    max-width: 46%;
   }
   
   .modal-body {
@@ -572,6 +747,11 @@
   .modal-actions {
     flex-direction: row;
   }
+
+  .case-image-backdrop,
+  .modal-image-backdrop {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -581,6 +761,14 @@
 
   .modal-image {
     height: 160px;
+  }
+
+  .modal-image.phone-shot {
+    height: 240px;
+  }
+
+  .modal-image.phone-shot .modal-image-main {
+    max-width: 54%;
   }
   
   .modal-body {
@@ -598,5 +786,37 @@
   .modal-actions {
     flex-direction: column;
     gap: 0.5rem;
+  }
+}
+
+@media (hover: none) {
+  .case-card:hover,
+  .case-link-btn:hover,
+  .view-all-btn:hover,
+  .modal-btn:hover {
+    transform: none;
+  }
+
+  .case-card:hover .case-image-main,
+  .case-card:hover .case-image.phone-shot .case-image-main {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-card,
+  .case-card::before,
+  .case-image-main,
+  .case-link-btn,
+  .view-all-btn,
+  .modal-btn,
+  .modal-close {
+    transition: none;
+  }
+}
+
+@supports not (filter: blur(1px)) {
+  .case-card {
+    filter: none !important;
   }
 }
