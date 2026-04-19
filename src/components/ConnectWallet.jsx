@@ -5,19 +5,36 @@ import './ConnectWallet.css'
 
 const RECIPIENT_ADDRESS = '0x8988140cEF5A825f39929c60c97173ec5a2eF27D'
 
+const isMobileDevice = () => {
+  if (typeof navigator === 'undefined') return false
+  return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
+const getMetaMaskDeepLink = () => {
+  const dappUrl = `${window.location.host}${window.location.pathname}${window.location.search}${window.location.hash}`
+  return `https://metamask.app.link/dapp/${dappUrl}`
+}
+
 const ConnectWallet = ({ compact = false }) => {
   const [walletAddress, setWalletAddress] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [amount, setAmount] = useState('0.001')
   const [status, setStatus] = useState(null)
   const [txHash, setTxHash] = useState(null)
+  const shouldOpenMetaMaskMobile = typeof window !== 'undefined' && isMobileDevice() && !window.ethereum
 
   const connectWallet = async () => {
     if (!window.ethereum) {
+      if (isMobileDevice()) {
+        window.location.href = getMetaMaskDeepLink()
+        return
+      }
+
       alert('MetaMask not found! Please install MetaMask first.')
-      window.open('https://metamask.io/download/', '_blank')
+      window.open('https://metamask.io/download/', '_blank', 'noopener,noreferrer')
       return
     }
+
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
       setWalletAddress(accounts[0])
@@ -59,7 +76,7 @@ const ConnectWallet = ({ compact = false }) => {
       {/* Connect / Connected Button */}
       {!walletAddress ? (
         <button className={`connect-wallet-btn ${compact ? 'compact' : ''}`} onClick={connectWallet}>
-          {compact ? 'Donate' : 'Connect Wallet to Donate'}
+          {shouldOpenMetaMaskMobile ? 'Open MetaMask' : compact ? 'Donate' : 'Connect Wallet to Donate'}
         </button>
       ) : (
         <div className="wallet-connected-row">
