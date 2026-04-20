@@ -63,7 +63,6 @@
   }
 }
 
-#about,
 #projects,
 #contact {
   content-visibility: auto;
@@ -155,7 +154,6 @@
 }
 
 @media (max-width: 768px) {
-  #about,
   #projects,
   #contact {
     content-visibility: visible;

@@ -30,19 +30,16 @@ const Contact = () => {
   }
 
   const copyToClipboard = (address) => {
-    console.log('Copying address:', address)
     navigator.clipboard.writeText(address)
     setCopiedAddress(true)
     setTimeout(() => setCopiedAddress(false), 2000)
   }
 
   const handleTabClick = (crypto) => {
-    console.log('Tab clicked:', crypto)
     setSelectedCrypto(crypto)
   }
 
   const handleCloseModal = () => {
-    console.log('Close modal clicked')
     setShowTipModal(false)
   }
 
@@ -140,7 +137,6 @@ const Contact = () => {
             exit={{ scale: 0.8, opacity: 0 }}
             onClick={(e) => {
               e.stopPropagation()
-              console.log('Modal content clicked')
             }}
           >
             <button className="tip-modal-close" onClick={handleCloseModal} type="button">

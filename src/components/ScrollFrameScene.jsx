@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './ScrollFrameScene.css'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const frameModules = import.meta.glob('../assets/kiluaanimated/*.jpg', {
   eager: true,
@@ -10,9 +13,8 @@ const frameModules = import.meta.glob('../assets/kiluaanimated/*.jpg', {
 
 const ScrollFrameScene = () => {
   const sectionRef = useRef(null)
-  const rafRef = useRef(null)
-  const progressRef = useRef(0)
-  const lastScrollYRef = useRef(typeof window === 'undefined' ? 0 : window.scrollY)
+  const imageRef = useRef(null)
+  const lastFrameRef = useRef(-1)
   const [frameIndex, setFrameIndex] = useState(0)
   const [isReady, setIsReady] = useState(false)
 
@@ -33,87 +35,48 @@ const ScrollFrameScene = () => {
 
   useEffect(() => {
     if (!frames.length) return undefined
+    if (!sectionRef.current || !imageRef.current) return undefined
 
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-
-    const updateFrame = () => {
-      rafRef.current = null
-      if (!sectionRef.current) return
-
-      if (reducedMotion.matches) {
-        setFrameIndex(Math.floor(frames.length / 2))
-        return
-      }
-
-      const rect = sectionRef.current.getBoundingClientRect()
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight
-      const visibleHeight = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0)
-      const visibleRatio = Math.max(visibleHeight, 0) / Math.min(rect.height, viewportHeight)
-      const currentScrollY = window.scrollY
-      const scrollDelta = currentScrollY - lastScrollYRef.current
-
-      lastScrollYRef.current = currentScrollY
-
-      if (rect.top > viewportHeight * 0.55) {
-        progressRef.current = 0
-      } else if (rect.bottom < viewportHeight * 0.45) {
-        progressRef.current = frames.length - 1
-      } else if (visibleRatio >= 0.5 && scrollDelta !== 0) {
-        progressRef.current = Math.min(
-          Math.max(progressRef.current + (scrollDelta / 18), 0),
-          frames.length - 1
-        )
-      }
-
-      const nextFrame = Math.round(progressRef.current)
-
-      setFrameIndex((currentFrame) => (
-        currentFrame === nextFrame ? currentFrame : nextFrame
-      ))
-    }
-
-    const requestUpdate = () => {
-      if (rafRef.current) return
-      rafRef.current = window.requestAnimationFrame(updateFrame)
-    }
-
-    requestUpdate()
-    window.addEventListener('scroll', requestUpdate, { passive: true })
-    window.addEventListener('resize', requestUpdate)
-
-    const handleMotionChange = () => {
-      if (reducedMotion.matches) {
-        setFrameIndex(Math.floor(frames.length / 2))
-      } else {
-        requestUpdate()
+    const updateFrame = (progress) => {
+      const nextFrame = Math.round(progress * (frames.length - 1))
+      if (lastFrameRef.current !== nextFrame) {
+        lastFrameRef.current = nextFrame
+        imageRef.current.src = frames[nextFrame]
+        setFrameIndex(nextFrame)
       }
     }
 
-    reducedMotion.addEventListener('change', handleMotionChange)
+    updateFrame(0)
+
+    const trigger = ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: 'top 50%',
+      end: 'bottom 35%',
+      scrub: 0.16,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => updateFrame(self.progress),
+      onRefresh: (self) => updateFrame(self.progress)
+    })
+
+    ScrollTrigger.refresh()
 
     return () => {
-      window.removeEventListener('scroll', requestUpdate)
-      window.removeEventListener('resize', requestUpdate)
-      reducedMotion.removeEventListener('change', handleMotionChange)
-      if (rafRef.current) window.cancelAnimationFrame(rafRef.current)
+      trigger.kill()
     }
   }, [frames])
 
   if (!frames.length) return null
 
   return (
-    <motion.div
+    <div
       ref={sectionRef}
       className="scroll-frame-section"
-      initial={{ opacity: 0, y: 34 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: 0.7, ease: 'easeOut' }}
       aria-hidden="true"
     >
       <div className="scroll-frame-scene">
         <div className="scroll-frame-orbit" />
         <img
+          ref={imageRef}
           src={frames[frameIndex]}
           alt=""
           className={`scroll-frame-image ${isReady ? 'is-ready' : ''}`}
@@ -121,7 +84,7 @@ const ScrollFrameScene = () => {
           draggable="false"
         />
       </div>
-    </motion.div>
+    </div>
   )
 }
 

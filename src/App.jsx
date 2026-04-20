@@ -16,10 +16,9 @@ function App() {
   const [showSpline, setShowSpline] = useState(false)
 
   useEffect(() => {
-    // Simulate initial page load
     const timer = setTimeout(() => {
       setPageLoading(false)
-    }, 700)
+    }, 320)
 
     return () => clearTimeout(timer)
   }, [])
