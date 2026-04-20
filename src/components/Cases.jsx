@@ -14,13 +14,12 @@ const containerVariants = {
 }
 
 const itemUp = {
-  initial: { opacity: 0, y: 44, scale: 0.96, filter: 'blur(8px)' },
+  initial: { opacity: 0, y: 34, scale: 0.97 },
   in: {
     opacity: 1,
     y: 0,
     scale: 1,
-    filter: 'blur(0px)',
-    transition: { duration: 0.72, ease: [0.16, 1, 0.3, 1] }
+    transition: { duration: 0.62, ease: [0.16, 1, 0.3, 1] }
   }
 }
 

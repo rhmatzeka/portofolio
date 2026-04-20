@@ -14,19 +14,94 @@ const containerVariants = {
 }
 
 const itemUp = {
-  initial: { opacity: 0, y: 30 },
-  in: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  initial: { opacity: 0, y: 28, scale: 0.98 },
+  in: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.62, ease: [0.16, 1, 0.3, 1] } }
 }
 
 const Contact = () => {
   const [showTipModal, setShowTipModal] = useState(false)
   const [selectedCrypto, setSelectedCrypto] = useState('ETH')
   const [copiedAddress, setCopiedAddress] = useState(false)
+  const [formValues, setFormValues] = useState({
+    name: '',
+    email: '',
+    message: '',
+    website: ''
+  })
+  const [formStatus, setFormStatus] = useState({ type: '', message: '' })
+  const [isSending, setIsSending] = useState(false)
 
   const walletAddresses = {
     ETH: '0x8988140cEF5A825f39929c60c97173ec5a2eF27D',
     BTC: 'bc1qyxfw58xn08qydxcmspq4cjjmq63v2wqh29eh2l',
     SOL: '6oga2odADjQcFdyiyt7fqxP3XERsmj1ZkUAw3wdPqFk'
+  }
+
+  const handleFormChange = (event) => {
+    const { name, value } = event.target
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      [name]: value
+    }))
+
+    if (formStatus.type === 'error') {
+      setFormStatus({ type: '', message: '' })
+    }
+  }
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault()
+    if (isSending) return
+
+    const name = formValues.name.trim()
+    const email = formValues.email.trim()
+    const message = formValues.message.trim()
+    const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+
+    if (!name || !email || !message) {
+      setFormStatus({ type: 'error', message: 'Please fill in all fields first.' })
+      return
+    }
+
+    if (!emailIsValid) {
+      setFormStatus({ type: 'error', message: 'Please enter a valid email address.' })
+      return
+    }
+
+    setIsSending(true)
+    setFormStatus({ type: '', message: '' })
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          website: formValues.website
+        })
+      })
+
+      const data = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to send message.')
+      }
+
+      setFormStatus({
+        type: 'success',
+        message: 'Message sent. I will reply as soon as possible.'
+      })
+      setFormValues({ name: '', email: '', message: '', website: '' })
+    } catch {
+      setFormStatus({
+        type: 'error',
+        message: 'Message failed to send. Please try again in a moment.'
+      })
+    } finally {
+      setIsSending(false)
+    }
   }
 
   const copyToClipboard = (address) => {
@@ -49,7 +124,7 @@ const Contact = () => {
       variants={containerVariants}
       initial="initial"
       whileInView="in"
-      viewport={{ once: true, amount: 0.3 }}
+      viewport={{ once: true, amount: 0.14 }}
       exit="out"
     >
       <div className="contact-content">
@@ -96,22 +171,69 @@ const Contact = () => {
         </motion.div>
 
         <motion.div variants={itemUp} className="contact-form-card">
-          <form className="contact-form" onSubmit={(e) => e.preventDefault()}>
+          <div className="contact-form-heading">
+            <span className="contact-form-kicker">Start a Project</span>
+            <h2>Tell me what you are building</h2>
+          </div>
+
+          <form className="contact-form" onSubmit={handleFormSubmit}>
             <div className="form-group">
-              <label className="form-label">Name</label>
-              <input type="text" placeholder="John Doe" className="form-input" />
+              <label className="form-label" htmlFor="contact-name">Name</label>
+              <input
+                id="contact-name"
+                name="name"
+                type="text"
+                placeholder="John Doe"
+                className="form-input"
+                value={formValues.name}
+                onChange={handleFormChange}
+                autoComplete="name"
+              />
             </div>
             <div className="form-group">
-              <label className="form-label">Email</label>
-              <input type="email" placeholder="john@example.com" className="form-input" />
+              <label className="form-label" htmlFor="contact-email">Email</label>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                placeholder="john@example.com"
+                className="form-input"
+                value={formValues.email}
+                onChange={handleFormChange}
+                autoComplete="email"
+              />
             </div>
             <div className="form-group">
-              <label className="form-label">Message</label>
-              <textarea rows="4" placeholder="Tell me about your project..." className="form-textarea"></textarea>
+              <label className="form-label" htmlFor="contact-message">Message</label>
+              <textarea
+                id="contact-message"
+                name="message"
+                rows="4"
+                placeholder="Tell me about your project..."
+                className="form-textarea"
+                value={formValues.message}
+                onChange={handleFormChange}
+              />
             </div>
+
+            <input
+              className="form-hidden-field"
+              name="website"
+              value={formValues.website}
+              onChange={handleFormChange}
+              tabIndex="-1"
+              autoComplete="off"
+              aria-hidden="true"
+            />
+
+            {formStatus.message && (
+              <p className={`form-status ${formStatus.type}`} role="status">
+                {formStatus.message}
+              </p>
+            )}
             
-            <button type="submit" className="form-button">
-              Send Message
+            <button type="submit" className="form-button" disabled={isSending}>
+              <span>{isSending ? 'Sending...' : 'Send Message'}</span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>

@@ -702,15 +702,15 @@
 /* Modal Responsive */
 @media (max-width: 768px) {
   .modal-overlay {
-    padding: 0.75rem;
-    align-items: flex-end;
+    padding: 1rem;
+    align-items: center;
   }
   
   .modal-content {
     flex-direction: column;
     width: min(100%, 520px);
-    max-height: min(86dvh, 680px);
-    border-radius: 18px 18px 0 0;
+    max-height: min(88dvh, 680px);
+    border-radius: 18px;
     overflow: hidden;
   }
   
@@ -781,12 +781,12 @@
 
 @media (max-width: 480px) {
   .modal-overlay {
-    padding: 0;
+    padding: 0.75rem;
   }
 
   .modal-content {
-    max-height: 84dvh;
-    border-radius: 16px 16px 0 0;
+    max-height: 86dvh;
+    border-radius: 16px;
   }
 
   .modal-image {

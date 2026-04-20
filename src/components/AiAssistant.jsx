@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import './AiAssistant.css'
 
@@ -15,11 +15,14 @@ const suggestions = [
   'How can I contact Rahmat?'
 ]
 
-const ChatIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M5 7.8C5 5.7 6.7 4 8.8 4h6.4C17.3 4 19 5.7 19 7.8v3.7c0 2.1-1.7 3.8-3.8 3.8h-2.5l-3.4 3.1c-.6.5-1.5.1-1.5-.7v-2.5C6.2 14.8 5 13.3 5 11.5V7.8Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-    <path d="M9 8.7h6M9 11.4h3.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-  </svg>
+const AssistantMark = ({ compact = false }) => (
+  <span className={`ai-mark ${compact ? 'compact' : ''}`} aria-hidden="true">
+    <svg viewBox="0 0 48 48" fill="none">
+      <path d="M24 5 40.5 14.5v19L24 43 7.5 33.5v-19L24 5Z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round"/>
+      <path d="M17 31V18.8c0-1 .8-1.8 1.8-1.8h10.4c1 0 1.8.8 1.8 1.8V31M17 25h14" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/>
+      <path d="M14 14.5 9.5 12M34 14.5l4.5-2.5M14 33.5 9.5 36M34 33.5l4.5 2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  </span>
 )
 
 const CloseIcon = () => (
@@ -41,6 +44,28 @@ const AiAssistant = () => {
   const [isLoading, setIsLoading] = useState(false)
   const inputRef = useRef(null)
 
+  useEffect(() => {
+    if (!isOpen) return undefined
+
+    const viewport = window.visualViewport
+    const setViewportHeight = () => {
+      const height = viewport?.height || window.innerHeight
+      document.documentElement.style.setProperty('--ai-viewport-height', `${height}px`)
+    }
+
+    setViewportHeight()
+    viewport?.addEventListener('resize', setViewportHeight)
+    viewport?.addEventListener('scroll', setViewportHeight)
+    window.addEventListener('resize', setViewportHeight)
+
+    return () => {
+      viewport?.removeEventListener('resize', setViewportHeight)
+      viewport?.removeEventListener('scroll', setViewportHeight)
+      window.removeEventListener('resize', setViewportHeight)
+      document.documentElement.style.removeProperty('--ai-viewport-height')
+    }
+  }, [isOpen])
+
   const visibleMessages = useMemo(() => (
     messages.filter((message) => message.role === 'user' || message.role === 'assistant')
   ), [messages])
@@ -48,6 +73,10 @@ const AiAssistant = () => {
   const openAssistant = () => {
     setIsOpen(true)
     window.setTimeout(() => inputRef.current?.focus(), 120)
+  }
+
+  const closeAssistant = () => {
+    setIsOpen(false)
   }
 
   const sendMessage = async (content) => {
@@ -100,7 +129,7 @@ const AiAssistant = () => {
   }
 
   return (
-    <div className="ai-assistant">
+    <div className={`ai-assistant ${isOpen ? 'is-open' : ''}`}>
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -111,11 +140,11 @@ const AiAssistant = () => {
             transition={{ duration: 0.22, ease: 'easeOut' }}
           >
             <div className="ai-panel-header">
+              <AssistantMark compact />
               <div>
-                <span className="ai-kicker">Groq powered</span>
                 <h2>RahmatDev Assistant</h2>
               </div>
-              <button className="ai-icon-btn" type="button" onClick={() => setIsOpen(false)} aria-label="Close assistant">
+              <button className="ai-icon-btn" type="button" onClick={closeAssistant} aria-label="Close assistant">
                 <CloseIcon />
               </button>
             </div>
@@ -163,10 +192,16 @@ const AiAssistant = () => {
         )}
       </AnimatePresence>
 
-      <button className="ai-toggle" type="button" onClick={openAssistant} aria-label="Open AI assistant">
-        <ChatIcon />
-        <span>AI</span>
-      </button>
+      <motion.button
+        className="ai-toggle"
+        type="button"
+        onClick={openAssistant}
+        whileTap={{ scale: 0.95 }}
+        aria-label="Open AI assistant"
+      >
+        <AssistantMark />
+        <span>Ask AI</span>
+      </motion.button>
     </div>
   )
 }
