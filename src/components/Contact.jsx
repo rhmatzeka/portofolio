@@ -94,10 +94,10 @@ const Contact = () => {
         message: 'Message sent. I will reply as soon as possible.'
       })
       setFormValues({ name: '', email: '', message: '', website: '' })
-    } catch {
+    } catch (error) {
       setFormStatus({
         type: 'error',
-        message: 'Message failed to send. Please try again in a moment.'
+        message: error.message || 'Message failed to send. Please try again in a moment.'
       })
     } finally {
       setIsSending(false)

@@ -10,9 +10,9 @@
 
 .contact-content {
   display: flex;
-  gap: 4rem;
+  gap: clamp(2rem, 4vw, 3rem);
   width: 100%;
-  max-width: 1200px;
+  max-width: 980px;
   align-items: flex-start;
   pointer-events: auto;
 }
@@ -21,11 +21,11 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.45rem;
 }
 
 .contact-title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(2.25rem, 4.1vw, 3.25rem);
   font-weight: 600;
   line-height: 1.1;
   color: white;
@@ -41,25 +41,26 @@
 
 .contact-subtitle {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 1.1rem;
-  line-height: 1.7;
+  max-width: 560px;
+  font-size: 0.98rem;
+  line-height: 1.62;
   margin: 0;
 }
 
 .contact-info {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  margin-top: 1rem;
+  gap: 0.82rem;
+  margin-top: 0.45rem;
 }
 
 .contact-info-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.82rem;
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   transition: all 0.3s ease;
   pointer-events: auto;
 }
@@ -77,14 +78,14 @@
   position: relative;
   flex: 1;
   width: 100%;
-  max-width: 500px;
+  max-width: 380px;
   overflow: hidden;
   background:
     linear-gradient(145deg, rgba(0, 209, 255, 0.08), rgba(255, 255, 255, 0.025)),
     rgba(10, 13, 15, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 18px;
-  padding: 2.5rem;
+  padding: 1.45rem;
   pointer-events: auto;
   box-shadow:
     0 26px 70px rgba(0, 0, 0, 0.42),
@@ -120,14 +121,14 @@
 }
 
 .contact-form-heading {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.95rem;
 }
 
 .contact-form-kicker {
   display: inline-flex;
-  margin-bottom: 0.55rem;
+  margin-bottom: 0.42rem;
   color: #00d1ff;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -136,7 +137,7 @@
 .contact-form-heading h2 {
   margin: 0;
   color: #ffffff;
-  font-size: clamp(1.35rem, 3vw, 1.8rem);
+  font-size: clamp(1.08rem, 2vw, 1.3rem);
   font-weight: 650;
   line-height: 1.2;
 }
@@ -144,18 +145,18 @@
 .contact-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.78rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
 
 .form-label {
   color: rgba(255, 255, 255, 0.72);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -168,10 +169,10 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02)),
     rgba(0, 0, 0, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.11);
-  border-radius: 12px;
-  padding: 1rem 1.1rem;
+  border-radius: 10px;
+  padding: 0.68rem 0.84rem;
   color: white;
-  font-size: 1rem;
+  font-size: 0.84rem;
   outline: none;
   font-family: inherit;
   line-height: 1.4;
@@ -195,7 +196,7 @@
 
 .form-textarea {
   resize: none;
-  min-height: 132px;
+  min-height: 88px;
   overflow-wrap: anywhere;
 }
 
@@ -210,9 +211,9 @@
 
 .form-status {
   margin: -0.25rem 0 0;
-  padding: 0.78rem 0.9rem;
-  border-radius: 12px;
-  font-size: 0.83rem;
+  padding: 0.62rem 0.72rem;
+  border-radius: 10px;
+  font-size: 0.76rem;
   font-weight: 650;
   line-height: 1.45;
 }
@@ -232,14 +233,14 @@
 .form-button {
   position: relative;
   overflow: hidden;
-  min-height: 56px;
+  min-height: 44px;
   background:
     linear-gradient(135deg, #00d1ff 0%, #03a9d5 52%, #007ea8 100%);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  padding: 1rem 2rem;
+  padding: 0.72rem 1.25rem;
   border-radius: 50px;
-  font-size: 1rem;
+  font-size: 0.88rem;
   font-weight: 800;
   cursor: pointer;
   margin-top: 0.25rem;
@@ -301,15 +302,16 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .contact-content {
-    gap: 3rem;
+    gap: 2.2rem;
+    max-width: 900px;
   }
   
   .contact-title {
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(2rem, 4.6vw, 2.8rem);
   }
   
   .contact-subtitle {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 }
 
@@ -391,7 +393,7 @@
   display: flex;
   gap: 0.8rem;
   flex-wrap: wrap;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   align-items: center;
 }
 
@@ -400,12 +402,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.7rem 1.4rem;
+  padding: 0.62rem 1.18rem;
   background: linear-gradient(135deg, #00d1ff 0%, #0099cc 100%);
   border: none;
   border-radius: 50px;
   color: white;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
