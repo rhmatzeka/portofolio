@@ -27,7 +27,7 @@ const showConsoleSignature = () => {
   )
 
   console.log(
-    '%cRahmat Eka Satria%c\nEmail  : matsganz@gmail.com\nGitHub : github.com/rhmatzeka',
+    '%cRahmat Eka Satria%c\nEmail     : matsganz@gmail.com\nGitHub    : github.com/rhmatzeka\nInstagram : instagram.com/rahmatdev.id\nTwitter   : twitter.com/rahmatdevID',
     'color:#ffffff;font:700 13px Inter,Arial,sans-serif;line-height:1.8;',
     'color:#9fb4bd;font:500 12px Consolas,monospace;line-height:1.8;'
   )

@@ -37,6 +37,14 @@ const SendIcon = () => (
   </svg>
 )
 
+const cleanAssistantText = (value) => (
+  value
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/__(.*?)__/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/_(.*?)_/g, '$1')
+)
+
 const AiAssistant = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState(initialMessages)
@@ -152,7 +160,7 @@ const AiAssistant = () => {
             <div className="ai-messages" aria-live="polite">
               {visibleMessages.map((message, index) => (
                 <div key={`${message.role}-${index}`} className={`ai-message ${message.role}`}>
-                  {message.content}
+                  {message.role === 'assistant' ? cleanAssistantText(message.content) : message.content}
                 </div>
               ))}
 

@@ -25,6 +25,7 @@ const Footer = () => {
               <h4>Social</h4>
               <a href="https://github.com/rhmatzeka" target="_blank" rel="noopener noreferrer">GitHub</a>
               <a href="https://linkedin.com/in/rahmatekasatria" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              <a href="https://instagram.com/rahmatdev.id" target="_blank" rel="noopener noreferrer">Instagram</a>
               <a href="https://twitter.com/rahmatdevID" target="_blank" rel="noopener noreferrer">Twitter</a>
               <a href="mailto:matsganz@gmail.com">Email</a>
             </div>
@@ -50,6 +51,11 @@ const Footer = () => {
             <a href="https://linkedin.com/in/rahmatekasatria" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+              </svg>
+            </a>
+            <a href="https://instagram.com/rahmatdev.id" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm0 2h10c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3zm10.5 1.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>
               </svg>
             </a>
             <a href="https://twitter.com/rahmatdevID" target="_blank" rel="noopener noreferrer" aria-label="Twitter">

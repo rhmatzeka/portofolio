@@ -13,6 +13,8 @@ Default vibe:
 - Never become abusive, hateful, degrading, sexually explicit, or hostile.
 - Never sound stiff, corporate, or robotic unless the user explicitly wants formal language.
 - Keep the energy witty and cool, but still useful.
+- You may sprinkle simple text emotes or character-style expressions sometimes, like: :v, :D, wkwk, bro, jir, cuy, bjir, santai, gas.
+- Do not overdo emotes. Use them lightly so the reply still feels clean and readable.
 
 Identity rules:
 - If someone asks who you are, say you are RahmatDev Assistant, an AI assistant made by Rahmat for this website.
@@ -26,6 +28,8 @@ Rahmat Eka Satria profile:
 - Goal: become a fullstack developer at a major tech company.
 - Contact email: matsganz@gmail.com
 - GitHub: https://github.com/rhmatzeka
+- Instagram: https://instagram.com/rahmatdev.id
+- Twitter/X: https://twitter.com/rahmatdevID
 
 Core stack:
 - React, Next.js, TypeScript, JavaScript, Python, Solidity, Node.js, Figma
@@ -51,13 +55,16 @@ Projects:
    - GitHub: https://github.com/rhmatzeka/CVBanbukStore
 
 Rules:
-- If asked about hiring, collaboration, or contact, point to email and GitHub.
+- If asked about hiring, collaboration, or contact, point to email, GitHub, Instagram, and Twitter/X.
 - If you are unsure, say so and suggest contacting Rahmat.
 - Do not invent private experience, education, prices, or availability.
 - Keep most replies under 120 words unless the user asks for detail.
 - When the user writes in Indonesian, reply in natural Indonesian. Casual is preferred unless they sound formal.
 - When the user writes in English, reply in natural English.
 - If the user is playful, you can answer with light banter. Keep it charming, not mean.
+- Output plain text only.
+- Do not use markdown bold, italics, bullet formatting, or asterisks for emphasis.
+- Never wrap words with ** or __.
 `
 
 const sendJson = (res, statusCode, payload) => {
@@ -65,6 +72,14 @@ const sendJson = (res, statusCode, payload) => {
   res.setHeader('Content-Type', 'application/json')
   res.end(JSON.stringify(payload))
 }
+
+const stripMarkdownDecorators = (value) => (
+  value
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/__(.*?)__/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/_(.*?)_/g, '$1')
+)
 
 const sanitizeMessages = (messages) => {
   if (!Array.isArray(messages)) return []
@@ -151,7 +166,7 @@ module.exports = async (req, res) => {
       return
     }
 
-    const reply = data?.choices?.[0]?.message?.content?.trim()
+    const reply = stripMarkdownDecorators(data?.choices?.[0]?.message?.content?.trim() || '')
     if (!reply) {
       sendJson(res, 502, { error: 'AI returned an empty response.' })
       return

@@ -156,6 +156,22 @@ const Contact = () => {
               </svg>
               <span>linkedin.com/in/rahmatekasatria</span>
             </a>
+
+            <a href="https://instagram.com/rahmatdev.id" target="_blank" rel="noopener noreferrer" className="contact-info-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2.5" y="2.5" width="19" height="19" rx="5"></rect>
+                <circle cx="12" cy="12" r="4.2"></circle>
+                <circle cx="18" cy="6.2" r="1"></circle>
+              </svg>
+              <span>instagram.com/rahmatdev.id</span>
+            </a>
+
+            <a href="https://twitter.com/rahmatdevID" target="_blank" rel="noopener noreferrer" className="contact-info-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 5.9c-.7.3-1.5.6-2.3.7.8-.5 1.5-1.2 1.8-2.2-.8.5-1.7.8-2.6 1-1.6-1.7-4.5-1.8-6.2-.2-1.1 1-1.5 2.5-1.1 3.9-3.3-.2-6.4-1.8-8.4-4.4-1.1 1.9-.5 4.4 1.3 5.6-.6 0-1.2-.2-1.7-.5 0 2.1 1.5 3.9 3.6 4.3-.6.2-1.3.3-1.9.1.5 1.8 2.2 3 4.1 3.1-1.8 1.4-4 2-6.3 1.8 2 1.3 4.4 2 6.9 2 8.2 0 12.8-7 12.6-13.2.9-.6 1.6-1.4 2.2-2.2Z"></path>
+              </svg>
+              <span>twitter.com/rahmatdevID</span>
+            </a>
           </div>
 
           {/* Crypto Buttons Row */}
