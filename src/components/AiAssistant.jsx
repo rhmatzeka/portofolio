@@ -5,14 +5,14 @@ import './AiAssistant.css'
 const initialMessages = [
   {
     role: 'assistant',
-    content: 'Hi, I am RahmatDev Assistant. Ask me about Rahmat, his projects, tech stack, or contact info.'
+    content: 'Yo, gue RahmatDev Assistant, AI bikinan Rahmat. Tanya aja soal project, tech stack, atau cara ngontak dia.'
   }
 ]
 
 const suggestions = [
-  'What projects has Rahmat built?',
-  'What is Rahmat good at?',
-  'How can I contact Rahmat?'
+  'Project Rahmat apa aja?',
+  'Rahmat jago di bidang apa?',
+  'Cara contact Rahmat gimana?'
 ]
 
 const AssistantMark = ({ compact = false }) => (
