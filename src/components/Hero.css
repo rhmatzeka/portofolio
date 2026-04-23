@@ -19,6 +19,10 @@
   pointer-events: none;
 }
 
+.hero-presence {
+  width: 100%;
+}
+
 .hero-title {
   font-size: clamp(4rem, 6vw, 7rem); 
   font-weight: 600;
@@ -213,7 +217,7 @@
   }
   
   .hero-left {
-    gap: 1.5rem;
+    gap: 1.2rem;
   }
   
   .hero-title {
