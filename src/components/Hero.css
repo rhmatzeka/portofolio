@@ -21,6 +21,7 @@
 
 .hero-presence {
   width: 100%;
+  max-width: 648px;
 }
 
 .hero-title {

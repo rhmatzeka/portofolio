@@ -8,10 +8,10 @@
 
 .dynamic-island {
   position: relative;
-  width: min(100%, 396px);
+  width: min(100%, 648px);
   min-height: 56px;
   padding: 0.32rem;
-  border-radius: 999px;
+  border-radius: 30px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)),
     rgba(5, 7, 10, 0.94);
@@ -21,6 +21,19 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
+}
+
+.dynamic-island-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.34rem;
+  z-index: 1;
+}
+
+.dynamic-island-has-secondary .dynamic-island-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(188px, 220px);
+  align-items: stretch;
 }
 
 .dynamic-island::before {
@@ -53,13 +66,13 @@
 }
 
 .dynamic-island-inner {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 0.62rem;
   min-height: 48px;
+  min-width: 0;
   padding: 0.26rem 0.3rem;
-  z-index: 1;
+  border-radius: 24px;
 }
 
 .island-visual {
@@ -103,14 +116,18 @@
 }
 
 .dynamic-island-coding .island-visual.icon {
-  background: rgba(0, 209, 255, 0.12);
-  color: #7ef5ff;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(82, 217, 255, 0.18), transparent 55%),
+    linear-gradient(180deg, rgba(19, 91, 117, 0.82), rgba(12, 54, 73, 0.92));
+  color: #69dbff;
+  border-color: rgba(110, 225, 255, 0.14);
 }
 
 .dynamic-island-copy {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
   text-align: left;
 }
 
@@ -125,9 +142,17 @@
 .dynamic-island-label,
 .dynamic-island-meta,
 .dynamic-island-footer,
-.dynamic-island-mini-label,
+.dynamic-island-mini-label {
+  display: block;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .dynamic-island-mini-text {
-  overflow-wrap: anywhere;
+  display: block;
+  min-width: 0;
 }
 
 .dynamic-island-label {
@@ -151,6 +176,21 @@
   line-height: 1.18;
 }
 
+.dynamic-island-footer-piece {
+  display: inline-flex;
+  align-items: center;
+}
+
+.dynamic-island-footer-separator {
+  margin: 0 0.36rem;
+  color: rgba(232, 240, 250, 0.34);
+}
+
+.dynamic-island-footer-timer {
+  color: #62c6ff;
+  font-weight: 700;
+}
+
 .dynamic-island-badge {
   margin-left: auto;
   flex-shrink: 0;
@@ -164,18 +204,34 @@
   text-transform: uppercase;
 }
 
+.dynamic-island-badge-online {
+  background: rgba(35, 165, 90, 0.16);
+  color: #59d98e;
+  border: 1px solid rgba(35, 165, 90, 0.22);
+}
+
+.dynamic-island-badge-idle {
+  background: rgba(240, 178, 50, 0.14);
+  color: #f0c15a;
+  border: 1px solid rgba(240, 178, 50, 0.2);
+}
+
+.dynamic-island-badge-do-not-disturb {
+  background: rgba(242, 63, 67, 0.14);
+  color: #ff7b7f;
+  border: 1px solid rgba(242, 63, 67, 0.2);
+}
+
 .dynamic-island-mini {
-  position: absolute;
-  top: 50%;
-  right: -0.28rem;
-  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   gap: 0.28rem;
-  min-height: 34px;
-  max-width: 132px;
-  padding: 0.22rem 0.28rem 0.22rem 0.22rem;
-  border-radius: 999px;
+  min-height: 100%;
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0.32rem 0.4rem;
+  border-radius: 24px;
   background: rgba(8, 10, 12, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.26);
@@ -185,21 +241,22 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
 }
 
 .dynamic-island-mini .island-visual {
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
 }
 
 .dynamic-island-mini .island-visual svg {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
 }
 
 .dynamic-island-mini-text {
   color: rgba(255, 255, 255, 0.86);
-  font-size: 0.48rem;
+  font-size: 0.54rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -207,33 +264,9 @@
 
 .dynamic-island-mini-label {
   margin-top: 0.04rem;
-  padding-right: 0.12rem;
   color: rgba(232, 240, 250, 0.68);
-  font-size: 0.53rem;
+  font-size: 0.66rem;
   line-height: 1.2;
-}
-
-.presence-dot {
-  position: absolute;
-  right: -1px;
-  bottom: -1px;
-  width: 11px;
-  height: 11px;
-  border-radius: 999px;
-  border: 2px solid rgba(5, 7, 10, 0.96);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.06);
-}
-
-.presence-dot-online {
-  background: #23a55a;
-}
-
-.presence-dot-idle {
-  background: #f0b232;
-}
-
-.presence-dot-dnd {
-  background: #f23f43;
 }
 
 .dynamic-island-discord .island-visual.icon {
@@ -251,8 +284,12 @@
 
 @media (max-width: 768px) {
   .dynamic-island {
-    width: min(100%, 360px);
+    width: min(100%, 560px);
     min-height: 54px;
+  }
+
+  .dynamic-island-has-secondary .dynamic-island-layout {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .dynamic-island-inner {
@@ -277,12 +314,7 @@
     font-size: 0.56rem;
   }
 
-  .dynamic-island-mini {
-    right: 0.22rem;
-    top: 50%;
-    bottom: auto;
-    transform: translateY(-50%);
-  }
+  .dynamic-island-mini { min-height: 0; }
 }
 
 @media (max-width: 560px) {
@@ -304,12 +336,11 @@
   }
 
   .dynamic-island-mini {
-    position: static;
     margin-top: 0.22rem;
     width: 100%;
     max-width: none;
     justify-content: flex-start;
-    transform: none;
+    padding: 0.28rem 0.32rem;
   }
 
   .live-presence-strip {
@@ -352,6 +383,11 @@
 
   .dynamic-island-inner {
     padding-right: 0.2rem;
+  }
+
+  .dynamic-island-mini {
+    padding-right: 0.24rem;
+    padding-left: 0.24rem;
   }
 
   .dynamic-island-mini-label {

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import './LivePresence.css'
+import codingArtwork from '../assets/images/ngoding.jpg'
+import gameArtwork from '../assets/images/game.jpg'
 
-const POLL_INTERVAL = 60000
+const POLL_INTERVAL = 15000
 
 const GitHubIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -11,7 +13,8 @@ const GitHubIcon = () => (
 
 const CodeIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 5 10 19" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M17.78 3.84 8.65 7.96a1.07 1.07 0 0 0-.63.98v6.11c0 .43.25.82.63.99l9.13 4.11c.7.32 1.5-.2 1.5-.97V4.81c0-.77-.8-1.29-1.5-.97Z" fill="currentColor" opacity="0.24" />
+    <path d="m17.96 5.2-6.62 5.03-2.9-2.2-1.4.7v6.62l1.4.7 2.9-2.2 6.62 5.03 1.82-.88V6.08l-1.82-.88Zm-6.48 7.35-1.76-1.34 1.76-1.34Zm6.55 3.74-4.22-3.2 4.22-3.2Z" fill="currentColor" />
   </svg>
 )
 
@@ -45,13 +48,13 @@ const formatRelativeTime = (value) => {
   return rtf.format(Math.round(diffMs / day), 'day')
 }
 
-const formatElapsedTime = (value) => {
+const formatElapsedTime = (value, now = Date.now()) => {
   if (!value) return null
 
   const timestamp = new Date(value).getTime()
   if (Number.isNaN(timestamp)) return null
 
-  const totalSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000))
+  const totalSeconds = Math.max(0, Math.floor((now - timestamp) / 1000))
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
@@ -74,29 +77,44 @@ const formatStatusLabel = (status) => {
   return labels[status] || 'Offline'
 }
 
-const buildStatusCards = (data) => {
+const isTimeLike = (value) => typeof value === 'string' && /^\d{1,2}:\d{2}(?::\d{2})?$/.test(value)
+
+const buildStatusCards = (data, now) => {
   const cards = []
   const discordStatus = data?.live?.status || 'offline'
   const activeActivity = data?.live?.activity
+  const shouldShowHistory = Boolean(
+    data?.lastCoding
+    && !activeActivity
+    && !data?.live?.music
+    && !data?.live?.coding
+  )
 
   if (data?.live?.online && activeActivity) {
-    const description = activeActivity.state || activeActivity.largeText || `In ${activeActivity.app}`
-    const footerParts = [
-      activeActivity.details,
-      formatElapsedTime(activeActivity.startedAt)
-    ].filter(Boolean)
+    const isCodingActivity = activeActivity.kind === 'coding'
+      || ['code', 'visual studio code', 'cursor', 'windsurf', 'android studio'].includes(
+        String(activeActivity.app || '').toLowerCase()
+      )
+    const description = isCodingActivity
+      ? activeActivity.details || activeActivity.largeText || `In ${activeActivity.app}`
+      : activeActivity.state || activeActivity.largeText || `In ${activeActivity.app}`
+    const footerParts = isCodingActivity
+      ? [activeActivity.state, formatElapsedTime(activeActivity.startedAt, now)]
+      : [activeActivity.details, formatElapsedTime(activeActivity.startedAt, now)]
 
     cards.push({
       key: 'activity',
-      theme: activeActivity.kind === 'coding' ? 'coding' : 'discord',
-      eyebrow: activeActivity.label || 'Online',
+      theme: isCodingActivity ? 'coding' : 'discord',
+      eyebrow: isCodingActivity
+        ? 'Rahmat lagi ngoding nih sekarang'
+        : `Rahmat lagi buka ${activeActivity.app || 'sesuatu'} nih sekarang`,
       label: activeActivity.app || 'Discord',
       meta: description || 'Active on Discord right now',
-      footer: footerParts.join('  |  '),
+      footerParts: footerParts.filter(Boolean),
       badge: formatStatusLabel(discordStatus),
-      artwork: '',
+      artwork: isCodingActivity ? codingArtwork : gameArtwork,
       status: discordStatus,
-      icon: activeActivity.kind === 'coding' ? <CodeIcon /> : <DiscordIcon />
+      icon: isCodingActivity ? <CodeIcon /> : <DiscordIcon />
     })
   }
 
@@ -104,10 +122,10 @@ const buildStatusCards = (data) => {
     cards.push({
       key: 'music',
       theme: 'spotify',
-      eyebrow: 'Listening',
+      eyebrow: 'Rahmat lagi dengerin lagu nih sekarang',
       label: data.live.music.song || 'Listening now',
       meta: data.live.music.artist || 'Spotify',
-      footer: formatElapsedTime(data.live.music.startedAt),
+      footerParts: [formatElapsedTime(data.live.music.startedAt, now)].filter(Boolean),
       badge: 'spotify',
       artwork: data.live.music.albumArtUrl || '',
       status: discordStatus,
@@ -119,15 +137,15 @@ const buildStatusCards = (data) => {
     cards.push({
       key: 'coding',
       theme: 'coding',
-      eyebrow: 'Coding',
+      eyebrow: 'Rahmat lagi ngoding nih sekarang',
       label: data.live.coding.app || 'Coding',
-      meta: data.live.coding.state || data.live.coding.details || 'Locked in',
-      footer: [
-        data.live.coding.details,
-        formatElapsedTime(data.live.coding.startedAt)
-      ].filter(Boolean).join('  |  '),
+      meta: data.live.coding.details || data.live.coding.state || 'Locked in',
+      footerParts: [
+        data.live.coding.state,
+        formatElapsedTime(data.live.coding.startedAt, now)
+      ].filter(Boolean),
       badge: 'Live',
-      artwork: '',
+      artwork: codingArtwork,
       status: discordStatus,
       icon: <CodeIcon />
     })
@@ -137,12 +155,12 @@ const buildStatusCards = (data) => {
     cards.push({
       key: 'online',
       theme: 'discord',
-      eyebrow: 'Discord',
+      eyebrow: 'Rahmat lagi online nih sekarang',
       label: formatStatusLabel(discordStatus),
-      meta: 'Online right now',
-      footer: data?.discordConfigured
+      meta: 'Belum keliatan lagi buka apa',
+      footerParts: [data?.discordConfigured
         ? 'Presence feed connected'
-        : 'Add DISCORD_USER_ID to enable live activity',
+        : 'Add DISCORD_USER_ID to enable live activity'],
       badge: formatStatusLabel(discordStatus),
       artwork: '',
       status: discordStatus,
@@ -150,7 +168,7 @@ const buildStatusCards = (data) => {
     })
   }
 
-  if (data?.lastCoding) {
+  if (shouldShowHistory) {
     cards.push({
       key: 'history',
       theme: 'github',
@@ -159,7 +177,7 @@ const buildStatusCards = (data) => {
       meta: data.lastCoding.repo
         ? `${data.lastCoding.summary} on ${data.lastCoding.repo}`
         : data.lastCoding.summary,
-      footer: data?.live?.online ? `Discord is ${formatStatusLabel(discordStatus).toLowerCase()}` : 'Latest public coding activity',
+      footerParts: [data?.live?.online ? `Discord is ${formatStatusLabel(discordStatus).toLowerCase()}` : 'Latest public coding activity'],
       badge: 'github',
       artwork: '',
       status: 'offline',
@@ -175,9 +193,6 @@ const Visual = ({ card }) => {
     return (
       <span className="island-visual artwork">
         <img src={card.artwork} alt="" loading="lazy" />
-        {card.status && card.status !== 'offline' && (
-          <span className={`presence-dot presence-dot-${card.status}`} aria-hidden="true" />
-        )}
       </span>
     )
   }
@@ -185,15 +200,13 @@ const Visual = ({ card }) => {
   return (
     <span className="island-visual icon" aria-hidden="true">
       {card.icon}
-      {card.status && card.status !== 'offline' && (
-        <span className={`presence-dot presence-dot-${card.status}`} aria-hidden="true" />
-      )}
     </span>
   )
 }
 
 const LivePresence = () => {
   const [presence, setPresence] = useState(null)
+  const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
     let isMounted = true
@@ -218,14 +231,24 @@ const LivePresence = () => {
     }
   }, [])
 
-  const cards = useMemo(() => buildStatusCards(presence), [presence])
+  useEffect(() => {
+    const timerId = window.setInterval(() => {
+      setNow(Date.now())
+    }, 1000)
+
+    return () => {
+      window.clearInterval(timerId)
+    }
+  }, [])
+
+  const cards = useMemo(() => buildStatusCards(presence, now), [presence, now])
   const primaryCard = cards[0] || {
     key: 'loading',
     theme: 'neutral',
     eyebrow: 'Presence',
     label: 'Loading live status',
     meta: 'Waking up the feed...',
-    footer: '',
+    footerParts: [],
     badge: 'sync',
     artwork: '',
     status: 'offline',
@@ -235,33 +258,42 @@ const LivePresence = () => {
 
   return (
     <div className="live-presence-strip" aria-label="Activity status">
-      <div className={`dynamic-island dynamic-island-${primaryCard.theme}`}>
-        <div className="dynamic-island-inner">
-          <Visual card={primaryCard} />
+      <div className={`dynamic-island dynamic-island-${primaryCard.theme}${secondaryCard ? ' dynamic-island-has-secondary' : ''}`}>
+        <div className="dynamic-island-layout">
+          <div className="dynamic-island-inner">
+            <Visual card={primaryCard} />
 
-          <div className="dynamic-island-copy">
-            {primaryCard.eyebrow && (
-              <span className="dynamic-island-eyebrow">{primaryCard.eyebrow}</span>
-            )}
-            <span className="dynamic-island-label">{primaryCard.label}</span>
-            <span className="dynamic-island-meta">{primaryCard.meta}</span>
-            {primaryCard.footer && (
-              <span className="dynamic-island-footer">{primaryCard.footer}</span>
-            )}
-          </div>
-
-          <span className="dynamic-island-badge">{primaryCard.badge}</span>
-        </div>
-
-        {secondaryCard && (
-          <div className="dynamic-island-mini">
-            <Visual card={secondaryCard} />
-            <div className="dynamic-island-mini-copy">
-              <span className="dynamic-island-mini-text">{secondaryCard.badge}</span>
-              <span className="dynamic-island-mini-label">{secondaryCard.label}</span>
+            <div className="dynamic-island-copy">
+              {primaryCard.eyebrow && (
+                <span className="dynamic-island-eyebrow">{primaryCard.eyebrow}</span>
+              )}
+              <span className="dynamic-island-label">{primaryCard.label}</span>
+              <span className="dynamic-island-meta">{primaryCard.meta}</span>
+              {primaryCard.footerParts?.length > 0 && (
+                <span className="dynamic-island-footer">
+                  {primaryCard.footerParts.map((part, index) => (
+                    <span key={`${primaryCard.key}-footer-${index}`} className="dynamic-island-footer-piece">
+                      {index > 0 && <span className="dynamic-island-footer-separator">|</span>}
+                      <span className={isTimeLike(part) ? 'dynamic-island-footer-timer' : undefined}>{part}</span>
+                    </span>
+                  ))}
+                </span>
+              )}
             </div>
+
+            <span className={`dynamic-island-badge dynamic-island-badge-${primaryCard.badge.toLowerCase().replace(/\s+/g, '-')}`}>{primaryCard.badge}</span>
           </div>
-        )}
+
+          {secondaryCard && (
+            <div className="dynamic-island-mini">
+              <Visual card={secondaryCard} />
+              <div className="dynamic-island-mini-copy">
+                <span className="dynamic-island-mini-text">{secondaryCard.badge}</span>
+                <span className="dynamic-island-mini-label">{secondaryCard.label}</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

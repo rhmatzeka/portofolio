@@ -2,6 +2,7 @@ const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions'
 const DEFAULT_MODEL = 'openai/gpt-oss-120b'
 const MAX_HISTORY_MESSAGES = 8
 const MAX_MESSAGE_LENGTH = 900
+const { fetchPresencePayload, getPresencePromptContext } = require('./_presenceData')
 
 const portfolioContext = `
 You are RahmatDev Assistant, the AI assistant for Rahmat Eka Satria's portfolio website.
@@ -140,6 +141,15 @@ module.exports = async (req, res) => {
   }
 
   try {
+    let livePresenceContext = 'Live activity status: unavailable right now.'
+
+    try {
+      const presencePayload = await fetchPresencePayload()
+      livePresenceContext = getPresencePromptContext(presencePayload)
+    } catch (error) {
+      // Keep a soft fallback so chat still works even if presence fetch fails.
+    }
+
     const groqResponse = await fetch(GROQ_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -150,6 +160,7 @@ module.exports = async (req, res) => {
         model: process.env.GROQ_MODEL || DEFAULT_MODEL,
         messages: [
           { role: 'system', content: portfolioContext },
+          { role: 'system', content: livePresenceContext },
           ...userMessages
         ],
         temperature: 0.55,
