@@ -3,45 +3,43 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
 
-// Console Easter Egg
-const art = `
-%c
-██████╗  █████╗ ██╗  ██╗███╗   ███╗ █████╗ ████████╗
-██╔══██╗██╔══██╗██║  ██║████╗ ████║██╔══██╗╚══██╔══╝
-██████╔╝███████║███████║██╔████╔██║███████║   ██║   
-██╔══██╗██╔══██║██╔══██║██║╚██╔╝██║██╔══██║   ██║   
-██║  ██║██║  ██║██║  ██║██║ ╚═╝ ██║██║  ██║   ██║   
-╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   
+const showConsoleSignature = () => {
+  if (typeof window === 'undefined' || window.__RAHMAT_CONSOLE_SIGNATURE__) return
+  window.__RAHMAT_CONSOLE_SIGNATURE__ = true
 
-██████╗ ███████╗██╗   ██╗
-██╔══██╗██╔════╝██║   ██║
-██║  ██║█████╗  ██║   ██║
-██║  ██║██╔══╝  ╚██╗ ██╔╝
-██████╔╝███████╗ ╚████╔╝ 
-╚═════╝ ╚══════╝  ╚═══╝  
-`
+  const banner = String.raw`
+██████╗░░█████╗░██╗░░██╗███╗░░░███╗░█████╗░████████╗██████╗░███████╗██╗░░░██╗
+██╔══██╗██╔══██╗██║░░██║████╗░████║██╔══██╗╚══██╔══╝██╔══██╗██╔════╝██║░░░██║
+██████╔╝███████║███████║██╔████╔██║███████║░░░██║░░░██║░░██║█████╗░░╚██╗░██╔╝
+██╔══██╗██╔══██║██╔══██║██║╚██╔╝██║██╔══██║░░░██║░░░██║░░██║██╔══╝░░░╚████╔╝░
+██║░░██║██║░░██║██║░░██║██║░╚═╝░██║██║░░██║░░░██║░░░██████╔╝███████╗░░╚██╔╝░░
+╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░░░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚═════╝░╚══════╝░░░╚═╝░░░`
 
-if (import.meta.env.DEV) {
   console.log(
-    art,
-    'color: #00d1ff; font-family: monospace; font-size: 10px; line-height: 1.2;'
+    `%c${banner}`,
+    [
+      'color:#f8fafc',
+      'background:#111417',
+      'font:700 12px/1.12 Consolas,monospace',
+      'letter-spacing:0',
+      'text-shadow:0 0 14px rgba(255,255,255,.22),0 0 26px rgba(148,163,184,.24)'
+    ].join(';')
   )
 
   console.log(
-    '%c Hey there, curious dev!',
-    'color: #ffffff; font-size: 16px; font-weight: bold;'
+    '%cRahmat Eka Satria%c\nEmail     : matsganz@gmail.com\nGitHub    : github.com/rhmatzeka\nInstagram : instagram.com/rahmatdev.id\nTwitter   : twitter.com/rahmatdevID',
+    'color:#ffffff;font:700 13px Inter,Arial,sans-serif;line-height:1.8;',
+    'color:#9fb4bd;font:500 12px Consolas,monospace;line-height:1.8;'
   )
 
   console.log(
-    '%c Built with React + Vite + Three.js\n Blockchain & Web3 Developer\n matsganz@gmail.com\n github.com/rhmatzeka',
-    'color: #00d1ff; font-size: 13px; line-height: 1.8;'
-  )
-
-  console.log(
-    '%c Stop! This browser feature is for developers. If someone told you to paste something here, it\'s a scam.',
-    'color: #ff4444; font-size: 12px; font-weight: bold;'
+    '%cSecurity note:%c never paste code here unless you know exactly what it does.',
+    'color:#ff6b6b;font:700 12px Inter,Arial,sans-serif;',
+    'color:#aebdc4;font:500 12px Inter,Arial,sans-serif;'
   )
 }
+
+showConsoleSignature()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -14,14 +14,22 @@ const containerVariants = {
 }
 
 const itemUp = {
-  initial: { opacity: 0, y: 30 },
-  in: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  initial: { opacity: 0, y: 28, scale: 0.98 },
+  in: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.62, ease: [0.16, 1, 0.3, 1] } }
 }
 
 const Contact = () => {
   const [showTipModal, setShowTipModal] = useState(false)
   const [selectedCrypto, setSelectedCrypto] = useState('ETH')
   const [copiedAddress, setCopiedAddress] = useState(false)
+  const [formValues, setFormValues] = useState({
+    name: '',
+    email: '',
+    message: '',
+    website: ''
+  })
+  const [formStatus, setFormStatus] = useState({ type: '', message: '' })
+  const [isSending, setIsSending] = useState(false)
 
   const walletAddresses = {
     ETH: '0x8988140cEF5A825f39929c60c97173ec5a2eF27D',
@@ -29,20 +37,84 @@ const Contact = () => {
     SOL: '6oga2odADjQcFdyiyt7fqxP3XERsmj1ZkUAw3wdPqFk'
   }
 
+  const handleFormChange = (event) => {
+    const { name, value } = event.target
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      [name]: value
+    }))
+
+    if (formStatus.type === 'error') {
+      setFormStatus({ type: '', message: '' })
+    }
+  }
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault()
+    if (isSending) return
+
+    const name = formValues.name.trim()
+    const email = formValues.email.trim()
+    const message = formValues.message.trim()
+    const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+
+    if (!name || !email || !message) {
+      setFormStatus({ type: 'error', message: 'Please fill in all fields first.' })
+      return
+    }
+
+    if (!emailIsValid) {
+      setFormStatus({ type: 'error', message: 'Please enter a valid email address.' })
+      return
+    }
+
+    setIsSending(true)
+    setFormStatus({ type: '', message: '' })
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          website: formValues.website
+        })
+      })
+
+      const data = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to send message.')
+      }
+
+      setFormStatus({
+        type: 'success',
+        message: 'Message sent. I will reply as soon as possible.'
+      })
+      setFormValues({ name: '', email: '', message: '', website: '' })
+    } catch (error) {
+      setFormStatus({
+        type: 'error',
+        message: error.message || 'Message failed to send. Please try again in a moment.'
+      })
+    } finally {
+      setIsSending(false)
+    }
+  }
+
   const copyToClipboard = (address) => {
-    console.log('Copying address:', address)
     navigator.clipboard.writeText(address)
     setCopiedAddress(true)
     setTimeout(() => setCopiedAddress(false), 2000)
   }
 
   const handleTabClick = (crypto) => {
-    console.log('Tab clicked:', crypto)
     setSelectedCrypto(crypto)
   }
 
   const handleCloseModal = () => {
-    console.log('Close modal clicked')
     setShowTipModal(false)
   }
 
@@ -52,7 +124,7 @@ const Contact = () => {
       variants={containerVariants}
       initial="initial"
       whileInView="in"
-      viewport={{ once: true, amount: 0.3 }}
+      viewport={{ once: true, amount: 0.14 }}
       exit="out"
     >
       <div className="contact-content">
@@ -84,6 +156,22 @@ const Contact = () => {
               </svg>
               <span>linkedin.com/in/rahmatekasatria</span>
             </a>
+
+            <a href="https://instagram.com/rahmatdev.id" target="_blank" rel="noopener noreferrer" className="contact-info-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2.5" y="2.5" width="19" height="19" rx="5"></rect>
+                <circle cx="12" cy="12" r="4.2"></circle>
+                <circle cx="18" cy="6.2" r="1"></circle>
+              </svg>
+              <span>instagram.com/rahmatdev.id</span>
+            </a>
+
+            <a href="https://twitter.com/rahmatdevID" target="_blank" rel="noopener noreferrer" className="contact-info-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 5.9c-.7.3-1.5.6-2.3.7.8-.5 1.5-1.2 1.8-2.2-.8.5-1.7.8-2.6 1-1.6-1.7-4.5-1.8-6.2-.2-1.1 1-1.5 2.5-1.1 3.9-3.3-.2-6.4-1.8-8.4-4.4-1.1 1.9-.5 4.4 1.3 5.6-.6 0-1.2-.2-1.7-.5 0 2.1 1.5 3.9 3.6 4.3-.6.2-1.3.3-1.9.1.5 1.8 2.2 3 4.1 3.1-1.8 1.4-4 2-6.3 1.8 2 1.3 4.4 2 6.9 2 8.2 0 12.8-7 12.6-13.2.9-.6 1.6-1.4 2.2-2.2Z"></path>
+              </svg>
+              <span>twitter.com/rahmatdevID</span>
+            </a>
           </div>
 
           {/* Crypto Buttons Row */}
@@ -99,22 +187,69 @@ const Contact = () => {
         </motion.div>
 
         <motion.div variants={itemUp} className="contact-form-card">
-          <form className="contact-form" onSubmit={(e) => e.preventDefault()}>
+          <div className="contact-form-heading">
+            <span className="contact-form-kicker">Start a Project</span>
+            <h2>Tell me what you are building</h2>
+          </div>
+
+          <form className="contact-form" onSubmit={handleFormSubmit}>
             <div className="form-group">
-              <label className="form-label">Name</label>
-              <input type="text" placeholder="John Doe" className="form-input" />
+              <label className="form-label" htmlFor="contact-name">Name</label>
+              <input
+                id="contact-name"
+                name="name"
+                type="text"
+                placeholder="John Doe"
+                className="form-input"
+                value={formValues.name}
+                onChange={handleFormChange}
+                autoComplete="name"
+              />
             </div>
             <div className="form-group">
-              <label className="form-label">Email</label>
-              <input type="email" placeholder="john@example.com" className="form-input" />
+              <label className="form-label" htmlFor="contact-email">Email</label>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                placeholder="john@example.com"
+                className="form-input"
+                value={formValues.email}
+                onChange={handleFormChange}
+                autoComplete="email"
+              />
             </div>
             <div className="form-group">
-              <label className="form-label">Message</label>
-              <textarea rows="4" placeholder="Tell me about your project..." className="form-textarea"></textarea>
+              <label className="form-label" htmlFor="contact-message">Message</label>
+              <textarea
+                id="contact-message"
+                name="message"
+                rows="4"
+                placeholder="Tell me about your project..."
+                className="form-textarea"
+                value={formValues.message}
+                onChange={handleFormChange}
+              />
             </div>
+
+            <input
+              className="form-hidden-field"
+              name="website"
+              value={formValues.website}
+              onChange={handleFormChange}
+              tabIndex="-1"
+              autoComplete="off"
+              aria-hidden="true"
+            />
+
+            {formStatus.message && (
+              <p className={`form-status ${formStatus.type}`} role="status">
+                {formStatus.message}
+              </p>
+            )}
             
-            <button type="submit" className="form-button">
-              Send Message
+            <button type="submit" className="form-button" disabled={isSending}>
+              <span>{isSending ? 'Sending...' : 'Send Message'}</span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -140,7 +275,6 @@ const Contact = () => {
             exit={{ scale: 0.8, opacity: 0 }}
             onClick={(e) => {
               e.stopPropagation()
-              console.log('Modal content clicked')
             }}
           >
             <button className="tip-modal-close" onClick={handleCloseModal} type="button">

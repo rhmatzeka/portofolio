@@ -1,24 +1,25 @@
 import { motion } from 'framer-motion'
 import { memo } from 'react'
+import LivePresence from './LivePresence'
 import './Hero.css'
 
 const containerVariants = {
   initial: { opacity: 0 },
   in: { 
     opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.1 }
+    transition: { staggerChildren: 0.12, delayChildren: 0.08 }
   },
   out: { opacity: 0, transition: { duration: 0.3 } }
 }
 
 const itemLeft = {
-  initial: { opacity: 0, x: -50 },
-  in: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
+  initial: { opacity: 0, y: 34, scale: 0.98 },
+  in: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.72, ease: [0.16, 1, 0.3, 1] } }
 }
 
 const itemRight = {
-  initial: { opacity: 0, x: 50 },
-  in: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
+  initial: { opacity: 0, y: 26, scale: 0.98 },
+  in: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.68, ease: [0.16, 1, 0.3, 1] } }
 }
 
 const Hero = memo(() => {
@@ -31,6 +32,10 @@ const Hero = memo(() => {
       exit="out"
     >
       <div className="hero-left">
+        <motion.div variants={itemLeft} className="hero-presence">
+          <LivePresence />
+        </motion.div>
+
         <motion.h1 variants={itemLeft} className="hero-title">
           Hi, I'm <span className="gradient-text">Rahmat</span><br/>
           Eka Satria

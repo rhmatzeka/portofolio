@@ -9,6 +9,7 @@ const About = lazy(() => import('./components/About'))
 const Cases = lazy(() => import('./components/Cases'))
 const Contact = lazy(() => import('./components/Contact'))
 const Footer = lazy(() => import('./components/Footer'))
+const AiAssistant = lazy(() => import('./components/AiAssistant'))
 
 function App() {
   const [pageLoading, setPageLoading] = useState(true)
@@ -16,10 +17,9 @@ function App() {
   const [showSpline, setShowSpline] = useState(false)
 
   useEffect(() => {
-    // Simulate initial page load
     const timer = setTimeout(() => {
       setPageLoading(false)
-    }, 700)
+    }, 320)
 
     return () => clearTimeout(timer)
   }, [])
@@ -129,6 +129,10 @@ function App() {
           <Footer />
         </Suspense>
       </div>
+
+      <Suspense fallback={null}>
+        <AiAssistant />
+      </Suspense>
     </div>
   )
 }

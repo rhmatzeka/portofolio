@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ethers } from 'ethers'
 import './ConnectWallet.css'
 
 const RECIPIENT_ADDRESS = '0x8988140cEF5A825f39929c60c97173ec5a2eF27D'
@@ -18,6 +17,7 @@ const getMetaMaskDeepLink = () => {
 const ConnectWallet = ({ compact = false }) => {
   const [walletAddress, setWalletAddress] = useState(null)
   const [showModal, setShowModal] = useState(false)
+  const [showWalletNotice, setShowWalletNotice] = useState(false)
   const [amount, setAmount] = useState('0.001')
   const [status, setStatus] = useState(null)
   const [txHash, setTxHash] = useState(null)
@@ -25,13 +25,7 @@ const ConnectWallet = ({ compact = false }) => {
 
   const connectWallet = async () => {
     if (!window.ethereum) {
-      if (isMobileDevice()) {
-        window.location.href = getMetaMaskDeepLink()
-        return
-      }
-
-      alert('MetaMask not found! Please install MetaMask first.')
-      window.open('https://metamask.io/download/', '_blank', 'noopener,noreferrer')
+      setShowWalletNotice(true)
       return
     }
 
@@ -47,6 +41,7 @@ const ConnectWallet = ({ compact = false }) => {
   const disconnectWallet = () => {
     setWalletAddress(null)
     setShowModal(false)
+    setShowWalletNotice(false)
     setStatus(null)
     setTxHash(null)
   }
@@ -55,6 +50,7 @@ const ConnectWallet = ({ compact = false }) => {
     if (!walletAddress) return
     try {
       setStatus('loading')
+      const { ethers } = await import('ethers')
       const provider = new ethers.BrowserProvider(window.ethereum)
       const signer = await provider.getSigner()
       const tx = await signer.sendTransaction({
@@ -71,9 +67,16 @@ const ConnectWallet = ({ compact = false }) => {
 
   const shortAddress = (addr) => addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : ''
 
+  const openMetaMask = () => {
+    window.location.href = getMetaMaskDeepLink()
+  }
+
+  const openMetaMaskDownload = () => {
+    window.open('https://metamask.io/download/', '_blank', 'noopener,noreferrer')
+  }
+
   return (
     <>
-      {/* Connect / Connected Button */}
       {!walletAddress ? (
         <button className={`connect-wallet-btn ${compact ? 'compact' : ''}`} onClick={connectWallet}>
           {shouldOpenMetaMaskMobile ? 'Open MetaMask' : compact ? 'Donate' : 'Connect Wallet to Donate'}
@@ -88,8 +91,59 @@ const ConnectWallet = ({ compact = false }) => {
         </div>
       )}
 
-      {/* Donate Modal */}
       <AnimatePresence>
+        {showWalletNotice && (
+          <motion.div
+            className="donate-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowWalletNotice(false)}
+          >
+            <motion.div
+              className="donate-modal wallet-notice-modal"
+              initial={{ scale: 0.9, opacity: 0, y: 18 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 18 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button className="donate-close" onClick={() => setShowWalletNotice(false)} type="button" aria-label="Close">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+
+              <div className="wallet-notice-icon" aria-hidden="true">
+                <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+                  <path d="M4 6.5h24v19H4z" fill="#0b1114" stroke="#00d1ff" strokeWidth="1.6"/>
+                  <path d="M8 11h16M8 16h10M8 21h7" stroke="#00d1ff" strokeWidth="1.6" strokeLinecap="round"/>
+                </svg>
+              </div>
+
+              <h2 className="donate-title">MetaMask Needed</h2>
+              <p className="donate-subtitle wallet-notice-copy">
+                Connect a MetaMask wallet first so the donation can be sent securely from your browser.
+              </p>
+
+              <div className="wallet-notice-actions">
+                {isMobileDevice() ? (
+                  <button className="donate-send-btn" type="button" onClick={openMetaMask}>
+                    Open MetaMask
+                  </button>
+                ) : (
+                  <button className="donate-send-btn" type="button" onClick={openMetaMaskDownload}>
+                    Install MetaMask
+                  </button>
+                )}
+
+                <button className="donate-secondary-btn" type="button" onClick={openMetaMaskDownload}>
+                  Download Page
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
         {showModal && walletAddress && (
           <motion.div
             className="donate-overlay"
@@ -105,7 +159,7 @@ const ConnectWallet = ({ compact = false }) => {
               exit={{ scale: 0.85, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button className="donate-close" onClick={() => { setShowModal(false); setStatus(null) }} type="button">
+              <button className="donate-close" onClick={() => { setShowModal(false); setStatus(null) }} type="button" aria-label="Close">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
@@ -113,16 +167,20 @@ const ConnectWallet = ({ compact = false }) => {
 
               {status === 'success' ? (
                 <div className="donate-success">
-                  <div className="donate-success-icon">✅</div>
+                  <div className="donate-success-icon success" aria-hidden="true">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+                      <path d="M20 6 9 17l-5-5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                   <h3>Transaction Sent!</h3>
-                  <p>Thank you for your support! 🙏</p>
+                  <p>Thank you for your support.</p>
                   <a
                     href={`https://etherscan.io/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="donate-etherscan-btn"
                   >
-                    View on Etherscan ↗
+                    View on Etherscan
                   </a>
                   <button className="donate-again-btn" onClick={() => setStatus(null)} type="button">
                     Donate Again
@@ -130,7 +188,11 @@ const ConnectWallet = ({ compact = false }) => {
                 </div>
               ) : status === 'error' ? (
                 <div className="donate-success">
-                  <div className="donate-success-icon">❌</div>
+                  <div className="donate-success-icon error" aria-hidden="true">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+                      <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/>
+                    </svg>
+                  </div>
                   <h3>Transaction Failed</h3>
                   <p>Something went wrong. Please try again.</p>
                   <button className="donate-again-btn" onClick={() => setStatus(null)} type="button">

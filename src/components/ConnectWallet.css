@@ -129,6 +129,56 @@
   pointer-events: auto;
 }
 
+.wallet-notice-modal {
+  max-width: 410px;
+  background:
+    linear-gradient(180deg, rgba(0, 209, 255, 0.08), transparent 42%),
+    rgba(12, 15, 17, 0.98);
+}
+
+.wallet-notice-icon {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.15rem;
+  border: 1px solid rgba(0, 209, 255, 0.28);
+  border-radius: 18px;
+  background: rgba(0, 209, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.wallet-notice-copy {
+  margin-bottom: 1.35rem;
+  line-height: 1.65;
+}
+
+.wallet-notice-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.donate-secondary-btn {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  font-family: inherit;
+}
+
+.donate-secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(0, 209, 255, 0.26);
+  color: #ffffff;
+}
+
 .donate-close {
   position: absolute;
   top: 1rem;
@@ -320,7 +370,25 @@
 }
 
 .donate-success-icon {
-  font-size: 3rem;
+  width: 58px;
+  height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.donate-success-icon.success {
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.32);
+  box-shadow: 0 0 24px rgba(0, 255, 136, 0.12);
+}
+
+.donate-success-icon.error {
+  color: #ff6464;
+  border: 1px solid rgba(255, 100, 100, 0.32);
+  box-shadow: 0 0 24px rgba(255, 100, 100, 0.12);
 }
 
 .donate-success h3 {

@@ -63,7 +63,6 @@
   }
 }
 
-#about,
 #projects,
 #contact {
   content-visibility: auto;
@@ -93,10 +92,16 @@
   .full-section {
     min-height: auto;
     padding: 5rem 1.25rem 2.5rem;
+    justify-content: flex-start;
   }
 
   .hero-section {
     min-height: 100svh;
+    justify-content: center;
+  }
+
+  #about {
+    padding-top: 2.75rem;
   }
   
   .hero-section .spline-iframe {
@@ -116,6 +121,10 @@
 @media (max-width: 480px) {
   .full-section {
     padding: 4.5rem 1rem 2.25rem;
+  }
+
+  #about {
+    padding-top: 2.25rem;
   }
 
   .hero-section .spline-iframe {
@@ -155,7 +164,6 @@
 }
 
 @media (max-width: 768px) {
-  #about,
   #projects,
   #contact {
     content-visibility: visible;

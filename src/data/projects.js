@@ -32,7 +32,7 @@ export const projects = [
   },
   {
     id: 2,
-    title: 'Mobile Wallet Ethereum',
+    title: 'Ethernest',
     tech: 'MOBILE \\ ETH',
     desc: 'Mobile cryptocurrency wallet app for Ethereum with secure transaction management and multi-chain support.',
     fullDesc: 'A feature-rich mobile wallet application built with React Native for managing Ethereum and ERC-20 tokens. Includes biometric authentication, QR code scanning, transaction history, real-time price tracking, and support for multiple networks including mainnet and testnets. Implements secure key storage using device encryption.',

@@ -1,0 +1,360 @@
+.live-presence-strip {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  pointer-events: auto;
+}
+
+.dynamic-island {
+  position: relative;
+  width: min(100%, 396px);
+  min-height: 56px;
+  padding: 0.32rem;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)),
+    rgba(5, 7, 10, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 22px 50px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.dynamic-island::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.92;
+}
+
+.dynamic-island-neutral::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 62%);
+}
+
+.dynamic-island-github::before {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(146, 154, 168, 0.06) 44%, transparent 74%);
+}
+
+.dynamic-island-spotify::before {
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.28), rgba(29, 185, 84, 0.05) 48%, transparent 75%);
+}
+
+.dynamic-island-discord::before {
+  background: linear-gradient(135deg, rgba(88, 101, 242, 0.28), rgba(88, 101, 242, 0.06) 52%, transparent 78%);
+}
+
+.dynamic-island-coding::before {
+  background: linear-gradient(135deg, rgba(0, 209, 255, 0.24), rgba(109, 255, 178, 0.06) 54%, transparent 78%);
+}
+
+.dynamic-island-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.62rem;
+  min-height: 48px;
+  padding: 0.26rem 0.3rem;
+  z-index: 1;
+}
+
+.island-visual {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.island-visual.artwork img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.island-visual.icon {
+  color: #ffffff;
+}
+
+.island-visual.icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.dynamic-island-spotify .island-visual.icon {
+  background: rgba(29, 185, 84, 0.16);
+  color: #1ed760;
+}
+
+.dynamic-island-github .island-visual.icon {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f5f7fa;
+}
+
+.dynamic-island-coding .island-visual.icon {
+  background: rgba(0, 209, 255, 0.12);
+  color: #7ef5ff;
+}
+
+.dynamic-island-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: left;
+}
+
+.dynamic-island-eyebrow {
+  color: rgba(232, 240, 250, 0.72);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dynamic-island-label,
+.dynamic-island-meta,
+.dynamic-island-footer,
+.dynamic-island-mini-label,
+.dynamic-island-mini-text {
+  overflow-wrap: anywhere;
+}
+
+.dynamic-island-label {
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.dynamic-island-meta {
+  margin-top: 0.14rem;
+  color: rgba(232, 240, 250, 0.68);
+  font-size: 0.64rem;
+  line-height: 1.22;
+}
+
+.dynamic-island-footer {
+  margin-top: 0.1rem;
+  color: rgba(232, 240, 250, 0.54);
+  font-size: 0.58rem;
+  line-height: 1.18;
+}
+
+.dynamic-island-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 0.28rem 0.48rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dynamic-island-mini {
+  position: absolute;
+  top: 50%;
+  right: -0.28rem;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-height: 34px;
+  max-width: 132px;
+  padding: 0.22rem 0.28rem 0.22rem 0.22rem;
+  border-radius: 999px;
+  background: rgba(8, 10, 12, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.26);
+}
+
+.dynamic-island-mini-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dynamic-island-mini .island-visual {
+  width: 24px;
+  height: 24px;
+}
+
+.dynamic-island-mini .island-visual svg {
+  width: 12px;
+  height: 12px;
+}
+
+.dynamic-island-mini-text {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.48rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dynamic-island-mini-label {
+  margin-top: 0.04rem;
+  padding-right: 0.12rem;
+  color: rgba(232, 240, 250, 0.68);
+  font-size: 0.53rem;
+  line-height: 1.2;
+}
+
+.presence-dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  border: 2px solid rgba(5, 7, 10, 0.96);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.06);
+}
+
+.presence-dot-online {
+  background: #23a55a;
+}
+
+.presence-dot-idle {
+  background: #f0b232;
+}
+
+.presence-dot-dnd {
+  background: #f23f43;
+}
+
+.dynamic-island-discord .island-visual.icon {
+  background: rgba(88, 101, 242, 0.14);
+  color: #cbd1ff;
+}
+
+.island-pulse-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 768px) {
+  .dynamic-island {
+    width: min(100%, 360px);
+    min-height: 54px;
+  }
+
+  .dynamic-island-inner {
+    min-height: 46px;
+    gap: 0.56rem;
+  }
+
+  .island-visual {
+    width: 36px;
+    height: 36px;
+  }
+
+  .dynamic-island-label {
+    font-size: 0.72rem;
+  }
+
+  .dynamic-island-meta {
+    font-size: 0.61rem;
+  }
+
+  .dynamic-island-footer {
+    font-size: 0.56rem;
+  }
+
+  .dynamic-island-mini {
+    right: 0.22rem;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+}
+
+@media (max-width: 560px) {
+  .dynamic-island {
+    width: min(100%, 320px);
+    min-height: 50px;
+    border-radius: 24px;
+    padding: 0.28rem;
+  }
+
+  .dynamic-island-inner {
+    min-height: 42px;
+    gap: 0.5rem;
+    padding: 0.24rem 0.24rem 0.24rem 0.26rem;
+  }
+
+  .dynamic-island-badge {
+    display: none;
+  }
+
+  .dynamic-island-mini {
+    position: static;
+    margin-top: 0.22rem;
+    width: 100%;
+    max-width: none;
+    justify-content: flex-start;
+    transform: none;
+  }
+
+  .live-presence-strip {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .island-visual {
+    width: 34px;
+    height: 34px;
+  }
+
+  .island-visual.icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .dynamic-island-eyebrow {
+    font-size: 0.52rem;
+  }
+
+  .dynamic-island-label {
+    font-size: 0.69rem;
+  }
+
+  .dynamic-island-meta {
+    font-size: 0.59rem;
+  }
+
+  .dynamic-island-footer {
+    font-size: 0.54rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .dynamic-island {
+    width: 100%;
+    border-radius: 22px;
+  }
+
+  .dynamic-island-inner {
+    padding-right: 0.2rem;
+  }
+
+  .dynamic-island-mini-label {
+    font-size: 0.5rem;
+  }
+}

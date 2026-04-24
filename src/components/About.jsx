@@ -5,17 +5,17 @@ import './About.css'
 
 const containerVariants = {
   initial: { opacity: 0 },
-  in: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } }
+  in: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.04 } }
 }
 
 const itemLeft = {
-  initial: { opacity: 0, x: -40 },
-  in: { opacity: 1, x: 0, transition: { duration: 0.7, ease: 'easeOut' } }
+  initial: { opacity: 0, y: 28, scale: 0.98 },
+  in: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.64, ease: [0.16, 1, 0.3, 1] } }
 }
 
 const itemRight = {
-  initial: { opacity: 0, x: 40 },
-  in: { opacity: 1, x: 0, transition: { duration: 0.7, ease: 'easeOut' } }
+  initial: { opacity: 0, y: 28, scale: 0.98 },
+  in: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.64, ease: [0.16, 1, 0.3, 1] } }
 }
 
 const stack = [
@@ -67,7 +67,7 @@ const About = () => {
       variants={containerVariants}
       initial="initial"
       whileInView="in"
-      viewport={{ once: true, amount: 0.3 }}
+      viewport={{ once: true, amount: 0.02, margin: '0px 0px -8% 0px' }}
     >
       <div className="about-container">
         {/* Avatar */}
