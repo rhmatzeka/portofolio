@@ -33,8 +33,8 @@ const DiscordIcon = () => (
 const formatRelativeTime = (value) => {
   if (!value) return 'recently'
 
-  const timestamp = new Date(value).getTime()
-  if (Number.isNaN(timestamp)) return 'recently'
+  const timestamp = getTimestamp(value)
+  if (!timestamp) return 'recently'
 
   const diffMs = timestamp - Date.now()
   const absMs = Math.abs(diffMs)
@@ -48,11 +48,18 @@ const formatRelativeTime = (value) => {
   return rtf.format(Math.round(diffMs / day), 'day')
 }
 
+const getTimestamp = (value) => {
+  if (!value) return null
+
+  const timestamp = typeof value === 'number' ? value : new Date(value).getTime()
+  return Number.isFinite(timestamp) ? timestamp : null
+}
+
 const formatElapsedTime = (value, now = Date.now()) => {
   if (!value) return null
 
-  const timestamp = new Date(value).getTime()
-  if (Number.isNaN(timestamp)) return null
+  const timestamp = getTimestamp(value)
+  if (!timestamp) return null
 
   const totalSeconds = Math.max(0, Math.floor((now - timestamp) / 1000))
   const hours = Math.floor(totalSeconds / 3600)
@@ -63,7 +70,36 @@ const formatElapsedTime = (value, now = Date.now()) => {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
   }
 
-  return `${minutes}:${String(seconds).padStart(2, '0')}`
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+const formatPlaybackTime = (milliseconds) => {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000))
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  }
+
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+const getPlaybackProgress = (startedAt, endsAt, now) => {
+  const start = getTimestamp(startedAt)
+  const end = getTimestamp(endsAt)
+
+  if (!start || !end || end <= start) return null
+
+  const duration = end - start
+  const elapsed = Math.min(Math.max(now - start, 0), duration)
+
+  return {
+    elapsedLabel: formatPlaybackTime(elapsed),
+    durationLabel: formatPlaybackTime(duration),
+    percent: Math.round((elapsed / duration) * 1000) / 10
+  }
 }
 
 const formatStatusLabel = (status) => {
@@ -79,6 +115,12 @@ const formatStatusLabel = (status) => {
 
 const isTimeLike = (value) => typeof value === 'string' && /^\d{1,2}:\d{2}(?::\d{2})?$/.test(value)
 
+const getActivityEyebrow = (activity, isCodingActivity) => {
+  if (isCodingActivity) return 'Rahmat is coding right now'
+  if (activity?.app) return `Rahmat is using ${activity.app} right now`
+  return 'Rahmat is active right now'
+}
+
 const buildStatusCards = (data, now) => {
   const cards = []
   const discordStatus = data?.live?.status || 'offline'
@@ -89,6 +131,30 @@ const buildStatusCards = (data, now) => {
     && !data?.live?.music
     && !data?.live?.coding
   )
+
+  if (data?.live?.music) {
+    const elapsedTime = formatElapsedTime(data.live.music.startedAt, now)
+
+    cards.push({
+      key: 'music',
+      theme: 'spotify',
+      eyebrow: 'Rahmat is listening right now',
+      label: data.live.music.song || 'Listening now',
+      meta: data.live.music.artist || 'Spotify',
+      footerParts: [],
+      playbackProgress: getPlaybackProgress(
+        data.live.music.startedAt,
+        data.live.music.endsAt,
+        now
+      ),
+      elapsedTime,
+      badge: 'Live',
+      actionUrl: data.live.music.spotifyUrl || '',
+      artwork: data.live.music.albumArtUrl || '',
+      status: discordStatus,
+      icon: <SpotifyIcon />
+    })
+  }
 
   if (data?.live?.online && activeActivity) {
     const isCodingActivity = activeActivity.kind === 'coding'
@@ -101,16 +167,16 @@ const buildStatusCards = (data, now) => {
     const footerParts = isCodingActivity
       ? [activeActivity.state, formatElapsedTime(activeActivity.startedAt, now)]
       : [activeActivity.details, formatElapsedTime(activeActivity.startedAt, now)]
+    const elapsedTime = formatElapsedTime(activeActivity.startedAt, now)
 
     cards.push({
       key: 'activity',
       theme: isCodingActivity ? 'coding' : 'discord',
-      eyebrow: isCodingActivity
-        ? 'Rahmat lagi ngoding nih sekarang'
-        : `Rahmat lagi buka ${activeActivity.app || 'sesuatu'} nih sekarang`,
+      eyebrow: getActivityEyebrow(activeActivity, isCodingActivity),
       label: activeActivity.app || 'Discord',
       meta: description || 'Active on Discord right now',
       footerParts: footerParts.filter(Boolean),
+      elapsedTime,
       badge: formatStatusLabel(discordStatus),
       artwork: isCodingActivity ? codingArtwork : gameArtwork,
       status: discordStatus,
@@ -118,32 +184,20 @@ const buildStatusCards = (data, now) => {
     })
   }
 
-  if (data?.live?.music) {
-    cards.push({
-      key: 'music',
-      theme: 'spotify',
-      eyebrow: 'Rahmat lagi dengerin lagu nih sekarang',
-      label: data.live.music.song || 'Listening now',
-      meta: data.live.music.artist || 'Spotify',
-      footerParts: [formatElapsedTime(data.live.music.startedAt, now)].filter(Boolean),
-      badge: 'spotify',
-      artwork: data.live.music.albumArtUrl || '',
-      status: discordStatus,
-      icon: <SpotifyIcon />
-    })
-  }
-
   if (!data?.live?.online && data?.live?.coding) {
+    const elapsedTime = formatElapsedTime(data.live.coding.startedAt, now)
+
     cards.push({
       key: 'coding',
       theme: 'coding',
-      eyebrow: 'Rahmat lagi ngoding nih sekarang',
+      eyebrow: 'Rahmat is coding right now',
       label: data.live.coding.app || 'Coding',
       meta: data.live.coding.details || data.live.coding.state || 'Locked in',
       footerParts: [
         data.live.coding.state,
-        formatElapsedTime(data.live.coding.startedAt, now)
+        elapsedTime
       ].filter(Boolean),
+      elapsedTime,
       badge: 'Live',
       artwork: codingArtwork,
       status: discordStatus,
@@ -155,9 +209,9 @@ const buildStatusCards = (data, now) => {
     cards.push({
       key: 'online',
       theme: 'discord',
-      eyebrow: 'Rahmat lagi online nih sekarang',
+      eyebrow: 'Rahmat is online right now',
       label: formatStatusLabel(discordStatus),
-      meta: 'Belum keliatan lagi buka apa',
+      meta: 'No detailed activity visible yet',
       footerParts: [data?.discordConfigured
         ? 'Presence feed connected'
         : 'Add DISCORD_USER_ID to enable live activity'],
@@ -202,6 +256,50 @@ const Visual = ({ card }) => {
       {card.icon}
     </span>
   )
+}
+
+const PlaybackProgress = ({ progress, label }) => {
+  if (!progress) return null
+
+  return (
+    <div className="spotify-playback" aria-label={`${label} playback progress`}>
+      <span className="spotify-playback-time">{progress.elapsedLabel}</span>
+      <div
+        className="spotify-playback-bar"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={Math.round(progress.percent)}
+        aria-valuetext={`${progress.elapsedLabel} of ${progress.durationLabel}`}
+      >
+        <span
+          className="spotify-playback-fill"
+          style={{ width: `${progress.percent}%` }}
+        />
+      </div>
+      <span className="spotify-playback-time">{progress.durationLabel}</span>
+    </div>
+  )
+}
+
+const StatusBadge = ({ card }) => {
+  const className = `dynamic-island-badge dynamic-island-badge-${card.badge.toLowerCase().replace(/\s+/g, '-')}`
+
+  if (card.actionUrl) {
+    return (
+      <a
+        href={card.actionUrl}
+        className={className}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Open ${card.label} on Spotify`}
+      >
+        {card.badge}
+      </a>
+    )
+  }
+
+  return <span className={className}>{card.badge}</span>
 }
 
 const LivePresence = () => {
@@ -269,6 +367,9 @@ const LivePresence = () => {
               )}
               <span className="dynamic-island-label">{primaryCard.label}</span>
               <span className="dynamic-island-meta">{primaryCard.meta}</span>
+              {primaryCard.playbackProgress && (
+                <PlaybackProgress progress={primaryCard.playbackProgress} label={primaryCard.label} />
+              )}
               {primaryCard.footerParts?.length > 0 && (
                 <span className="dynamic-island-footer">
                   {primaryCard.footerParts.map((part, index) => (
@@ -281,15 +382,18 @@ const LivePresence = () => {
               )}
             </div>
 
-            <span className={`dynamic-island-badge dynamic-island-badge-${primaryCard.badge.toLowerCase().replace(/\s+/g, '-')}`}>{primaryCard.badge}</span>
+            <StatusBadge card={primaryCard} />
           </div>
 
           {secondaryCard && (
             <div className="dynamic-island-mini">
               <Visual card={secondaryCard} />
               <div className="dynamic-island-mini-copy">
-                <span className="dynamic-island-mini-text">{secondaryCard.badge}</span>
+                <span className="dynamic-island-mini-text">{secondaryCard.eyebrow || secondaryCard.badge}</span>
                 <span className="dynamic-island-mini-label">{secondaryCard.label}</span>
+                {secondaryCard.elapsedTime && (
+                  <span className="dynamic-island-mini-time">{secondaryCard.elapsedTime}</span>
+                )}
               </div>
             </div>
           )}

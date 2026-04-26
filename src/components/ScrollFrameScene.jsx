@@ -6,7 +6,6 @@ import './ScrollFrameScene.css'
 gsap.registerPlugin(ScrollTrigger)
 
 const frameModules = import.meta.glob('../assets/kiluaanimated/*.jpg', {
-  eager: true,
   query: '?url',
   import: 'default'
 })
@@ -15,23 +14,45 @@ const ScrollFrameScene = () => {
   const sectionRef = useRef(null)
   const imageRef = useRef(null)
   const lastFrameRef = useRef(-1)
+  const hasLoadedFramesRef = useRef(false)
+  const [frames, setFrames] = useState([])
   const [frameIndex, setFrameIndex] = useState(0)
   const [isReady, setIsReady] = useState(false)
 
-  const frames = useMemo(() => (
+  const frameLoaders = useMemo(() => (
     Object.entries(frameModules)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, src]) => src)
+      .map(([, loadFrame]) => loadFrame)
   ), [])
 
   useEffect(() => {
-    if (!frames.length) return undefined
+    if (!sectionRef.current || hasLoadedFramesRef.current) return undefined
 
-    frames.forEach((src) => {
-      const image = new Image()
-      image.src = src
+    const loadFrames = async () => {
+      if (hasLoadedFramesRef.current) return
+      hasLoadedFramesRef.current = true
+      const sources = await Promise.all(frameLoaders.map((loadFrame) => loadFrame()))
+      setFrames(sources)
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      loadFrames()
+      return undefined
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        loadFrames()
+        observer.disconnect()
+      }
+    }, {
+      rootMargin: '420px 0px'
     })
-  }, [frames])
+
+    observer.observe(sectionRef.current)
+
+    return () => observer.disconnect()
+  }, [frameLoaders])
 
   useEffect(() => {
     if (!frames.length) return undefined
@@ -65,25 +86,25 @@ const ScrollFrameScene = () => {
     }
   }, [frames])
 
-  if (!frames.length) return null
-
   return (
     <div
       ref={sectionRef}
       className="scroll-frame-section"
       aria-hidden="true"
     >
-      <div className="scroll-frame-scene">
-        <div className="scroll-frame-orbit" />
-        <img
-          ref={imageRef}
-          src={frames[frameIndex]}
-          alt=""
-          className={`scroll-frame-image ${isReady ? 'is-ready' : ''}`}
-          onLoad={() => setIsReady(true)}
-          draggable="false"
-        />
-      </div>
+      {frames.length > 0 && (
+        <div className="scroll-frame-scene">
+          <div className="scroll-frame-orbit" />
+          <img
+            ref={imageRef}
+            src={frames[frameIndex]}
+            alt=""
+            className={`scroll-frame-image ${isReady ? 'is-ready' : ''}`}
+            onLoad={() => setIsReady(true)}
+            draggable="false"
+          />
+        </div>
+      )}
     </div>
   )
 }

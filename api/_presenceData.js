@@ -92,12 +92,15 @@ const getPrimaryActivity = (presence) => {
 
 const getMusicPresence = (presence) => {
   if (!presence?.listening_to_spotify || !presence?.spotify) return null
+  const trackId = presence.spotify.track_id || null
 
   return {
     song: presence.spotify.song,
     artist: presence.spotify.artist,
     album: presence.spotify.album,
     albumArtUrl: presence.spotify.album_art_url,
+    trackId,
+    spotifyUrl: trackId ? `https://open.spotify.com/track/${trackId}` : null,
     startedAt: presence.spotify.timestamps?.start || null,
     endsAt: presence.spotify.timestamps?.end || null
   }

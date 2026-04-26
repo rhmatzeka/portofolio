@@ -15,6 +15,7 @@ function App() {
   const [pageLoading, setPageLoading] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
   const [showSpline, setShowSpline] = useState(false)
+  const [showAssistant, setShowAssistant] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -31,10 +32,11 @@ function App() {
     const scheduleSpline = () => {
       setShowSpline(false)
 
-      if (reducedMotion.matches) return undefined
+      const saveData = navigator.connection?.saveData
+      if (reducedMotion.matches || !desktop.matches || saveData) return undefined
 
       const load = () => setShowSpline(true)
-      const timeout = desktop.matches ? 1200 : 800
+      const timeout = 1600
       const idleId = 'requestIdleCallback' in window
         ? window.requestIdleCallback(load, { timeout })
         : window.setTimeout(load, timeout)
@@ -63,6 +65,72 @@ function App() {
       reducedMotion.removeEventListener('change', handleChange)
     }
   }, [])
+
+  useEffect(() => {
+    let didMount = false
+    const mountAssistant = () => {
+      if (didMount) return
+      didMount = true
+      setShowAssistant(true)
+    }
+    const idleId = 'requestIdleCallback' in window
+      ? window.requestIdleCallback(mountAssistant, { timeout: 2600 })
+      : window.setTimeout(mountAssistant, 2600)
+    const events = ['pointerdown', 'keydown', 'touchstart']
+
+    events.forEach((eventName) => {
+      window.addEventListener(eventName, mountAssistant, { once: true, passive: true })
+    })
+
+    return () => {
+      if ('cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleId)
+      } else {
+        window.clearTimeout(idleId)
+      }
+      events.forEach((eventName) => {
+        window.removeEventListener(eventName, mountAssistant)
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) {
+      const elements = Array.from(document.querySelectorAll('.reveal-on-scroll'))
+      elements.forEach((element) => element.classList.add('is-visible'))
+      return undefined
+    }
+
+    const watchedElements = new WeakSet()
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible')
+          observer.unobserve(entry.target)
+        }
+      })
+    }, {
+      threshold: 0.12,
+      rootMargin: '0px 0px -10% 0px'
+    })
+
+    const watchRevealElements = () => {
+      document.querySelectorAll('.reveal-on-scroll').forEach((element) => {
+        if (watchedElements.has(element)) return
+        watchedElements.add(element)
+        observer.observe(element)
+      })
+    }
+
+    watchRevealElements()
+    const mutationObserver = new MutationObserver(watchRevealElements)
+    mutationObserver.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      observer.disconnect()
+      mutationObserver.disconnect()
+    }
+  }, [pageLoading])
 
   useEffect(() => {
     let rafId = null
@@ -102,26 +170,26 @@ function App() {
               title="3D Background Animation"
             />
           )}
-          <div className="section-content">
+          <div className="section-content reveal-on-scroll">
             <Hero />
           </div>
         </section>
         
         <Suspense fallback={<div className="loading-section">Loading...</div>}>
           <section id="about" className="full-section">
-            <div className="section-content">
+            <div className="section-content reveal-on-scroll">
               <About />
             </div>
           </section>
           
           <section id="projects" className="full-section">
-            <div className="section-content">
+            <div className="section-content reveal-on-scroll">
               <Cases />
             </div>
           </section>
           
           <section id="contact" className="full-section">
-            <div className="section-content">
+            <div className="section-content reveal-on-scroll">
               <Contact />
             </div>
           </section>
@@ -130,9 +198,11 @@ function App() {
         </Suspense>
       </div>
 
-      <Suspense fallback={null}>
-        <AiAssistant />
-      </Suspense>
+      {showAssistant && (
+        <Suspense fallback={null}>
+          <AiAssistant />
+        </Suspense>
+      )}
     </div>
   )
 }
