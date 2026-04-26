@@ -115,12 +115,6 @@ const formatStatusLabel = (status) => {
 
 const isTimeLike = (value) => typeof value === 'string' && /^\d{1,2}:\d{2}(?::\d{2})?$/.test(value)
 
-const getActivityEyebrow = (activity, isCodingActivity) => {
-  if (isCodingActivity) return 'Rahmat is coding right now'
-  if (activity?.app) return `Rahmat is using ${activity.app} right now`
-  return 'Rahmat is active right now'
-}
-
 const buildStatusCards = (data, now) => {
   const cards = []
   const discordStatus = data?.live?.status || 'offline'
@@ -138,7 +132,7 @@ const buildStatusCards = (data, now) => {
     cards.push({
       key: 'music',
       theme: 'spotify',
-      eyebrow: 'Rahmat is listening right now',
+      eyebrow: 'Rahmat is listening on Spotify',
       label: data.live.music.song || 'Listening now',
       meta: data.live.music.artist || 'Spotify',
       footerParts: [],
@@ -172,7 +166,7 @@ const buildStatusCards = (data, now) => {
     cards.push({
       key: 'activity',
       theme: isCodingActivity ? 'coding' : 'discord',
-      eyebrow: getActivityEyebrow(activeActivity, isCodingActivity),
+      eyebrow: activeActivity.label || (isCodingActivity ? 'Playing' : 'Active now'),
       label: activeActivity.app || 'Discord',
       meta: description || 'Active on Discord right now',
       footerParts: footerParts.filter(Boolean),
@@ -190,7 +184,7 @@ const buildStatusCards = (data, now) => {
     cards.push({
       key: 'coding',
       theme: 'coding',
-      eyebrow: 'Rahmat is coding right now',
+      eyebrow: data.live.coding.label || 'Playing',
       label: data.live.coding.app || 'Coding',
       meta: data.live.coding.details || data.live.coding.state || 'Locked in',
       footerParts: [
@@ -288,7 +282,7 @@ const StatusBadge = ({ card }) => {
   return <span className={className}>{card.badge}</span>
 }
 
-const IslandShell = ({ card, className, children }) => {
+const PresenceCardShell = ({ card, className, children }) => {
   if (card.actionUrl) {
     return (
       <a
@@ -345,7 +339,7 @@ const LivePresence = () => {
   }, [])
 
   const cards = useMemo(() => buildStatusCards(presence, now), [presence, now])
-  const primaryCard = cards[0] || {
+  const visibleCards = cards.length > 0 ? cards : [{
     key: 'loading',
     theme: 'neutral',
     eyebrow: 'Presence',
@@ -356,55 +350,46 @@ const LivePresence = () => {
     artwork: '',
     status: 'offline',
     icon: <span className="island-pulse-dot" />
-  }
-  const secondaryCard = cards[1] || null
-  const islandClassName = `dynamic-island dynamic-island-${primaryCard.theme}${secondaryCard ? ' dynamic-island-has-secondary' : ''}${primaryCard.actionUrl ? ' dynamic-island-clickable' : ''}`
+  }]
 
   return (
     <div className="live-presence-strip" aria-label="Activity status">
-      <IslandShell card={primaryCard} className={islandClassName}>
-        <div className="dynamic-island-layout">
-          <div className="dynamic-island-inner">
-            <Visual card={primaryCard} />
+      {visibleCards.map((card) => {
+        const islandClassName = `dynamic-island dynamic-island-${card.theme}${card.actionUrl ? ' dynamic-island-clickable' : ''}`
 
-            <div className="dynamic-island-copy">
-              {primaryCard.eyebrow && (
-                <span className="dynamic-island-eyebrow">{primaryCard.eyebrow}</span>
-              )}
-              <span className="dynamic-island-label">{primaryCard.label}</span>
-              <span className="dynamic-island-meta">{primaryCard.meta}</span>
-              {primaryCard.playbackProgress && (
-                <PlaybackProgress progress={primaryCard.playbackProgress} label={primaryCard.label} />
-              )}
-              {primaryCard.footerParts?.length > 0 && (
-                <span className="dynamic-island-footer">
-                  {primaryCard.footerParts.map((part, index) => (
-                    <span key={`${primaryCard.key}-footer-${index}`} className="dynamic-island-footer-piece">
-                      {index > 0 && <span className="dynamic-island-footer-separator">|</span>}
-                      <span className={isTimeLike(part) ? 'dynamic-island-footer-timer' : undefined}>{part}</span>
+        return (
+          <PresenceCardShell key={card.key} card={card} className={islandClassName}>
+            <div className="dynamic-island-layout">
+              <div className="dynamic-island-inner">
+                <Visual card={card} />
+
+                <div className="dynamic-island-copy">
+                  {card.eyebrow && (
+                    <span className="dynamic-island-eyebrow">{card.eyebrow}</span>
+                  )}
+                  <span className="dynamic-island-label">{card.label}</span>
+                  <span className="dynamic-island-meta">{card.meta}</span>
+                  {card.playbackProgress && (
+                    <PlaybackProgress progress={card.playbackProgress} label={card.label} />
+                  )}
+                  {card.footerParts?.length > 0 && (
+                    <span className="dynamic-island-footer">
+                      {card.footerParts.map((part, index) => (
+                        <span key={`${card.key}-footer-${index}`} className="dynamic-island-footer-piece">
+                          {index > 0 && <span className="dynamic-island-footer-separator">|</span>}
+                          <span className={isTimeLike(part) ? 'dynamic-island-footer-timer' : undefined}>{part}</span>
+                        </span>
+                      ))}
                     </span>
-                  ))}
-                </span>
-              )}
-            </div>
+                  )}
+                </div>
 
-            <StatusBadge card={primaryCard} />
-          </div>
-
-          {secondaryCard && (
-            <div className="dynamic-island-mini">
-              <Visual card={secondaryCard} />
-              <div className="dynamic-island-mini-copy">
-                <span className="dynamic-island-mini-text">{secondaryCard.eyebrow || secondaryCard.badge}</span>
-                <span className="dynamic-island-mini-label">{secondaryCard.label}</span>
-                {secondaryCard.elapsedTime && (
-                  <span className="dynamic-island-mini-time">{secondaryCard.elapsedTime}</span>
-                )}
+                <StatusBadge card={card} />
               </div>
             </div>
-          )}
-        </div>
-      </IslandShell>
+          </PresenceCardShell>
+        )
+      })}
     </div>
   )
 }
