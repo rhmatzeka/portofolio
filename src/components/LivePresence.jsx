@@ -285,6 +285,10 @@ const PlaybackProgress = ({ progress, label }) => {
 const StatusBadge = ({ card }) => {
   const className = `dynamic-island-badge dynamic-island-badge-${card.badge.toLowerCase().replace(/\s+/g, '-')}`
 
+  return <span className={className}>{card.badge}</span>
+}
+
+const IslandShell = ({ card, className, children }) => {
   if (card.actionUrl) {
     return (
       <a
@@ -292,14 +296,15 @@ const StatusBadge = ({ card }) => {
         className={className}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Open ${card.label} on Spotify`}
+        aria-label={`Open ${card.label} by ${card.meta} on Spotify`}
+        title={`Open ${card.label} on Spotify`}
       >
-        {card.badge}
+        {children}
       </a>
     )
   }
 
-  return <span className={className}>{card.badge}</span>
+  return <div className={className}>{children}</div>
 }
 
 const LivePresence = () => {
@@ -353,10 +358,11 @@ const LivePresence = () => {
     icon: <span className="island-pulse-dot" />
   }
   const secondaryCard = cards[1] || null
+  const islandClassName = `dynamic-island dynamic-island-${primaryCard.theme}${secondaryCard ? ' dynamic-island-has-secondary' : ''}${primaryCard.actionUrl ? ' dynamic-island-clickable' : ''}`
 
   return (
     <div className="live-presence-strip" aria-label="Activity status">
-      <div className={`dynamic-island dynamic-island-${primaryCard.theme}${secondaryCard ? ' dynamic-island-has-secondary' : ''}`}>
+      <IslandShell card={primaryCard} className={islandClassName}>
         <div className="dynamic-island-layout">
           <div className="dynamic-island-inner">
             <Visual card={primaryCard} />
@@ -398,7 +404,7 @@ const LivePresence = () => {
             </div>
           )}
         </div>
-      </div>
+      </IslandShell>
     </div>
   )
 }

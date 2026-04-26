@@ -8,6 +8,7 @@
 
 .dynamic-island {
   position: relative;
+  display: block;
   width: min(100%, 648px);
   min-height: 56px;
   padding: 0.32rem;
@@ -21,6 +22,31 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
+  color: inherit;
+  text-decoration: none;
+}
+
+.dynamic-island-clickable {
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.dynamic-island-clickable:hover,
+.dynamic-island-clickable:focus-visible {
+  border-color: rgba(0, 209, 255, 0.28);
+  box-shadow:
+    0 24px 54px rgba(0, 0, 0, 0.38),
+    0 0 26px rgba(0, 209, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.dynamic-island-clickable:focus-visible {
+  outline: 2px solid rgba(0, 209, 255, 0.72);
+  outline-offset: 4px;
 }
 
 .dynamic-island-layout {
