@@ -99,8 +99,9 @@
 
 @media (max-width: 768px) {
   .scroll-frame-section {
-    height: auto;
-    min-height: 0;
+    height: 92svh;
+    min-height: 560px;
+    aspect-ratio: auto;
     margin-left: calc(50% - 50vw);
   }
 
@@ -110,14 +111,16 @@
 
   .scroll-frame-image {
     object-position: center center;
+    object-fit: cover;
     transform: translateZ(0);
   }
 }
 
 @media (max-width: 480px) {
   .scroll-frame-section {
-    height: auto;
-    min-height: 0;
+    height: 86svh;
+    min-height: 500px;
+    aspect-ratio: auto;
   }
 
   .scroll-frame-scene {
