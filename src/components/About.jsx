@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import avatar from '../assets/images/k.jpg'
+import LivePresence from './LivePresence'
 import ScrollFrameScene from './ScrollFrameScene'
 import './About.css'
 
@@ -107,6 +108,10 @@ const About = () => {
 
         </motion.div>
       </div>
+
+      <motion.div className="about-presence" variants={itemRight}>
+        <LivePresence />
+      </motion.div>
 
       <ScrollFrameScene />
 

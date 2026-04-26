@@ -16,6 +16,12 @@
   overflow: clip;
 }
 
+.about-presence {
+  width: min(100%, 648px);
+  margin: 0 auto;
+  pointer-events: auto;
+}
+
 /* Left - Avatar */
 .about-avatar-wrapper {
   flex-shrink: 0;

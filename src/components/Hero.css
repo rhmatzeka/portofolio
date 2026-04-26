@@ -19,11 +19,6 @@
   pointer-events: none;
 }
 
-.hero-presence {
-  width: 100%;
-  max-width: 648px;
-}
-
 .hero-title {
   font-size: clamp(4rem, 6vw, 7rem); 
   font-weight: 600;

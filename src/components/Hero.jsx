@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
 import { memo } from 'react'
-import LivePresence from './LivePresence'
 import './Hero.css'
 
 const containerVariants = {
@@ -32,10 +31,6 @@ const Hero = memo(() => {
       exit="out"
     >
       <div className="hero-left">
-        <motion.div variants={itemLeft} className="hero-presence">
-          <LivePresence />
-        </motion.div>
-
         <motion.h1 variants={itemLeft} className="hero-title">
           Hi, I'm <span className="gradient-text">Rahmat</span><br/>
           Eka Satria
