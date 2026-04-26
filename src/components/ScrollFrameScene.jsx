@@ -1,60 +1,35 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { KILUA_FRAME_ASPECT_RATIO, ensureKiluaFramesPreloaded } from '../utils/kiluaFrames'
 import './ScrollFrameScene.css'
 
 gsap.registerPlugin(ScrollTrigger)
-
-const frameModules = import.meta.glob('../assets/kiluaanimated/*.{jpg,jpeg,png,webp}', {
-  query: '?url',
-  import: 'default'
-})
-
-const FRAME_ASPECT_RATIO = '1920 / 1076'
 
 const ScrollFrameScene = () => {
   const sectionRef = useRef(null)
   const imageRef = useRef(null)
   const lastFrameRef = useRef(-1)
-  const hasLoadedFramesRef = useRef(false)
   const [frames, setFrames] = useState([])
   const [frameIndex, setFrameIndex] = useState(0)
-  const [isReady, setIsReady] = useState(false)
-
-  const frameLoaders = useMemo(() => (
-    Object.entries(frameModules)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, loadFrame]) => loadFrame)
-  ), [])
 
   useEffect(() => {
-    if (!sectionRef.current || hasLoadedFramesRef.current) return undefined
+    let isCancelled = false
 
     const loadFrames = async () => {
-      if (hasLoadedFramesRef.current) return
-      hasLoadedFramesRef.current = true
-      const sources = await Promise.all(frameLoaders.map((loadFrame) => loadFrame()))
+      const sources = await ensureKiluaFramesPreloaded()
+      if (isCancelled) return
+      lastFrameRef.current = -1
+      setFrameIndex(0)
       setFrames(sources)
     }
 
-    if (!('IntersectionObserver' in window)) {
-      loadFrames()
-      return undefined
+    loadFrames()
+
+    return () => {
+      isCancelled = true
     }
-
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        loadFrames()
-        observer.disconnect()
-      }
-    }, {
-      rootMargin: '420px 0px'
-    })
-
-    observer.observe(sectionRef.current)
-
-    return () => observer.disconnect()
-  }, [frameLoaders])
+  }, [])
 
   useEffect(() => {
     if (!frames.length) return undefined
@@ -92,22 +67,21 @@ const ScrollFrameScene = () => {
     <div
       ref={sectionRef}
       className="scroll-frame-section"
-      style={{ '--frame-aspect-ratio': FRAME_ASPECT_RATIO }}
+      style={{ '--frame-aspect-ratio': KILUA_FRAME_ASPECT_RATIO }}
       aria-hidden="true"
     >
-      {frames.length > 0 && (
-        <div className="scroll-frame-scene">
-          <div className="scroll-frame-orbit" />
+      <div className="scroll-frame-scene">
+        <div className="scroll-frame-orbit" />
+        {frames.length > 0 && (
           <img
             ref={imageRef}
             src={frames[frameIndex]}
             alt=""
-            className={`scroll-frame-image ${isReady ? 'is-ready' : ''}`}
-            onLoad={() => setIsReady(true)}
+            className="scroll-frame-image is-ready"
             draggable="false"
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

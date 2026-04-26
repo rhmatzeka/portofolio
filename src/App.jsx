@@ -2,6 +2,7 @@ import { useState, useEffect, lazy, Suspense } from 'react'
 import Hero from './components/Hero'
 import Navbar from './components/Navbar'
 import Loading from './components/Loading'
+import { ensureKiluaFramesPreloaded } from './utils/kiluaFrames'
 import './App.css'
 
 // Lazy load components that are below the fold
@@ -13,16 +14,25 @@ const AiAssistant = lazy(() => import('./components/AiAssistant'))
 
 function App() {
   const [pageLoading, setPageLoading] = useState(true)
+  const [loadingProgress, setLoadingProgress] = useState(0)
   const [isScrolled, setIsScrolled] = useState(false)
   const [showSpline, setShowSpline] = useState(false)
   const [showAssistant, setShowAssistant] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setPageLoading(false)
-    }, 320)
+    let isMounted = true
+    const minimumDelay = new Promise((resolve) => window.setTimeout(resolve, 320))
+    const framesReady = ensureKiluaFramesPreloaded(({ percent }) => {
+      if (isMounted) setLoadingProgress(percent)
+    })
 
-    return () => clearTimeout(timer)
+    Promise.allSettled([minimumDelay, framesReady]).then(() => {
+      if (isMounted) setPageLoading(false)
+    })
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   useEffect(() => {
@@ -154,7 +164,7 @@ function App() {
 
   return (
     <div className="app">
-      {pageLoading && <Loading />}
+      {pageLoading && <Loading progress={loadingProgress} />}
       
       <Navbar isScrolled={isScrolled} />
       

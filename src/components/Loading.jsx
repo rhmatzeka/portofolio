@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import './Loading.css'
 
-const Loading = () => {
+const Loading = ({ progress = 0 }) => {
   const containerVariants = {
     initial: { opacity: 0 },
     animate: { opacity: 1, transition: { duration: 0.3 } },
@@ -58,7 +58,7 @@ const Loading = () => {
           animate="animate"
         />
 
-        <p className="loading-text">Loading amazing things...</p>
+        <p className="loading-text">Preparing frames {progress}%</p>
       </div>
 
       <div className="loading-bg-gradient" />
