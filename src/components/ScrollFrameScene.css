@@ -1,7 +1,9 @@
 .scroll-frame-section {
   position: relative;
   width: 100vw;
-  height: clamp(620px, 100svh, 920px);
+  height: auto;
+  min-height: 0;
+  aspect-ratio: var(--frame-aspect-ratio);
   margin: 0 0 0 calc(50% - 50vw);
   pointer-events: none;
 }
@@ -31,6 +33,7 @@
   position: relative;
   width: 100%;
   height: 100%;
+  aspect-ratio: var(--frame-aspect-ratio);
   margin: 0 auto;
   overflow: hidden;
   border: 0;
@@ -80,7 +83,7 @@
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
   opacity: 0;
   filter: brightness(1.06) saturate(1.16) contrast(1.12);
@@ -96,8 +99,8 @@
 
 @media (max-width: 768px) {
   .scroll-frame-section {
-    height: 92svh;
-    min-height: 560px;
+    height: auto;
+    min-height: 0;
     margin-left: calc(50% - 50vw);
   }
 
@@ -113,8 +116,8 @@
 
 @media (max-width: 480px) {
   .scroll-frame-section {
-    height: 86svh;
-    min-height: 500px;
+    height: auto;
+    min-height: 0;
   }
 
   .scroll-frame-scene {

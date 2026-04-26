@@ -5,10 +5,12 @@ import './ScrollFrameScene.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const frameModules = import.meta.glob('../assets/kiluaanimated/*.jpg', {
+const frameModules = import.meta.glob('../assets/kiluaanimated/*.{jpg,jpeg,png,webp}', {
   query: '?url',
   import: 'default'
 })
+
+const FRAME_ASPECT_RATIO = '1920 / 1076'
 
 const ScrollFrameScene = () => {
   const sectionRef = useRef(null)
@@ -90,6 +92,7 @@ const ScrollFrameScene = () => {
     <div
       ref={sectionRef}
       className="scroll-frame-section"
+      style={{ '--frame-aspect-ratio': FRAME_ASPECT_RATIO }}
       aria-hidden="true"
     >
       {frames.length > 0 && (
