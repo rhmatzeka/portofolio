@@ -2,24 +2,50 @@ import { useState, useEffect, lazy, Suspense } from 'react'
 import Hero from './components/Hero'
 import Navbar from './components/Navbar'
 import Loading from './components/Loading'
+import { projects as defaultProjects } from './data/projects'
+import { getAdminContent } from './utils/portfolioContent'
 import { ensureKiluaFramesPreloaded } from './utils/kiluaFrames'
 import './App.css'
 
 // Lazy load components that are below the fold
+const AdminPage = lazy(() => import('./components/AdminPage'))
 const About = lazy(() => import('./components/About'))
 const Cases = lazy(() => import('./components/Cases'))
+const Certificates = lazy(() => import('./components/Certificates'))
 const Contact = lazy(() => import('./components/Contact'))
 const Footer = lazy(() => import('./components/Footer'))
 const AiAssistant = lazy(() => import('./components/AiAssistant'))
 
 function App() {
+  const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
   const [pageLoading, setPageLoading] = useState(true)
   const [loadingProgress, setLoadingProgress] = useState(0)
   const [isScrolled, setIsScrolled] = useState(false)
   const [showSpline, setShowSpline] = useState(false)
   const [showAssistant, setShowAssistant] = useState(false)
+  const [adminContent, setAdminContent] = useState({ projects: [], certificates: [] })
 
   useEffect(() => {
+    if (isAdminRoute) return undefined
+
+    let isMounted = true
+    getAdminContent()
+      .then((content) => {
+        if (isMounted) setAdminContent(content)
+      })
+      .catch(() => undefined)
+
+    return () => {
+      isMounted = false
+    }
+  }, [isAdminRoute])
+
+  useEffect(() => {
+    if (isAdminRoute) {
+      setPageLoading(false)
+      return undefined
+    }
+
     let isMounted = true
     const minimumDelay = new Promise((resolve) => window.setTimeout(resolve, 320))
     const framesReady = ensureKiluaFramesPreloaded(({ percent }) => {
@@ -33,9 +59,11 @@ function App() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [isAdminRoute])
 
   useEffect(() => {
+    if (isAdminRoute) return undefined
+
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const desktop = window.matchMedia('(min-width: 769px)')
 
@@ -74,9 +102,11 @@ function App() {
       desktop.removeEventListener('change', handleChange)
       reducedMotion.removeEventListener('change', handleChange)
     }
-  }, [])
+  }, [isAdminRoute])
 
   useEffect(() => {
+    if (isAdminRoute) return undefined
+
     let didMount = false
     const mountAssistant = () => {
       if (didMount) return
@@ -102,9 +132,11 @@ function App() {
         window.removeEventListener(eventName, mountAssistant)
       })
     }
-  }, [])
+  }, [isAdminRoute])
 
   useEffect(() => {
+    if (isAdminRoute) return undefined
+
     if (!('IntersectionObserver' in window)) {
       const elements = Array.from(document.querySelectorAll('.reveal-on-scroll'))
       elements.forEach((element) => element.classList.add('is-visible'))
@@ -140,9 +172,11 @@ function App() {
       observer.disconnect()
       mutationObserver.disconnect()
     }
-  }, [pageLoading])
+  }, [pageLoading, isAdminRoute])
 
   useEffect(() => {
+    if (isAdminRoute) return undefined
+
     let rafId = null
 
     const handleScroll = () => {
@@ -160,7 +194,20 @@ function App() {
       window.removeEventListener('scroll', handleScroll)
       if (rafId) cancelAnimationFrame(rafId)
     }
-  }, [])
+  }, [isAdminRoute])
+
+  if (isAdminRoute) {
+    return (
+      <Suspense fallback={<div className="loading-section">Loading...</div>}>
+        <AdminPage />
+      </Suspense>
+    )
+  }
+
+  const portfolioProjects = [
+    ...adminContent.projects,
+    ...defaultProjects
+  ]
 
   return (
     <div className="app">
@@ -194,7 +241,13 @@ function App() {
           
           <section id="projects" className="full-section">
             <div className="section-content reveal-on-scroll">
-              <Cases />
+              <Cases projects={portfolioProjects} />
+            </div>
+          </section>
+
+          <section id="certificates" className="full-section">
+            <div className="section-content reveal-on-scroll">
+              <Certificates certificates={adminContent.certificates} />
             </div>
           </section>
           

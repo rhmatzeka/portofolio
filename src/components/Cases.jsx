@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, memo } from 'react'
 import { createPortal } from 'react-dom'
-import { projects, stackIcons } from '../data/projects'
+import { getCanonicalStackName, getStackIcon, projects as defaultProjects } from '../data/projects'
 import './Cases.css'
 
 const containerVariants = {
@@ -43,12 +43,12 @@ const modalVariants = {
 
 const StackBadge = ({ tech, className = '' }) => (
   <span className={`stack-badge ${className}`}>
-    {stackIcons[tech] && (
+    {getStackIcon(tech) && (
       <span className="stack-badge-icon">
-        <img src={stackIcons[tech]} alt="" loading="lazy" />
+        <img src={getStackIcon(tech)} alt="" loading="lazy" />
       </span>
     )}
-    {tech}
+    {getCanonicalStackName(tech)}
   </span>
 )
 
@@ -119,7 +119,7 @@ const ProjectCard = memo(({ project, onClick }) => (
 
 ProjectCard.displayName = 'ProjectCard'
 
-const Cases = () => {
+const Cases = ({ projects = defaultProjects }) => {
   const [selectedProject, setSelectedProject] = useState(null)
 
   // Prevent body scroll when modal is open

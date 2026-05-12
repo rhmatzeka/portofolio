@@ -81,6 +81,7 @@
 }
 
 #projects,
+#certificates,
 #contact {
   content-visibility: auto;
   contain-intrinsic-size: 900px;
@@ -182,6 +183,7 @@
 
 @media (max-width: 768px) {
   #projects,
+  #certificates,
   #contact {
     content-visibility: visible;
     contain-intrinsic-size: auto;
