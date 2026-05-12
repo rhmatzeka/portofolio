@@ -240,7 +240,7 @@ const AdminPage = () => {
             </div>
             <div className="admin-login-copy">
               <h2>Admin Login</h2>
-              <p>Enter the admin password before managing portfolio content.</p>
+              <p>Manage projects, certificates, and portfolio updates from one private workspace.</p>
             </div>
             <label htmlFor="admin-login-password">
               Password
@@ -249,7 +249,7 @@ const AdminPage = () => {
                 type="password"
                 value={loginPassword}
                 onChange={(event) => setLoginPassword(event.target.value)}
-                placeholder="ADMIN_PASSWORD"
+                placeholder="Enter password"
                 autoComplete="current-password"
               />
             </label>
@@ -270,12 +270,6 @@ const AdminPage = () => {
         {!isAuthenticated && status.message && (
           <div className={`admin-status ${status.type}`}>
             {status.message}
-          </div>
-        )}
-
-        {!isAuthenticated && (
-          <div className="admin-login-note">
-            Set `ADMIN_PASSWORD` in `.env.local` for local development and in Vercel Environment Variables for production.
           </div>
         )}
 
