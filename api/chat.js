@@ -29,7 +29,7 @@ Rahmat Eka Satria profile:
 - Goal: become a fullstack developer at a major tech company.
 - Contact email: matsganz@gmail.com
 - GitHub: https://github.com/rhmatzeka
-- Instagram: https://instagram.com/rahmatdev.id
+- Instagram: https://instagram.com/rhmat.dev
 - Twitter/X: https://twitter.com/rahmatdevID
 
 Core stack:

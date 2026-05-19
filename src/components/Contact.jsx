@@ -157,13 +157,13 @@ const Contact = () => {
               <span>linkedin.com/in/rahmatekasatria</span>
             </a>
 
-            <a href="https://instagram.com/rahmatdev.id" target="_blank" rel="noopener noreferrer" className="contact-info-item">
+            <a href="https://instagram.com/rhmat.dev" target="_blank" rel="noopener noreferrer" className="contact-info-item">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="2.5" y="2.5" width="19" height="19" rx="5"></rect>
                 <circle cx="12" cy="12" r="4.2"></circle>
                 <circle cx="18" cy="6.2" r="1"></circle>
               </svg>
-              <span>instagram.com/rahmatdev.id</span>
+              <span>instagram.com/rhmat.dev</span>
             </a>
 
             <a href="https://twitter.com/rahmatdevID" target="_blank" rel="noopener noreferrer" className="contact-info-item">
