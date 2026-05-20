@@ -427,6 +427,16 @@
   cursor: pointer;
 }
 
+.admin-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .admin-tabs {
   display: inline-flex;
   gap: 0.4rem;
@@ -557,6 +567,124 @@
   color: rgba(255, 255, 255, 0.56);
   font-size: 0.76rem;
   line-height: 1.45;
+}
+
+.admin-upload-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.95rem;
+  border: 1px dashed rgba(0, 209, 255, 0.34);
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg, rgba(0, 209, 255, 0.08), rgba(255, 255, 255, 0.025)),
+    rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+
+.admin-upload-card:focus-within,
+.admin-upload-card:focus {
+  border-color: rgba(0, 209, 255, 0.72);
+  box-shadow: 0 0 0 3px rgba(0, 209, 255, 0.1);
+}
+
+.admin-upload-icon {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 209, 255, 0.34);
+  border-radius: 14px;
+  color: #00d1ff;
+  background: rgba(0, 209, 255, 0.08);
+}
+
+.admin-upload-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.admin-upload-copy {
+  min-width: 0;
+}
+
+.admin-upload-copy span {
+  display: block;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 850;
+}
+
+.admin-upload-copy p,
+.admin-upload-copy small,
+.admin-upload-state small {
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.admin-upload-copy p {
+  margin: 0.22rem 0 0;
+}
+
+.admin-upload-copy small {
+  display: block;
+  margin-top: 0.1rem;
+}
+
+.admin-upload-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.admin-upload-actions button {
+  min-height: 36px;
+  border: 1px solid rgba(0, 209, 255, 0.28);
+  border-radius: 999px;
+  color: #001015;
+  background: #00d1ff;
+  padding: 0.5rem 0.85rem;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.admin-upload-actions .admin-upload-clear {
+  color: #ffd7d7;
+  border-color: rgba(255, 99, 99, 0.34);
+  background: rgba(255, 76, 76, 0.09);
+}
+
+.admin-upload-state {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  min-height: 40px;
+  padding: 0.58rem 0.72rem;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.admin-upload-state span {
+  min-width: 0;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-upload-state.has-file {
+  border-color: rgba(0, 209, 255, 0.26);
+  background: rgba(0, 209, 255, 0.07);
 }
 
 .admin-submit {
@@ -718,6 +846,15 @@
   .admin-page-login .admin-home-link {
     min-height: 42px;
   }
+
+  .admin-upload-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .admin-upload-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 520px) {
@@ -768,6 +905,29 @@
     min-height: 40px;
     padding: 0.6rem 0.85rem;
     font-size: 0.78rem;
+  }
+
+  .admin-upload-card {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-upload-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .admin-upload-actions {
+    flex-direction: column;
+  }
+
+  .admin-upload-actions button {
+    width: 100%;
+  }
+
+  .admin-upload-state {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.15rem;
   }
 
   .admin-list-item {

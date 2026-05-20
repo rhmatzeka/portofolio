@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { getCanonicalStackName, getStackIcon } from '../data/projects'
 import { fileToDataUrl, getAdminContent, normalizeCsv } from '../utils/portfolioContent'
 import './AdminPage.css'
+
+const projectMediaAccept = 'image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/ogg'
 
 const emptyProject = {
   title: '',
@@ -26,6 +28,14 @@ const emptyCertificate = {
   imageUrl: ''
 }
 
+const getMediaTypeFromUrl = (value) => (
+  /\.(mp4|webm|ogv|ogg)(?:[?#].*)?$/i.test(value) ? 'video' : 'image'
+)
+
+const getMediaTypeFromFile = (file) => (
+  file?.type?.startsWith('video/') ? 'video' : 'image'
+)
+
 const AdminPage = () => {
   const [password, setPassword] = useState(() => sessionStorage.getItem('rahmat-admin-password') || '')
   const [loginPassword, setLoginPassword] = useState('')
@@ -38,6 +48,7 @@ const AdminPage = () => {
   const [certificateImage, setCertificateImage] = useState(null)
   const [status, setStatus] = useState({ type: '', message: '' })
   const [isSaving, setIsSaving] = useState(false)
+  const projectMediaInputRef = useRef(null)
 
   const visibleItems = useMemo(() => content[activeTab] || [], [activeTab, content])
   const projectStackPreview = useMemo(() => (
@@ -146,6 +157,52 @@ const AdminPage = () => {
     setStatus({ type: '', message: '' })
   }
 
+  const setProjectMediaFile = (file) => {
+    if (!file) return
+
+    setProjectMedia(file)
+    setProjectForm((currentForm) => ({
+      ...currentForm,
+      mediaType: getMediaTypeFromFile(file)
+    }))
+  }
+
+  const clearProjectMedia = () => {
+    setProjectMedia(null)
+    if (projectMediaInputRef.current) {
+      projectMediaInputRef.current.value = ''
+    }
+  }
+
+  const handleProjectMediaPaste = (event) => {
+    const files = Array.from(event.clipboardData?.files || [])
+    const mediaFile = files.find((file) => file.type.startsWith('image/') || file.type.startsWith('video/'))
+
+    if (mediaFile) {
+      event.preventDefault()
+      setProjectMediaFile(mediaFile)
+      return
+    }
+
+    const pastedText = event.clipboardData?.getData('text')?.trim()
+    if (!pastedText) return
+
+    event.preventDefault()
+    setProjectForm((currentForm) => ({
+      ...currentForm,
+      mediaUrl: pastedText,
+      mediaType: getMediaTypeFromUrl(pastedText)
+    }))
+  }
+
+  const handleProjectMediaDrop = (event) => {
+    event.preventDefault()
+    const file = Array.from(event.dataTransfer?.files || [])
+      .find((currentFile) => currentFile.type.startsWith('image/') || currentFile.type.startsWith('video/'))
+
+    if (file) setProjectMediaFile(file)
+  }
+
   const handleProjectSubmit = async (event) => {
     event.preventDefault()
     const mediaDataUrl = await fileToDataUrl(projectMedia)
@@ -160,7 +217,7 @@ const AdminPage = () => {
 
     if (saved) {
       setProjectForm(emptyProject)
-      setProjectMedia(null)
+      clearProjectMedia()
       event.currentTarget.reset()
     }
   }
@@ -378,22 +435,60 @@ const AdminPage = () => {
                   Use an uploaded file or paste a direct media URL. Videos play in the project modal, GIFs work as animated images.
                 </p>
               </div>
-              <label>
-                Upload Media (max 8MB)
+              <div
+                className="admin-upload-card"
+                onPaste={handleProjectMediaPaste}
+                onDrop={handleProjectMediaDrop}
+                onDragOver={(event) => event.preventDefault()}
+                tabIndex="0"
+                role="button"
+                aria-label="Upload, drop, or paste project media"
+              >
                 <input
+                  ref={projectMediaInputRef}
+                  className="admin-file-input"
                   type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/ogg"
+                  accept={projectMediaAccept}
                   onChange={(event) => {
                     const file = event.target.files?.[0] || null
-                    setProjectMedia(file)
-                    if (file?.type.startsWith('video/')) {
-                      setProjectForm((currentForm) => ({ ...currentForm, mediaType: 'video' }))
-                    } else if (file?.type.startsWith('image/')) {
-                      setProjectForm((currentForm) => ({ ...currentForm, mediaType: 'image' }))
-                    }
+                    if (file) setProjectMediaFile(file)
                   }}
                 />
-              </label>
+                <div className="admin-upload-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 16V4m0 0 4.5 4.5M12 4 7.5 8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M5 15.5v1.8A2.7 2.7 0 0 0 7.7 20h8.6a2.7 2.7 0 0 0 2.7-2.7v-1.8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div className="admin-upload-copy">
+                  <span>Upload media from device</span>
+                  <p>Choose a file, drag it here, or paste a copied image/video/URL.</p>
+                  <small>PNG, JPG, WEBP, GIF, MP4, WEBM, or OGG. Max 8MB.</small>
+                </div>
+                <div className="admin-upload-actions">
+                  <button type="button" onClick={() => projectMediaInputRef.current?.click()}>
+                    Choose File
+                  </button>
+                  {projectMedia && (
+                    <button type="button" className="admin-upload-clear" onClick={clearProjectMedia}>
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className={`admin-upload-state ${projectMedia ? 'has-file' : ''}`}>
+                  {projectMedia ? (
+                    <>
+                      <span>{projectMedia.name}</span>
+                      <small>{getMediaTypeFromFile(projectMedia)} / {(projectMedia.size / (1024 * 1024)).toFixed(2)}MB</small>
+                    </>
+                  ) : (
+                    <>
+                      <span>No media selected</span>
+                      <small>Paste while this box is focused, or use the Media URL field above.</small>
+                    </>
+                  )}
+                </div>
+              </div>
               <button className="admin-submit" type="submit" disabled={isSaving}>
                 {isSaving ? 'Saving...' : 'Save Project'}
               </button>
