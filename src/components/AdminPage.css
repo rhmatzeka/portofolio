@@ -915,13 +915,19 @@
   transform: translateX(-50%);
 }
 
-.admin-nav-center {
+.admin-nav-tabs {
   min-width: 0;
   justify-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
+  gap: 0.34rem;
+  padding: 0.26rem;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 999px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(0, 209, 255, 0.025)),
+    rgba(255, 255, 255, 0.035);
 }
 
 .admin-nav-brand {
@@ -948,51 +954,30 @@
   font-weight: 800;
 }
 
-.admin-nav-links {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.38rem;
-  padding: 0.24rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.admin-nav-project-views {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.32rem;
-  min-width: 0;
-  padding: 0.24rem;
-  border: 1px solid rgba(0, 209, 255, 0.12);
-  border-radius: 999px;
-  background: rgba(0, 209, 255, 0.045);
-}
-
-.admin-nav-project-views button {
-  min-height: 34px;
+.admin-nav-tabs button {
+  min-height: 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.42rem;
+  gap: 0.46rem;
   border: 0;
   border-radius: 999px;
-  padding: 0.46rem 0.78rem;
+  padding: 0.5rem 0.95rem;
   color: rgba(255, 255, 255, 0.68);
   background: transparent;
   font-family: inherit;
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   font-weight: 850;
   cursor: pointer;
   white-space: nowrap;
 }
 
-.admin-nav-project-views button.active {
+.admin-nav-tabs button.active {
   color: #001015;
   background: #00d1ff;
 }
 
-.admin-nav-project-views span {
+.admin-nav-tabs span {
   min-width: 20px;
   height: 20px;
   display: inline-flex;
@@ -1002,24 +987,6 @@
   color: inherit;
   background: rgba(0, 0, 0, 0.14);
   font-size: 0.66rem;
-}
-
-.admin-nav-links button {
-  min-height: 36px;
-  border: 0;
-  border-radius: 999px;
-  padding: 0.5rem 0.95rem;
-  color: rgba(255, 255, 255, 0.66);
-  background: transparent;
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 850;
-  cursor: pointer;
-}
-
-.admin-nav-links button.active {
-  color: #001015;
-  background: #00d1ff;
 }
 
 .admin-nav-actions {
@@ -1648,20 +1615,12 @@
     grid-column: 1;
   }
 
-  .admin-nav-center {
+  .admin-nav-tabs {
     grid-column: 1 / -1;
     grid-row: 2;
     justify-self: stretch;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 0.5rem;
-  }
-
-  .admin-nav-links,
-  .admin-nav-project-views {
-    justify-self: stretch;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .admin-nav-actions {
@@ -1820,18 +1779,11 @@
     font-size: 0.68rem;
   }
 
-  .admin-nav-center {
-    grid-template-columns: 1fr;
-    gap: 0.38rem;
-  }
-
-  .admin-nav-links,
-  .admin-nav-project-views {
+  .admin-nav-tabs {
     padding: 0.2rem;
   }
 
-  .admin-nav-links button,
-  .admin-nav-project-views button {
+  .admin-nav-tabs button {
     min-height: 34px;
     padding: 0.44rem 0.5rem;
     font-size: 0.72rem;
