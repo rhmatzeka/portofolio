@@ -219,7 +219,7 @@ const AdminPage = () => {
   }
 
   return (
-    <main className="admin-page">
+    <main className={`admin-page ${isAuthenticated ? 'admin-page-dashboard' : 'admin-page-login'}`}>
       <section className="admin-shell">
         <header className="admin-header">
           <div>

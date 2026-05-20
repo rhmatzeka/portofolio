@@ -1,4 +1,6 @@
 .admin-page {
+  position: relative;
+  overflow-x: hidden;
   min-height: 100vh;
   background:
     radial-gradient(circle at 18% 0%, rgba(0, 209, 255, 0.18), transparent 30%),
@@ -7,9 +9,62 @@
   padding: clamp(1rem, 4vw, 3rem);
 }
 
+.admin-page-login {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background:
+    radial-gradient(circle at 12% 15%, rgba(0, 209, 255, 0.2), transparent 28%),
+    radial-gradient(circle at 82% 72%, rgba(0, 126, 168, 0.16), transparent 30%),
+    linear-gradient(135deg, #020607 0%, #05090b 46%, #000000 100%);
+}
+
+.admin-page-login::before,
+.admin-page-login::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+}
+
+.admin-page-login::before {
+  inset: 0;
+  opacity: 0.24;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at 50% 50%, black, transparent 76%);
+}
+
+.admin-page-login::after {
+  width: min(54vw, 620px);
+  aspect-ratio: 1;
+  right: -16vw;
+  bottom: -28vh;
+  border: 1px solid rgba(0, 209, 255, 0.12);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(0, 209, 255, 0.14), transparent 62%);
+  filter: blur(2px);
+}
+
 .admin-shell {
   width: min(100%, 1180px);
   margin: 0 auto;
+}
+
+.admin-page-login .admin-shell {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 1280px);
+  min-height: min(760px, calc(100svh - clamp(2rem, 6vw, 5rem)));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
+  grid-template-areas:
+    "header login"
+    "header status";
+  align-items: center;
+  gap: clamp(2rem, 6vw, 5.5rem);
 }
 
 .admin-header {
@@ -18,6 +73,22 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.4rem;
+}
+
+.admin-page-login .admin-header {
+  grid-area: header;
+  display: block;
+  margin: 0;
+  max-width: 650px;
+}
+
+.admin-page-login .admin-header::after {
+  content: '';
+  display: block;
+  width: min(100%, 430px);
+  height: 1px;
+  margin-top: clamp(1.5rem, 4vw, 2.4rem);
+  background: linear-gradient(90deg, rgba(0, 209, 255, 0.72), transparent);
 }
 
 .admin-kicker {
@@ -30,11 +101,30 @@
   text-transform: uppercase;
 }
 
+.admin-page-login .admin-kicker {
+  min-height: 30px;
+  align-items: center;
+  padding: 0 0.65rem;
+  border: 1px solid rgba(0, 209, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(0, 209, 255, 0.08);
+  letter-spacing: 0.24em;
+}
+
 .admin-header h1 {
   margin: 0;
   font-size: clamp(2.1rem, 5vw, 4.4rem);
   font-weight: 650;
   line-height: 1;
+}
+
+.admin-page-login .admin-header h1 {
+  max-width: 8ch;
+  margin-top: 1rem;
+  font-size: clamp(3.2rem, 7.8vw, 6.8rem);
+  font-weight: 760;
+  letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .admin-header p {
@@ -43,6 +133,12 @@
   color: rgba(255, 255, 255, 0.64);
   font-size: 0.98rem;
   line-height: 1.6;
+}
+
+.admin-page-login .admin-header p {
+  max-width: 520px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: clamp(1rem, 1.4vw, 1.18rem);
 }
 
 .admin-home-link {
@@ -58,6 +154,22 @@
   font-size: 0.84rem;
   font-weight: 800;
   background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-page-login .admin-home-link {
+  position: fixed;
+  top: clamp(1rem, 3vw, 2rem);
+  right: clamp(1rem, 3vw, 2rem);
+  z-index: 3;
+  min-height: 48px;
+  padding: 0.7rem 1.15rem;
+  background: rgba(255, 255, 255, 0.065);
+  backdrop-filter: blur(14px);
+}
+
+.admin-page-login .admin-home-link:hover {
+  border-color: rgba(0, 209, 255, 0.44);
+  background: rgba(0, 209, 255, 0.1);
 }
 
 .admin-password-card,
@@ -94,6 +206,21 @@
   padding: clamp(1.25rem, 3vw, 1.75rem);
 }
 
+.admin-page-login .admin-login-card {
+  grid-area: login;
+  width: 100%;
+  margin: 0;
+  gap: 1.1rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: 24px;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(0, 209, 255, 0.04)),
+    rgba(7, 13, 15, 0.88);
+  box-shadow:
+    0 32px 90px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(0, 209, 255, 0.08);
+}
+
 .admin-login-card::before {
   content: '';
   position: absolute;
@@ -101,6 +228,21 @@
   background:
     radial-gradient(circle at 16% 8%, rgba(0, 209, 255, 0.18), transparent 34%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 24%);
+  pointer-events: none;
+}
+
+.admin-page-login .admin-login-card::before {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(0, 209, 255, 0.2), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 32%);
+}
+
+.admin-page-login .admin-login-card::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
   pointer-events: none;
 }
 
@@ -124,6 +266,13 @@
   box-shadow: 0 16px 34px rgba(0, 209, 255, 0.12);
 }
 
+.admin-page-login .admin-login-icon {
+  width: 66px;
+  height: 66px;
+  border-radius: 18px;
+  box-shadow: 0 18px 42px rgba(0, 209, 255, 0.18);
+}
+
 .admin-login-icon svg {
   width: 28px;
   height: 28px;
@@ -135,6 +284,11 @@
   font-size: clamp(1.65rem, 4vw, 2.1rem);
   font-weight: 800;
   line-height: 1.05;
+}
+
+.admin-page-login .admin-login-copy h2 {
+  font-size: clamp(2rem, 4.2vw, 3rem);
+  letter-spacing: 0;
 }
 
 .admin-login-copy p,
@@ -171,9 +325,29 @@
   line-height: 1.4;
 }
 
+.admin-page-login .admin-login-card input {
+  min-height: 54px;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.035)),
+    rgba(0, 0, 0, 0.24);
+}
+
 .admin-login-card input:focus {
   border-color: rgba(0, 209, 255, 0.62);
   box-shadow: 0 0 0 3px rgba(0, 209, 255, 0.12);
+}
+
+.admin-page-login .admin-submit {
+  min-height: 54px;
+  margin-top: 0.35rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #16d8ff 0%, #0098c8 55%, #087394 100%);
+}
+
+.admin-page-login > .admin-shell > .admin-status {
+  grid-area: status;
+  margin: 0;
 }
 
 .admin-session-card {
@@ -485,6 +659,47 @@
 }
 
 @media (max-width: 900px) {
+  .admin-page-login {
+    align-items: flex-start;
+    padding-top: 5.4rem;
+  }
+
+  .admin-page-login .admin-shell {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "login"
+      "status";
+    gap: 1.35rem;
+  }
+
+  .admin-page-login .admin-header {
+    display: block;
+    max-width: none;
+    text-align: center;
+  }
+
+  .admin-page-login .admin-header h1 {
+    max-width: none;
+    font-size: clamp(2.6rem, 12vw, 4.8rem);
+  }
+
+  .admin-page-login .admin-header p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .admin-page-login .admin-header::after {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .admin-page-login .admin-login-card {
+    width: min(100%, 520px);
+    justify-self: center;
+  }
+
   .admin-header,
   .admin-password-card,
   .admin-grid,
@@ -499,11 +714,60 @@
   .admin-home-link {
     width: max-content;
   }
+
+  .admin-page-login .admin-home-link {
+    min-height: 42px;
+  }
 }
 
 @media (max-width: 520px) {
   .admin-page {
     padding: 1rem;
+  }
+
+  .admin-page-login {
+    padding-top: 4.8rem;
+  }
+
+  .admin-page-login .admin-kicker {
+    font-size: 0.66rem;
+    letter-spacing: 0.18em;
+  }
+
+  .admin-page-login .admin-header h1 {
+    margin-top: 0.8rem;
+    font-size: clamp(2.35rem, 15vw, 3.7rem);
+  }
+
+  .admin-page-login .admin-header p {
+    font-size: 0.92rem;
+  }
+
+  .admin-page-login .admin-login-card {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .admin-page-login .admin-login-card::after {
+    inset: 8px;
+    border-radius: 14px;
+  }
+
+  .admin-page-login .admin-login-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+  }
+
+  .admin-page-login .admin-login-copy h2 {
+    font-size: 1.75rem;
+  }
+
+  .admin-page-login .admin-home-link {
+    right: 1rem;
+    min-height: 40px;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.78rem;
   }
 
   .admin-list-item {
