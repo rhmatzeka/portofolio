@@ -93,6 +93,12 @@ const normalizeStackList = (value) => cleanList(value).map((item) => {
   return STACK_ALIASES[key] || item
 })
 
+const normalizeDisplayOrder = (value) => {
+  const order = Number.parseInt(value, 10)
+  if (!Number.isFinite(order) || order < 1) return null
+  return Math.min(order, 999)
+}
+
 const slugify = (value) => (
   cleanText(value, 'upload')
     .toLowerCase()
@@ -327,6 +333,7 @@ const normalizeProject = async (item = {}) => {
     mediaUrl,
     image: mediaType === 'image' ? mediaUrl : cleanText(item.image || item.thumbnailUrl),
     imageVariant: ['desktop-shot', 'phone-shot'].includes(item.imageVariant) ? item.imageVariant : 'desktop-shot',
+    order: normalizeDisplayOrder(item.order),
     github: cleanText(item.github),
     demo: cleanText(item.demo)
   }

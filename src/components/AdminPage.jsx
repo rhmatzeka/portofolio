@@ -6,6 +6,7 @@ import './AdminPage.css'
 const projectMediaAccept = 'image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/ogg'
 
 const emptyProject = {
+  order: '',
   title: '',
   tech: '',
   desc: '',
@@ -36,12 +37,27 @@ const getMediaTypeFromFile = (file) => (
   file?.type?.startsWith('video/') ? 'video' : 'image'
 )
 
+const getProjectOrder = (project, fallbackIndex = 0) => {
+  const order = Number(project?.order)
+  return Number.isFinite(order) && order > 0 ? order : fallbackIndex + 1
+}
+
+const sortProjects = (projects = []) => (
+  [...projects].sort((firstProject, secondProject) => {
+    const firstOrder = getProjectOrder(firstProject, projects.indexOf(firstProject))
+    const secondOrder = getProjectOrder(secondProject, projects.indexOf(secondProject))
+    if (firstOrder !== secondOrder) return firstOrder - secondOrder
+    return String(firstProject.title || '').localeCompare(String(secondProject.title || ''))
+  })
+)
+
 const AdminPage = () => {
   const [password, setPassword] = useState(() => sessionStorage.getItem('rahmat-admin-password') || '')
   const [loginPassword, setLoginPassword] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(sessionStorage.getItem('rahmat-admin-password')))
   const [content, setContent] = useState({ projects: [], certificates: [] })
   const [activeTab, setActiveTab] = useState('projects')
+  const [projectView, setProjectView] = useState('form')
   const [projectForm, setProjectForm] = useState(emptyProject)
   const [certificateForm, setCertificateForm] = useState(emptyCertificate)
   const [projectMedia, setProjectMedia] = useState(null)
@@ -51,7 +67,10 @@ const AdminPage = () => {
   const [isSaving, setIsSaving] = useState(false)
   const projectMediaInputRef = useRef(null)
 
-  const visibleItems = useMemo(() => content[activeTab] || [], [activeTab, content])
+  const sortedProjects = useMemo(() => sortProjects(content.projects), [content.projects])
+  const visibleItems = useMemo(() => (
+    activeTab === 'projects' ? sortedProjects : content[activeTab] || []
+  ), [activeTab, content, sortedProjects])
   const projectStackPreview = useMemo(() => (
     normalizeCsv(projectForm.stack).map((tech) => ({
       name: getCanonicalStackName(tech),
@@ -236,6 +255,7 @@ const AdminPage = () => {
 
     if (saved) {
       resetProjectForm()
+      setProjectView('library')
       event.currentTarget.reset()
     }
   }
@@ -264,9 +284,11 @@ const AdminPage = () => {
     setStatus({ type: '', message: '' })
 
     if (collection === 'projects') {
+      setProjectView('form')
       clearProjectMedia()
       setProjectForm({
         id: item.id,
+        order: String(getProjectOrder(item, sortedProjects.findIndex((project) => project.id === item.id))),
         title: item.title || '',
         tech: item.tech || '',
         desc: item.desc || '',
@@ -329,6 +351,22 @@ const AdminPage = () => {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const updateProjectOrder = async (project, nextOrder) => {
+    const order = String(nextOrder || '').trim()
+    if (!order) {
+      setStatus({ type: 'error', message: 'Project display order is required.' })
+      return
+    }
+
+    await saveContent({
+      collection: 'projects',
+      item: {
+        ...project,
+        order
+      }
+    })
   }
 
   return (
@@ -413,7 +451,103 @@ const AdminPage = () => {
           </div>
         )}
 
-        <div className="admin-grid">
+        {activeTab === 'projects' && (
+          <div className="admin-project-menu" role="tablist" aria-label="Project admin view">
+            <button
+              type="button"
+              className={projectView === 'form' ? 'active' : ''}
+              onClick={() => setProjectView('form')}
+            >
+              {editingItem.collection === 'projects' ? 'Edit Project' : 'Add Project'}
+            </button>
+            <button
+              type="button"
+              className={projectView === 'library' ? 'active' : ''}
+              onClick={() => {
+                setProjectView('library')
+                if (editingItem.collection === 'projects') resetProjectForm()
+              }}
+            >
+              All Projects
+              <span>{sortedProjects.length}</span>
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'projects' && projectView === 'library' ? (
+          <section className="admin-project-library">
+            <div className="admin-library-header">
+              <div>
+                <span className="admin-library-kicker">Dashboard Order</span>
+                <h2>All Projects</h2>
+                <p>Set the display position for each project on the main portfolio page.</p>
+              </div>
+              <button type="button" onClick={() => setProjectView('form')}>
+                Add New Project
+              </button>
+            </div>
+
+            {sortedProjects.length ? (
+              <div className="admin-project-board">
+                {sortedProjects.map((project, index) => (
+                  <article key={project.id} className="admin-project-card">
+                    <button type="button" className="admin-project-media" onClick={() => editItem('projects', project)} aria-label={`Edit ${project.title}`}>
+                      {project.mediaType === 'video' && project.mediaUrl ? (
+                        <video src={project.mediaUrl} muted playsInline preload="metadata" aria-hidden="true" />
+                      ) : (
+                        (project.mediaUrl || project.image) ? (
+                          <img src={project.mediaUrl || project.image} alt="" />
+                        ) : null
+                      )}
+                      <span>{project.title?.slice(0, 1) || 'P'}</span>
+                    </button>
+
+                    <div className="admin-project-main">
+                      <div className="admin-project-copy">
+                        <span className="admin-project-rank">#{getProjectOrder(project, index)}</span>
+                        <h3>{project.title}</h3>
+                        <p>{project.tech || 'WEB PROJECT'}</p>
+                      </div>
+
+                      <form className="admin-project-order" onSubmit={(event) => {
+                        event.preventDefault()
+                        updateProjectOrder(project, event.currentTarget.elements.order.value)
+                      }}>
+                        <label>
+                          Position
+                          <input
+                            name="order"
+                            type="number"
+                            min="1"
+                            max="999"
+                            defaultValue={getProjectOrder(project, index)}
+                          />
+                        </label>
+                        <button type="submit" disabled={isSaving}>Save Order</button>
+                      </form>
+                    </div>
+
+                    <div className="admin-project-actions">
+                      <button type="button" className="admin-edit-btn" onClick={() => editItem('projects', project)} disabled={isSaving}>
+                        Edit
+                      </button>
+                      <button type="button" className="admin-delete-btn" onClick={() => deleteItem('projects', project.id)} disabled={isSaving}>
+                        Delete
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="admin-library-empty">
+                <h3>No projects yet</h3>
+                <p>Add your first project, then manage its display order here.</p>
+                <button type="button" onClick={() => setProjectView('form')}>Add Project</button>
+              </div>
+            )}
+          </section>
+        ) : (
+        <div className={activeTab === 'projects' ? 'admin-single-panel' : 'admin-grid'}>
           {activeTab === 'projects' ? (
             <form className="admin-form" onSubmit={handleProjectSubmit}>
               <div className="admin-form-title-row">
@@ -422,26 +556,45 @@ const AdminPage = () => {
                   <button type="button" onClick={resetProjectForm}>Cancel edit</button>
                 )}
               </div>
-              <label>
-                Title
-                <input name="title" value={projectForm.title} onChange={updateProjectField} required />
-              </label>
-              <label>
-                Category
-                <input name="tech" value={projectForm.tech} onChange={updateProjectField} placeholder="WEB \\ DASHBOARD" />
-              </label>
-              <label>
-                Short Description
-                <textarea name="desc" value={projectForm.desc} onChange={updateProjectField} rows="3" required />
-              </label>
-              <label>
-                Full Description
-                <textarea name="fullDesc" value={projectForm.fullDesc} onChange={updateProjectField} rows="4" />
-              </label>
-              <label>
-                Tech Stack
-                <input name="stack" value={projectForm.stack} onChange={updateProjectField} placeholder="React, Tailwind, Supabase" />
-              </label>
+              <div className="admin-two-col">
+                <label>
+                  Title
+                  <input name="title" value={projectForm.title} onChange={updateProjectField} required />
+                </label>
+                <label>
+                  Category
+                  <input name="tech" value={projectForm.tech} onChange={updateProjectField} placeholder="WEB \\ DASHBOARD" />
+                </label>
+              </div>
+              <div className="admin-two-col admin-description-grid">
+                <label>
+                  Short Description
+                  <textarea name="desc" value={projectForm.desc} onChange={updateProjectField} rows="3" required />
+                </label>
+                <label>
+                  Full Description
+                  <textarea name="fullDesc" value={projectForm.fullDesc} onChange={updateProjectField} rows="3" />
+                </label>
+              </div>
+              <div className="admin-two-col admin-order-stack-row">
+                <label>
+                  Display Order
+                  <input
+                    name="order"
+                    type="number"
+                    min="1"
+                    max="999"
+                    inputMode="numeric"
+                    value={projectForm.order}
+                    onChange={updateProjectField}
+                    placeholder="1"
+                  />
+                </label>
+                <label>
+                  Tech Stack
+                  <input name="stack" value={projectForm.stack} onChange={updateProjectField} placeholder="React, Tailwind, Supabase" />
+                </label>
+              </div>
               {projectStackPreview.length > 0 && (
                 <div className="admin-stack-preview" aria-label="Tech stack preview">
                   {projectStackPreview.map((tech) => (
@@ -602,7 +755,8 @@ const AdminPage = () => {
             </form>
           )}
 
-          <aside className="admin-list">
+	          {activeTab === 'certificates' && (
+	          <aside className="admin-list">
             <div className="admin-list-header">
               <h2>Saved {activeTab}</h2>
               <span>{visibleItems.length}</span>
@@ -650,8 +804,10 @@ const AdminPage = () => {
             ) : (
             <p className="admin-empty">No admin content saved yet.</p>
             )}
-          </aside>
-        </div>
+	          </aside>
+	          )}
+	        </div>
+	        )}
           </>
         )}
       </section>

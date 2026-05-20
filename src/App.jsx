@@ -15,6 +15,20 @@ const Contact = lazy(() => import('./components/Contact'))
 const Footer = lazy(() => import('./components/Footer'))
 const AiAssistant = lazy(() => import('./components/AiAssistant'))
 
+const getProjectOrder = (project, fallbackIndex = 0) => {
+  const order = Number(project?.order)
+  return Number.isFinite(order) && order > 0 ? order : fallbackIndex + 1
+}
+
+const sortPortfolioProjects = (projects = []) => (
+  [...projects].sort((firstProject, secondProject) => {
+    const firstOrder = getProjectOrder(firstProject, projects.indexOf(firstProject))
+    const secondOrder = getProjectOrder(secondProject, projects.indexOf(secondProject))
+    if (firstOrder !== secondOrder) return firstOrder - secondOrder
+    return String(firstProject.title || '').localeCompare(String(secondProject.title || ''))
+  })
+)
+
 function App() {
   const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
   const [pageLoading, setPageLoading] = useState(true)
@@ -203,7 +217,7 @@ function App() {
     )
   }
 
-  const portfolioProjects = adminContent.projects
+  const portfolioProjects = sortPortfolioProjects(adminContent.projects)
   const hasProjects = portfolioProjects.length > 0
   const hasCertificates = adminContent.certificates.length > 0
 
