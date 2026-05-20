@@ -115,6 +115,21 @@ const formatStatusLabel = (status) => {
 
 const isTimeLike = (value) => typeof value === 'string' && /^\d{1,2}:\d{2}(?::\d{2})?$/.test(value)
 
+const buildUnavailableCard = (data) => ({
+  key: 'unavailable',
+  theme: 'neutral',
+  eyebrow: 'Presence',
+  label: data?.ok === false ? 'Live status unavailable' : 'No live activity visible',
+  meta: data?.ok === false
+    ? 'The activity feed could not be reached right now'
+    : 'Rahmat is not showing active status right now',
+  footerParts: [data?.discordConfigured ? 'Presence feed connected' : 'Discord live activity not configured'],
+  badge: data?.ok === false ? 'Offline' : 'Idle',
+  artwork: '',
+  status: 'offline',
+  icon: <DiscordIcon />
+})
+
 const buildStatusCards = (data, now) => {
   const cards = []
   const discordStatus = data?.live?.status || 'offline'
@@ -233,6 +248,10 @@ const buildStatusCards = (data, now) => {
     })
   }
 
+  if (data && cards.length === 0) {
+    cards.push(buildUnavailableCard(data))
+  }
+
   return cards
 }
 
@@ -315,7 +334,21 @@ const LivePresence = () => {
         if (!response.ok || !data || !isMounted) return
         setPresence(data)
       } catch (error) {
-        // Let the widget gracefully keep its fallback state.
+        if (isMounted) {
+          setPresence({
+            ok: false,
+            discordConfigured: false,
+            live: {
+              online: false,
+              activity: null,
+              coding: null,
+              music: null,
+              status: 'offline'
+            },
+            lastCoding: null,
+            updatedAt: Date.now()
+          })
+        }
       }
     }
 

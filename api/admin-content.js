@@ -218,6 +218,15 @@ const putGitHubFile = async ({ repoPath, base64Content, message, sha }) => {
 }
 
 const isGitHubStorageEnabled = () => Boolean(process.env.GITHUB_REPO && process.env.GITHUB_TOKEN)
+const isReadOnlyDeployment = () => Boolean(process.env.VERCEL || process.cwd().startsWith('/var/task'))
+
+const assertWritableStorage = () => {
+  if (!isGitHubStorageEnabled() && isReadOnlyDeployment()) {
+    const error = new Error('Admin uploads need GitHub storage in production. Add GITHUB_REPO and GITHUB_TOKEN environment variables, or use a direct Media URL.')
+    error.statusCode = 500
+    throw error
+  }
+}
 
 const emptyContent = () => ({ projects: [], certificates: [] })
 
@@ -262,6 +271,7 @@ const writeContent = async (content) => {
     return
   }
 
+  assertWritableStorage()
   await ensureLocalContentFile()
   await fs.writeFile(CONTENT_PATH, serialized)
 }
@@ -282,6 +292,7 @@ const saveMediaDataUrl = async (dataUrl, title, options = {}) => {
     return { url: publicPath, mediaType: parsedMedia.mediaType }
   }
 
+  assertWritableStorage()
   await fs.mkdir(UPLOADS_DIR, { recursive: true })
   await fs.writeFile(path.join(UPLOADS_DIR, filename), parsedMedia.buffer)
   return { url: publicPath, mediaType: parsedMedia.mediaType }

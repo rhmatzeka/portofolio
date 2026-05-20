@@ -146,27 +146,28 @@ const getLastCodingEvent = (events) => {
   return null
 }
 
+const fetchJson = async (url, options = {}, fallback = null) => {
+  try {
+    const response = await fetch(url, options)
+    if (!response.ok) return fallback
+    return response.json().catch(() => fallback)
+  } catch (error) {
+    return fallback
+  }
+}
+
 const fetchPresencePayload = async () => {
   const discordUserId = process.env.DISCORD_USER_ID
 
-  const requests = [
-    fetch(GITHUB_EVENTS_ENDPOINT, {
+  const [githubEvents, lanyardPayload] = await Promise.all([
+    fetchJson(GITHUB_EVENTS_ENDPOINT, {
       headers: {
         Accept: 'application/vnd.github+json',
         'User-Agent': 'rahmatdev-portfolio'
       }
-    })
-  ]
-
-  if (discordUserId) {
-    requests.push(fetch(`${LANYARD_BASE_ENDPOINT}${discordUserId}`))
-  }
-
-  const [githubResponse, lanyardResponse] = await Promise.all(requests)
-  const githubEvents = await githubResponse.json().catch(() => [])
-  const lanyardPayload = lanyardResponse
-    ? await lanyardResponse.json().catch(() => null)
-    : null
+    }, []),
+    discordUserId ? fetchJson(`${LANYARD_BASE_ENDPOINT}${discordUserId}`) : Promise.resolve(null)
+  ])
 
   const presence = lanyardPayload?.success ? lanyardPayload.data : null
 
