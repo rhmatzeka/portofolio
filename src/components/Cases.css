@@ -30,14 +30,17 @@
 
 .cases-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 420px));
+  justify-content: center;
   gap: 1.2rem;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1320px;
   align-items: stretch;
 }
 
 .case-card {
+  width: 100%;
+  max-width: 420px;
   background: rgba(20, 20, 20, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
@@ -403,7 +406,13 @@
   }
   
   .cases-grid {
+    grid-template-columns: minmax(0, min(100%, 520px));
+    justify-content: center;
     gap: 1rem;
+  }
+
+  .case-card {
+    max-width: 520px;
   }
   
   .case-image {

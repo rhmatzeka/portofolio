@@ -60,8 +60,13 @@ const getProjectMedia = (project) => ({
 const ProjectMedia = ({ project, context = 'card' }) => {
   const media = getProjectMedia(project)
   const isModal = context === 'modal'
+  const [mediaFailed, setMediaFailed] = useState(false)
 
-  if (!media.url) {
+  useEffect(() => {
+    setMediaFailed(false)
+  }, [media.url])
+
+  if (!media.url || mediaFailed) {
     return (
       <div className={`${context === 'modal' ? 'modal-image-placeholder' : 'case-image-placeholder'}`}>
         <span>{project.title?.slice(0, 1) || 'P'}</span>
@@ -90,6 +95,7 @@ const ProjectMedia = ({ project, context = 'card' }) => {
           playsInline
           preload={isModal ? 'metadata' : 'none'}
           aria-label={`${project.title} video preview`}
+          onError={() => setMediaFailed(true)}
         />
         {!isModal && <span className="case-media-badge">Video</span>}
       </>
@@ -105,6 +111,7 @@ const ProjectMedia = ({ project, context = 'card' }) => {
         aria-hidden="true"
         loading={isModal ? 'eager' : 'lazy'}
         decoding="async"
+        onError={() => setMediaFailed(true)}
       />
       <img
         src={media.url}
@@ -112,6 +119,7 @@ const ProjectMedia = ({ project, context = 'card' }) => {
         className={context === 'modal' ? 'modal-image-main' : 'case-image-main'}
         loading={isModal ? 'eager' : 'lazy'}
         decoding="async"
+        onError={() => setMediaFailed(true)}
       />
       {String(media.url).toLowerCase().includes('.gif') && !isModal && (
         <span className="case-media-badge">GIF</span>

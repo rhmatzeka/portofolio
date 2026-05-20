@@ -507,6 +507,26 @@
   font-weight: 700;
 }
 
+.admin-form-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.admin-form-title-row button {
+  min-height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.45rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
 .admin-two-col {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -748,13 +768,51 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
-.admin-list-item img,
-.admin-list-item video {
+.admin-list-item.is-editing {
+  border-color: rgba(0, 209, 255, 0.36);
+  background: rgba(0, 209, 255, 0.07);
+}
+
+.admin-list-thumb {
+  position: relative;
   width: 58px;
   height: 46px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0, 209, 255, 0.18), transparent 52%),
+    rgba(255, 255, 255, 0.06);
+  padding: 0;
+  cursor: pointer;
+}
+
+.admin-list-thumb img,
+.admin-list-thumb video {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-list-thumb span {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.admin-list-thumb.has-broken-media img {
+  display: none;
 }
 
 .admin-list-item h3 {
@@ -774,7 +832,13 @@
   font-size: 0.75rem;
 }
 
-.admin-list-item button {
+.admin-list-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.admin-list-actions button {
   border: 1px solid rgba(255, 99, 99, 0.34);
   border-radius: 999px;
   color: #ffd7d7;
@@ -784,6 +848,12 @@
   font-size: 0.72rem;
   font-weight: 850;
   cursor: pointer;
+}
+
+.admin-list-actions .admin-edit-btn {
+  color: #dffaff;
+  border-color: rgba(0, 209, 255, 0.3);
+  background: rgba(0, 209, 255, 0.1);
 }
 
 @media (max-width: 900px) {
@@ -934,14 +1004,16 @@
     grid-template-columns: 48px minmax(0, 1fr);
   }
 
-  .admin-list-item img,
-  .admin-list-item video {
+  .admin-list-thumb {
     width: 48px;
     height: 40px;
   }
 
-  .admin-list-item button {
+  .admin-list-actions {
     grid-column: 1 / -1;
+  }
+
+  .admin-list-actions button {
     width: 100%;
   }
 }

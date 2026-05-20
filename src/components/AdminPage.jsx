@@ -46,6 +46,7 @@ const AdminPage = () => {
   const [certificateForm, setCertificateForm] = useState(emptyCertificate)
   const [projectMedia, setProjectMedia] = useState(null)
   const [certificateImage, setCertificateImage] = useState(null)
+  const [editingItem, setEditingItem] = useState({ collection: '', id: '' })
   const [status, setStatus] = useState({ type: '', message: '' })
   const [isSaving, setIsSaving] = useState(false)
   const projectMediaInputRef = useRef(null)
@@ -74,6 +75,22 @@ const AdminPage = () => {
   const updateCertificateField = (event) => {
     const { name, value } = event.target
     setCertificateForm((currentForm) => ({ ...currentForm, [name]: value }))
+  }
+
+  const clearEditingItem = () => {
+    setEditingItem({ collection: '', id: '' })
+  }
+
+  const resetProjectForm = () => {
+    setProjectForm(emptyProject)
+    clearProjectMedia()
+    clearEditingItem()
+  }
+
+  const resetCertificateForm = () => {
+    setCertificateForm(emptyCertificate)
+    setCertificateImage(null)
+    clearEditingItem()
   }
 
   const saveContent = async ({ collection, item }) => {
@@ -154,6 +171,8 @@ const AdminPage = () => {
     setLoginPassword('')
     setIsAuthenticated(false)
     setContent({ projects: [], certificates: [] })
+    resetProjectForm()
+    resetCertificateForm()
     setStatus({ type: '', message: '' })
   }
 
@@ -216,8 +235,7 @@ const AdminPage = () => {
     })
 
     if (saved) {
-      setProjectForm(emptyProject)
-      clearProjectMedia()
+      resetProjectForm()
       event.currentTarget.reset()
     }
   }
@@ -235,10 +253,45 @@ const AdminPage = () => {
     })
 
     if (saved) {
-      setCertificateForm(emptyCertificate)
-      setCertificateImage(null)
+      resetCertificateForm()
       event.currentTarget.reset()
     }
+  }
+
+  const editItem = (collection, item) => {
+    setActiveTab(collection)
+    setEditingItem({ collection, id: item.id })
+    setStatus({ type: '', message: '' })
+
+    if (collection === 'projects') {
+      clearProjectMedia()
+      setProjectForm({
+        id: item.id,
+        title: item.title || '',
+        tech: item.tech || '',
+        desc: item.desc || '',
+        fullDesc: item.fullDesc || item.desc || '',
+        stack: Array.isArray(item.stack) ? item.stack.join(', ') : '',
+        mediaType: item.mediaType || getMediaTypeFromUrl(item.mediaUrl || item.image || ''),
+        mediaUrl: item.mediaUrl || item.image || '',
+        imageVariant: item.imageVariant || 'desktop-shot',
+        github: item.github || '',
+        demo: item.demo || ''
+      })
+      return
+    }
+
+    setCertificateImage(null)
+    setCertificateForm({
+      id: item.id,
+      title: item.title || '',
+      issuer: item.issuer || '',
+      issuedAt: item.issuedAt || '',
+      description: item.description || '',
+      skills: Array.isArray(item.skills) ? item.skills.join(', ') : '',
+      credentialUrl: item.credentialUrl || '',
+      imageUrl: item.image || ''
+    })
   }
 
   const deleteItem = async (collection, id) => {
@@ -267,6 +320,9 @@ const AdminPage = () => {
 
       sessionStorage.setItem('rahmat-admin-password', password)
       setContent(data)
+      if (editingItem.collection === collection && editingItem.id === id) {
+        collection === 'projects' ? resetProjectForm() : resetCertificateForm()
+      }
       setStatus({ type: 'success', message: 'Content deleted.' })
     } catch (error) {
       setStatus({ type: 'error', message: error.message || 'Failed to delete content.' })
@@ -360,7 +416,12 @@ const AdminPage = () => {
         <div className="admin-grid">
           {activeTab === 'projects' ? (
             <form className="admin-form" onSubmit={handleProjectSubmit}>
-              <h2>Add Project</h2>
+              <div className="admin-form-title-row">
+                <h2>{editingItem.collection === 'projects' ? 'Edit Project' : 'Add Project'}</h2>
+                {editingItem.collection === 'projects' && (
+                  <button type="button" onClick={resetProjectForm}>Cancel edit</button>
+                )}
+              </div>
               <label>
                 Title
                 <input name="title" value={projectForm.title} onChange={updateProjectField} required />
@@ -490,12 +551,17 @@ const AdminPage = () => {
                 </div>
               </div>
               <button className="admin-submit" type="submit" disabled={isSaving}>
-                {isSaving ? 'Saving...' : 'Save Project'}
+                {isSaving ? 'Saving...' : editingItem.collection === 'projects' ? 'Update Project' : 'Save Project'}
               </button>
             </form>
           ) : (
             <form className="admin-form" onSubmit={handleCertificateSubmit}>
-              <h2>Add Certificate</h2>
+              <div className="admin-form-title-row">
+                <h2>{editingItem.collection === 'certificates' ? 'Edit Certificate' : 'Add Certificate'}</h2>
+                {editingItem.collection === 'certificates' && (
+                  <button type="button" onClick={resetCertificateForm}>Cancel edit</button>
+                )}
+              </div>
               <label>
                 Title
                 <input name="title" value={certificateForm.title} onChange={updateCertificateField} required />
@@ -531,7 +597,7 @@ const AdminPage = () => {
                 <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => setCertificateImage(event.target.files?.[0] || null)} />
               </label>
               <button className="admin-submit" type="submit" disabled={isSaving}>
-                {isSaving ? 'Saving...' : 'Save Certificate'}
+                {isSaving ? 'Saving...' : editingItem.collection === 'certificates' ? 'Update Certificate' : 'Save Certificate'}
               </button>
             </form>
           )}
@@ -545,19 +611,39 @@ const AdminPage = () => {
             {visibleItems.length ? (
               <div className="admin-list-items">
                 {visibleItems.map((item) => (
-                  <article key={item.id} className="admin-list-item">
-                    {item.mediaType === 'video' && item.mediaUrl ? (
-                      <video src={item.mediaUrl} muted playsInline preload="metadata" aria-hidden="true" />
-                    ) : (
-                      (item.mediaUrl || item.image) && <img src={item.mediaUrl || item.image} alt="" />
-                    )}
+                  <article
+                    key={item.id}
+                    className={`admin-list-item ${editingItem.collection === activeTab && editingItem.id === item.id ? 'is-editing' : ''}`}
+                  >
+                    <button type="button" className="admin-list-thumb" onClick={() => editItem(activeTab, item)} aria-label={`Edit ${item.title}`}>
+                      {item.mediaType === 'video' && item.mediaUrl ? (
+                        <video src={item.mediaUrl} muted playsInline preload="metadata" aria-hidden="true" />
+                      ) : (
+                        (item.mediaUrl || item.image) ? (
+                          <img
+                            src={item.mediaUrl || item.image}
+                            alt=""
+                            onError={(event) => {
+                              event.currentTarget.style.display = 'none'
+                              event.currentTarget.parentElement?.classList.add('has-broken-media')
+                            }}
+                          />
+                        ) : null
+                      )}
+                      <span>{item.title?.slice(0, 1) || 'P'}</span>
+                    </button>
                     <div>
                       <h3>{item.title}</h3>
                       <p>{item.tech || item.issuer || item.issuedAt || 'Saved content'}</p>
                     </div>
-                    <button type="button" onClick={() => deleteItem(activeTab, item.id)} disabled={isSaving}>
-                      Delete
-                    </button>
+                    <div className="admin-list-actions">
+                      <button type="button" className="admin-edit-btn" onClick={() => editItem(activeTab, item)} disabled={isSaving}>
+                        Edit
+                      </button>
+                      <button type="button" className="admin-delete-btn" onClick={() => deleteItem(activeTab, item.id)} disabled={isSaving}>
+                        Delete
+                      </button>
+                    </div>
                   </article>
                 ))}
               </div>
