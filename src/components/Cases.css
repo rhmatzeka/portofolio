@@ -79,7 +79,7 @@
 .case-image {
   position: relative;
   width: 100%;
-  height: 170px;
+  height: 190px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -87,7 +87,7 @@
   background:
     radial-gradient(circle at 20% 20%, rgba(0, 209, 255, 0.18), transparent 34%),
     linear-gradient(135deg, rgba(10, 18, 22, 0.98), rgba(3, 6, 9, 0.98));
-  padding: 0.75rem;
+  padding: 0;
 }
 
 .case-image img,
@@ -112,6 +112,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   transition: transform 0.5s ease;
 }
 
@@ -159,17 +160,18 @@
 }
 
 .case-image.desktop-shot .case-image-main {
-  height: auto;
-  max-height: 86%;
-  object-fit: contain;
-  border-radius: 10px;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .case-image.phone-shot {
   background:
     radial-gradient(circle at 50% 14%, rgba(255, 55, 95, 0.24), transparent 28%),
     linear-gradient(135deg, #111326, #080912);
+  padding: 0.75rem;
 }
 
 .case-image.phone-shot .case-image-main {
