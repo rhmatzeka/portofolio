@@ -2,7 +2,6 @@ import { useState, useEffect, lazy, Suspense } from 'react'
 import Hero from './components/Hero'
 import Navbar from './components/Navbar'
 import Loading from './components/Loading'
-import { projects as defaultProjects } from './data/projects'
 import { getAdminContent } from './utils/portfolioContent'
 import { ensureKiluaFramesPreloaded } from './utils/kiluaFrames'
 import './App.css'
@@ -204,16 +203,15 @@ function App() {
     )
   }
 
-  const portfolioProjects = [
-    ...adminContent.projects,
-    ...defaultProjects
-  ]
+  const portfolioProjects = adminContent.projects
+  const hasProjects = portfolioProjects.length > 0
+  const hasCertificates = adminContent.certificates.length > 0
 
   return (
     <div className="app">
       {pageLoading && <Loading progress={loadingProgress} />}
       
-      <Navbar isScrolled={isScrolled} />
+      <Navbar isScrolled={isScrolled} hasProjects={hasProjects} />
       
       <div className="page-container">
         <section id="home" className="full-section hero-section">
@@ -228,7 +226,7 @@ function App() {
             />
           )}
           <div className="section-content reveal-on-scroll">
-            <Hero />
+            <Hero hasProjects={hasProjects} />
           </div>
         </section>
         
@@ -239,17 +237,21 @@ function App() {
             </div>
           </section>
           
-          <section id="projects" className="full-section">
-            <div className="section-content reveal-on-scroll">
-              <Cases projects={portfolioProjects} />
-            </div>
-          </section>
+          {hasProjects && (
+            <section id="projects" className="full-section">
+              <div className="section-content reveal-on-scroll">
+                <Cases projects={portfolioProjects} />
+              </div>
+            </section>
+          )}
 
-          <section id="certificates" className="full-section">
-            <div className="section-content reveal-on-scroll">
-              <Certificates certificates={adminContent.certificates} />
-            </div>
-          </section>
+          {hasCertificates && (
+            <section id="certificates" className="full-section">
+              <div className="section-content reveal-on-scroll">
+                <Certificates certificates={adminContent.certificates} />
+              </div>
+            </section>
+          )}
           
           <section id="contact" className="full-section">
             <div className="section-content reveal-on-scroll">
@@ -257,7 +259,7 @@ function App() {
             </div>
           </section>
           
-          <Footer />
+          <Footer hasProjects={hasProjects} />
         </Suspense>
       </div>
 

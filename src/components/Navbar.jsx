@@ -2,8 +2,13 @@ import React, { memo } from 'react'
 import ConnectWallet from './ConnectWallet'
 import './Navbar.css'
 
-const Navbar = memo(({ isScrolled }) => {
-  const navItems = ['Home', 'About', 'Projects', 'Contact']
+const Navbar = memo(({ isScrolled, hasProjects = true }) => {
+  const navItems = [
+    'Home',
+    'About',
+    ...(hasProjects ? ['Projects'] : []),
+    'Contact'
+  ]
   
   return (
     <nav className={`navbar fixed-nav ${isScrolled ? 'scrolled' : ''}`}>

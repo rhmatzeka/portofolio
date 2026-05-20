@@ -1,6 +1,6 @@
 import './Footer.css'
 
-const Footer = () => {
+const Footer = ({ hasProjects = true }) => {
   const currentYear = new Date().getFullYear()
   
   return (
@@ -17,7 +17,7 @@ const Footer = () => {
               <h4>Navigation</h4>
               <a href="#home">Home</a>
               <a href="#about">About</a>
-              <a href="#projects">Projects</a>
+              {hasProjects && <a href="#projects">Projects</a>}
               <a href="#contact">Contact</a>
             </div>
             

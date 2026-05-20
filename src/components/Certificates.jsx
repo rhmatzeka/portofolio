@@ -59,6 +59,8 @@ const CertificateCard = ({ certificate }) => (
 )
 
 const Certificates = ({ certificates = [] }) => {
+  if (!certificates.length) return null
+
   return (
     <motion.div
       className="certificates-container"
@@ -74,17 +76,11 @@ const Certificates = ({ certificates = [] }) => {
         </motion.p>
       </div>
 
-      {certificates.length ? (
-        <motion.div className="certificates-grid" variants={containerVariants}>
-          {certificates.map((certificate) => (
-            <CertificateCard key={certificate.id} certificate={certificate} />
-          ))}
-        </motion.div>
-      ) : (
-        <motion.div className="certificates-empty" variants={itemUp}>
-          <span>Certificates added from admin will appear here.</span>
-        </motion.div>
-      )}
+      <motion.div className="certificates-grid" variants={containerVariants}>
+        {certificates.map((certificate) => (
+          <CertificateCard key={certificate.id} certificate={certificate} />
+        ))}
+      </motion.div>
     </motion.div>
   )
 }

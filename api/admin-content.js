@@ -4,7 +4,8 @@ const path = require('node:path')
 const CONTENT_REPO_PATH = 'public/content.json'
 const CONTENT_PATH = path.join(process.cwd(), CONTENT_REPO_PATH)
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads')
-const MAX_BODY_SIZE = 4 * 1024 * 1024
+const MAX_BODY_SIZE = 12 * 1024 * 1024
+const MAX_MEDIA_SIZE = 8 * 1024 * 1024
 const MAX_FIELD_LENGTH = 4000
 
 const sendJson = (res, statusCode, payload) => {
@@ -100,27 +101,55 @@ const slugify = (value) => (
     .slice(0, 64) || 'upload'
 )
 
-const parseImageDataUrl = (dataUrl) => {
+const mediaExtensionByMime = {
+  'image/gif': 'gif',
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'video/mp4': 'mp4',
+  'video/ogg': 'ogv',
+  'video/webm': 'webm'
+}
+
+const inferMediaType = (mediaType, mediaUrl = '') => {
+  if (mediaType === 'video') return 'video'
+  if (mediaType === 'image') return 'image'
+
+  return /\.(mp4|webm|ogv|ogg)(?:[?#].*)?$/i.test(mediaUrl) ? 'video' : 'image'
+}
+
+const parseMediaDataUrl = (dataUrl, { allowVideo = false } = {}) => {
   if (!dataUrl) return null
 
-  const match = /^data:image\/(png|jpe?g|webp);base64,([a-zA-Z0-9+/=]+)$/.exec(dataUrl)
+  const match = /^data:(image\/(?:png|jpe?g|webp|gif)|video\/(?:mp4|webm|ogg));base64,([a-zA-Z0-9+/=]+)$/.exec(dataUrl)
   if (!match) {
-    const error = new Error('Image must be PNG, JPG, or WEBP.')
+    const error = new Error(allowVideo
+      ? 'Media must be PNG, JPG, WEBP, GIF, MP4, WEBM, or OGG.'
+      : 'Image must be PNG, JPG, WEBP, or GIF.')
     error.statusCode = 400
     throw error
   }
 
-  const extension = match[1] === 'jpeg' ? 'jpg' : match[1]
+  const mimeType = match[1]
+  const mediaType = mimeType.startsWith('video/') ? 'video' : 'image'
+  if (mediaType === 'video' && !allowVideo) {
+    const error = new Error('Video uploads are only supported for projects.')
+    error.statusCode = 400
+    throw error
+  }
+
+  const extension = mediaExtensionByMime[mimeType]
   const base64 = match[2]
   const buffer = Buffer.from(base64, 'base64')
 
-  if (buffer.length > 3 * 1024 * 1024) {
-    const error = new Error('Image file must be 3MB or smaller.')
+  if (buffer.length > MAX_MEDIA_SIZE) {
+    const error = new Error('Media file must be 8MB or smaller.')
     error.statusCode = 413
     throw error
   }
 
-  return { extension, base64, buffer }
+  return { extension, base64, buffer, mediaType }
 }
 
 const getGitHubConfig = () => {
@@ -237,36 +266,44 @@ const writeContent = async (content) => {
   await fs.writeFile(CONTENT_PATH, serialized)
 }
 
-const saveImageDataUrl = async (dataUrl, title) => {
-  const parsedImage = parseImageDataUrl(dataUrl)
-  if (!parsedImage) return ''
+const saveMediaDataUrl = async (dataUrl, title, options = {}) => {
+  const parsedMedia = parseMediaDataUrl(dataUrl, options)
+  if (!parsedMedia) return null
 
-  const filename = `${Date.now()}-${slugify(title)}.${parsedImage.extension}`
+  const filename = `${Date.now()}-${slugify(title)}.${parsedMedia.extension}`
   const publicPath = `/uploads/${filename}`
 
   if (isGitHubStorageEnabled()) {
     await putGitHubFile({
       repoPath: `public${publicPath}`,
-      base64Content: parsedImage.base64,
-      message: `Upload portfolio image ${filename}`
+      base64Content: parsedMedia.base64,
+      message: `Upload portfolio media ${filename}`
     })
-    return publicPath
+    return { url: publicPath, mediaType: parsedMedia.mediaType }
   }
 
   await fs.mkdir(UPLOADS_DIR, { recursive: true })
-  await fs.writeFile(path.join(UPLOADS_DIR, filename), parsedImage.buffer)
-  return publicPath
+  await fs.writeFile(path.join(UPLOADS_DIR, filename), parsedMedia.buffer)
+  return { url: publicPath, mediaType: parsedMedia.mediaType }
+}
+
+const saveImageDataUrl = async (dataUrl, title) => {
+  const media = await saveMediaDataUrl(dataUrl, title)
+  return media?.url || ''
 }
 
 const normalizeProject = async (item = {}) => {
   const title = cleanText(item.title)
-  const image = await saveImageDataUrl(item.imageDataUrl, title)
 
   if (!title) {
     const error = new Error('Project title is required.')
     error.statusCode = 400
     throw error
   }
+
+  const uploadedMedia = await saveMediaDataUrl(item.mediaDataUrl || item.imageDataUrl, title, { allowVideo: true })
+  const mediaUrl = uploadedMedia?.url || cleanText(item.mediaUrl || item.imageUrl || item.image)
+  const mediaType = uploadedMedia?.mediaType || inferMediaType(cleanText(item.mediaType), mediaUrl)
 
   return {
     id: cleanText(item.id) || `admin-project-${Date.now()}`,
@@ -275,22 +312,25 @@ const normalizeProject = async (item = {}) => {
     desc: cleanText(item.desc),
     fullDesc: cleanText(item.fullDesc || item.desc),
     stack: normalizeStackList(item.stack),
-    image: image || cleanText(item.image || item.imageUrl),
+    mediaType,
+    mediaUrl,
+    image: mediaType === 'image' ? mediaUrl : cleanText(item.image || item.thumbnailUrl),
     imageVariant: ['desktop-shot', 'phone-shot'].includes(item.imageVariant) ? item.imageVariant : 'desktop-shot',
-    github: cleanText(item.github) || '#',
-    demo: cleanText(item.demo) || '#'
+    github: cleanText(item.github),
+    demo: cleanText(item.demo)
   }
 }
 
 const normalizeCertificate = async (item = {}) => {
   const title = cleanText(item.title)
-  const image = await saveImageDataUrl(item.imageDataUrl, title)
 
   if (!title) {
     const error = new Error('Certificate title is required.')
     error.statusCode = 400
     throw error
   }
+
+  const image = await saveImageDataUrl(item.imageDataUrl, title)
 
   return {
     id: cleanText(item.id) || `admin-certificate-${Date.now()}`,

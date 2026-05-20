@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, memo } from 'react'
 import { createPortal } from 'react-dom'
-import { getCanonicalStackName, getStackIcon, projects as defaultProjects } from '../data/projects'
+import { getCanonicalStackName, getStackIcon } from '../data/projects'
 import './Cases.css'
 
 const containerVariants = {
@@ -52,28 +52,82 @@ const StackBadge = ({ tech, className = '' }) => (
   </span>
 )
 
+const getProjectMedia = (project) => ({
+  type: project.mediaType === 'video' ? 'video' : 'image',
+  url: project.mediaUrl || project.image || ''
+})
+
+const ProjectMedia = ({ project, context = 'card' }) => {
+  const media = getProjectMedia(project)
+  const isModal = context === 'modal'
+
+  if (!media.url) {
+    return (
+      <div className={`${context === 'modal' ? 'modal-image-placeholder' : 'case-image-placeholder'}`}>
+        <span>{project.title?.slice(0, 1) || 'P'}</span>
+      </div>
+    )
+  }
+
+  if (media.type === 'video') {
+    return (
+      <>
+        <video
+          src={media.url}
+          className={`${context === 'modal' ? 'modal-image-backdrop' : 'case-image-backdrop'} media-video`}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+        />
+        <video
+          src={media.url}
+          className={`${context === 'modal' ? 'modal-image-main' : 'case-image-main'} media-video`}
+          controls={isModal}
+          muted={!isModal}
+          loop={!isModal}
+          playsInline
+          preload={isModal ? 'metadata' : 'none'}
+          aria-label={`${project.title} video preview`}
+        />
+        {!isModal && <span className="case-media-badge">Video</span>}
+      </>
+    )
+  }
+
+  return (
+    <>
+      <img
+        src={media.url}
+        alt=""
+        className={context === 'modal' ? 'modal-image-backdrop' : 'case-image-backdrop'}
+        aria-hidden="true"
+        loading={isModal ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+      <img
+        src={media.url}
+        alt={project.title}
+        className={context === 'modal' ? 'modal-image-main' : 'case-image-main'}
+        loading={isModal ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+      {String(media.url).toLowerCase().includes('.gif') && !isModal && (
+        <span className="case-media-badge">GIF</span>
+      )}
+    </>
+  )
+}
+
 const ProjectCard = memo(({ project, onClick }) => (
-  <motion.div 
-    className="case-card" 
+  <motion.div
+    className="case-card"
     variants={itemUp}
     onClick={onClick}
   >
     <div className={`case-image ${project.imageVariant || ''}`}>
-      <img
-        src={project.image}
-        alt=""
-        className="case-image-backdrop"
-        aria-hidden="true"
-        loading="lazy"
-        decoding="async"
-      />
-      <img 
-        src={project.image} 
-        alt={project.title}
-        className="case-image-main"
-        loading="lazy"
-        decoding="async"
-      />
+      <ProjectMedia project={project} />
       <div className="case-overlay"></div>
     </div>
     
@@ -92,26 +146,32 @@ const ProjectCard = memo(({ project, onClick }) => (
       </div>
       
       <div className="case-links">
-        <a 
-          href={project.github} 
-          className="case-link-btn"
-          onClick={(e) => e.stopPropagation()}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-          </svg>
-          Code
-        </a>
-        <a 
-          href={project.demo} 
-          className="case-link-btn primary"
-          onClick={(e) => e.stopPropagation()}
-        >
-          Live Demo
-          <span className="arrow">↗</span>
-        </a>
+        {project.github && project.github !== '#' && (
+          <a
+            href={project.github}
+            className="case-link-btn"
+            onClick={(e) => e.stopPropagation()}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+            Code
+          </a>
+        )}
+        {project.demo && project.demo !== '#' && (
+          <a
+            href={project.demo}
+            className="case-link-btn primary"
+            onClick={(e) => e.stopPropagation()}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Live Demo
+            <span className="arrow">↗</span>
+          </a>
+        )}
       </div>
     </div>
   </motion.div>
@@ -119,7 +179,7 @@ const ProjectCard = memo(({ project, onClick }) => (
 
 ProjectCard.displayName = 'ProjectCard'
 
-const Cases = ({ projects = defaultProjects }) => {
+const Cases = ({ projects = [] }) => {
   const [selectedProject, setSelectedProject] = useState(null)
 
   // Prevent body scroll when modal is open
@@ -134,6 +194,8 @@ const Cases = ({ projects = defaultProjects }) => {
       document.body.style.overflow = 'unset'
     }
   }, [selectedProject])
+
+  if (!projects.length) return null
 
   return (
     <>
@@ -193,21 +255,7 @@ const Cases = ({ projects = defaultProjects }) => {
               </button>
 
               <div className={`modal-image ${selectedProject.imageVariant || ''}`}>
-                <img
-                  src={selectedProject.image}
-                  alt=""
-                  className="modal-image-backdrop"
-                  aria-hidden="true"
-                  loading="eager"
-                  decoding="async"
-                />
-                <img 
-                  src={selectedProject.image} 
-                  alt={selectedProject.title}
-                  className="modal-image-main"
-                  loading="eager"
-                  decoding="async"
-                />
+                <ProjectMedia project={selectedProject} context="modal" />
               </div>
 
               <div className="modal-body">
@@ -224,26 +272,34 @@ const Cases = ({ projects = defaultProjects }) => {
                   </div>
                 </div>
 
-                <div className="modal-actions">
-                  <a 
-                    href={selectedProject.github} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="modal-btn"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                    </svg>
-                    View on GitHub
-                  </a>
-                  <a 
-                    href={selectedProject.demo}
-                    className="modal-btn primary"
-                  >
-                    Live Demo
-                    <span className="arrow">↗</span>
-                  </a>
-                </div>
+                {((selectedProject.github && selectedProject.github !== '#') || (selectedProject.demo && selectedProject.demo !== '#')) && (
+                  <div className="modal-actions">
+                  {selectedProject.github && selectedProject.github !== '#' && (
+                    <a
+                      href={selectedProject.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="modal-btn"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                      </svg>
+                      View on GitHub
+                    </a>
+                  )}
+                  {selectedProject.demo && selectedProject.demo !== '#' && (
+                    <a
+                      href={selectedProject.demo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="modal-btn primary"
+                    >
+                      Live Demo
+                      <span className="arrow">↗</span>
+                    </a>
+                  )}
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

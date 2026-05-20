@@ -9,8 +9,9 @@ const emptyProject = {
   desc: '',
   fullDesc: '',
   stack: '',
+  mediaType: 'image',
+  mediaUrl: '',
   imageVariant: 'desktop-shot',
-  imageUrl: '',
   github: '',
   demo: ''
 }
@@ -33,7 +34,7 @@ const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('projects')
   const [projectForm, setProjectForm] = useState(emptyProject)
   const [certificateForm, setCertificateForm] = useState(emptyCertificate)
-  const [projectImage, setProjectImage] = useState(null)
+  const [projectMedia, setProjectMedia] = useState(null)
   const [certificateImage, setCertificateImage] = useState(null)
   const [status, setStatus] = useState({ type: '', message: '' })
   const [isSaving, setIsSaving] = useState(false)
@@ -147,19 +148,19 @@ const AdminPage = () => {
 
   const handleProjectSubmit = async (event) => {
     event.preventDefault()
-    const imageDataUrl = await fileToDataUrl(projectImage)
+    const mediaDataUrl = await fileToDataUrl(projectMedia)
     const saved = await saveContent({
       collection: 'projects',
       item: {
         ...projectForm,
         stack: normalizeCsv(projectForm.stack),
-        imageDataUrl
+        mediaDataUrl
       }
     })
 
     if (saved) {
       setProjectForm(emptyProject)
-      setProjectImage(null)
+      setProjectMedia(null)
       event.currentTarget.reset()
     }
   }
@@ -349,20 +350,49 @@ const AdminPage = () => {
               </div>
               <div className="admin-two-col">
                 <label>
-                  Screenshot Type
+                  Media Type
+                  <select name="mediaType" value={projectForm.mediaType} onChange={updateProjectField}>
+                    <option value="image">Image / GIF</option>
+                    <option value="video">Video</option>
+                  </select>
+                </label>
+                <label>
+                  Preview Layout
                   <select name="imageVariant" value={projectForm.imageVariant} onChange={updateProjectField}>
                     <option value="desktop-shot">Desktop</option>
                     <option value="phone-shot">Phone</option>
                   </select>
                 </label>
+              </div>
+              <div className="admin-media-panel">
                 <label>
-                  Image URL
-                  <input name="imageUrl" value={projectForm.imageUrl} onChange={updateProjectField} placeholder="/uploads/image.png" />
+                  Media URL
+                  <input
+                    name="mediaUrl"
+                    value={projectForm.mediaUrl}
+                    onChange={updateProjectField}
+                    placeholder={projectForm.mediaType === 'video' ? 'https://.../demo.mp4' : '/uploads/screenshot.gif'}
+                  />
                 </label>
+                <p>
+                  Use an uploaded file or paste a direct media URL. Videos play in the project modal, GIFs work as animated images.
+                </p>
               </div>
               <label>
-                Upload Image (max 3MB)
-                <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => setProjectImage(event.target.files?.[0] || null)} />
+                Upload Media (max 8MB)
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/ogg"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] || null
+                    setProjectMedia(file)
+                    if (file?.type.startsWith('video/')) {
+                      setProjectForm((currentForm) => ({ ...currentForm, mediaType: 'video' }))
+                    } else if (file?.type.startsWith('image/')) {
+                      setProjectForm((currentForm) => ({ ...currentForm, mediaType: 'image' }))
+                    }
+                  }}
+                />
               </label>
               <button className="admin-submit" type="submit" disabled={isSaving}>
                 {isSaving ? 'Saving...' : 'Save Project'}
@@ -402,8 +432,8 @@ const AdminPage = () => {
                 <input name="imageUrl" value={certificateForm.imageUrl} onChange={updateCertificateField} placeholder="/uploads/certificate.png" />
               </label>
               <label>
-                Upload Image (max 3MB)
-                <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => setCertificateImage(event.target.files?.[0] || null)} />
+                Upload Image (max 8MB)
+                <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => setCertificateImage(event.target.files?.[0] || null)} />
               </label>
               <button className="admin-submit" type="submit" disabled={isSaving}>
                 {isSaving ? 'Saving...' : 'Save Certificate'}
@@ -421,7 +451,11 @@ const AdminPage = () => {
               <div className="admin-list-items">
                 {visibleItems.map((item) => (
                   <article key={item.id} className="admin-list-item">
-                    {item.image && <img src={item.image} alt="" />}
+                    {item.mediaType === 'video' && item.mediaUrl ? (
+                      <video src={item.mediaUrl} muted playsInline preload="metadata" aria-hidden="true" />
+                    ) : (
+                      (item.mediaUrl || item.image) && <img src={item.mediaUrl || item.image} alt="" />
+                    )}
                     <div>
                       <h3>{item.title}</h3>
                       <p>{item.tech || item.issuer || item.issuedAt || 'Saved content'}</p>

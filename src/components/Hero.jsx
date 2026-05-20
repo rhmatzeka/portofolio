@@ -21,7 +21,7 @@ const itemRight = {
   in: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.68, ease: [0.16, 1, 0.3, 1] } }
 }
 
-const Hero = memo(() => {
+const Hero = memo(({ hasProjects = true }) => {
   return (
     <motion.div 
       className="hero-wrapper"
@@ -44,7 +44,7 @@ const Hero = memo(() => {
 
       <div className="hero-right">
         <motion.div variants={itemRight} className="hero-actions">
-          <a href="#projects" className="btn-ghost">View Projects</a>
+          {hasProjects && <a href="#projects" className="btn-ghost">View Projects</a>}
           <a href="#contact" className="btn-glow">
             Let's Talk
             <span className="plus-circle">
