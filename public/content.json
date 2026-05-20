@@ -1,4 +1,24 @@
 {
-  "projects": [],
+  "projects": [
+    {
+      "id": "admin-project-1779241510878",
+      "title": "App Absensi SDN 1 Bintaro",
+      "tech": "WEB \\ ATTENDANCE",
+      "desc": "A school attendance management system for SDN 1 Bintaro with student data, daily attendance tracking, and admin-friendly reporting.",
+      "fullDesc": "App Absensi SDN 1 Bintaro is a web-based attendance management system built to help school staff record, manage, and monitor student attendance more efficiently. The application focuses on clean data input, organized student records, class-based attendance tracking, and a simple dashboard flow for daily school operations.",
+      "stack": [
+        "React",
+        "Tailwind",
+        "Supabase",
+        "Next.js"
+      ],
+      "mediaType": "image",
+      "mediaUrl": "/uploads/1779241509004-app-absensi-sdn-1-bintaro.png",
+      "image": "/uploads/1779241509004-app-absensi-sdn-1-bintaro.png",
+      "imageVariant": "desktop-shot",
+      "github": "https://github.com/rhmatzeka/AppAbsensiSDN1Bintaro.git",
+      "demo": "https://www.absensisdnbintaro01.com/"
+    }
+  ],
   "certificates": []
 }
