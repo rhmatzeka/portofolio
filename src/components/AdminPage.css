@@ -903,7 +903,7 @@
   width: min(calc(100% - 2rem), 1160px);
   min-height: 58px;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 1rem;
   padding: 0.52rem 0.62rem 0.52rem 1rem;
@@ -913,6 +913,15 @@
   box-shadow: 0 16px 42px rgba(0, 0, 0, 0.32);
   backdrop-filter: blur(16px);
   transform: translateX(-50%);
+}
+
+.admin-nav-center {
+  min-width: 0;
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
 }
 
 .admin-nav-brand {
@@ -940,7 +949,6 @@
 }
 
 .admin-nav-links {
-  justify-self: center;
   display: inline-flex;
   align-items: center;
   gap: 0.38rem;
@@ -948,6 +956,52 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-nav-project-views {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  min-width: 0;
+  padding: 0.24rem;
+  border: 1px solid rgba(0, 209, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(0, 209, 255, 0.045);
+}
+
+.admin-nav-project-views button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.46rem 0.78rem;
+  color: rgba(255, 255, 255, 0.68);
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 850;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-nav-project-views button.active {
+  color: #001015;
+  background: #00d1ff;
+}
+
+.admin-nav-project-views span {
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.14);
+  font-size: 0.66rem;
 }
 
 .admin-nav-links button {
@@ -1004,11 +1058,12 @@
 }
 
 .admin-page-dashboard .admin-shell {
-  width: min(100%, 1160px);
+  width: min(100%, 1080px);
 }
 
 .admin-dashboard-heading {
-  margin-bottom: 0.9rem;
+  width: min(100%, 900px);
+  margin: 0 auto 0.9rem;
 }
 
 .admin-dashboard-heading span {
@@ -1165,7 +1220,8 @@
 }
 
 .admin-single-panel {
-  width: min(100%, 760px);
+  width: min(100%, 900px);
+  margin: 0 auto;
 }
 
 .admin-page-dashboard .admin-form,
@@ -1181,7 +1237,7 @@
 
 .admin-page-dashboard .admin-form {
   gap: 0.58rem;
-  padding: 0.84rem;
+  padding: 1rem;
 }
 
 .admin-page-dashboard .admin-form h2,
@@ -1354,8 +1410,9 @@
 }
 
 .admin-project-library {
-  width: min(100%, 1080px);
-  padding: 0.9rem;
+  width: min(100%, 980px);
+  margin: 0 auto;
+  padding: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.11);
   border-radius: 16px;
   background:
@@ -1575,7 +1632,7 @@
 
 @media (max-width: 900px) {
   .admin-page-dashboard {
-    padding-top: 7.2rem;
+    padding-top: 8.1rem;
   }
 
   .admin-navbar {
@@ -1591,9 +1648,17 @@
     grid-column: 1;
   }
 
-  .admin-nav-links {
+  .admin-nav-center {
     grid-column: 1 / -1;
     grid-row: 2;
+    justify-self: stretch;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .admin-nav-links,
+  .admin-nav-project-views {
     justify-self: stretch;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1725,7 +1790,7 @@
   }
 
   .admin-page-dashboard {
-    padding: 7.05rem 0.75rem 1rem;
+    padding: 8.2rem 0.75rem 1rem;
   }
 
   .admin-navbar {
@@ -1755,7 +1820,18 @@
     font-size: 0.68rem;
   }
 
-  .admin-nav-links button {
+  .admin-nav-center {
+    grid-template-columns: 1fr;
+    gap: 0.38rem;
+  }
+
+  .admin-nav-links,
+  .admin-nav-project-views {
+    padding: 0.2rem;
+  }
+
+  .admin-nav-links button,
+  .admin-nav-project-views button {
     min-height: 34px;
     padding: 0.44rem 0.5rem;
     font-size: 0.72rem;

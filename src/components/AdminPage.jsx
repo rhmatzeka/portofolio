@@ -378,21 +378,50 @@ const AdminPage = () => {
             <strong>Admin</strong>
           </a>
 
-          <div className="admin-nav-links" role="tablist" aria-label="Admin content type">
-            <button
-              type="button"
-              className={activeTab === 'projects' ? 'active' : ''}
-              onClick={() => setActiveTab('projects')}
-            >
-              Projects
-            </button>
-            <button
-              type="button"
-              className={activeTab === 'certificates' ? 'active' : ''}
-              onClick={() => setActiveTab('certificates')}
-            >
-              Certificates
-            </button>
+          <div className="admin-nav-center">
+            <div className="admin-nav-links" role="tablist" aria-label="Admin content type">
+              <button
+                type="button"
+                className={activeTab === 'projects' ? 'active' : ''}
+                onClick={() => setActiveTab('projects')}
+              >
+                Projects
+              </button>
+              <button
+                type="button"
+                className={activeTab === 'certificates' ? 'active' : ''}
+                onClick={() => setActiveTab('certificates')}
+              >
+                Certificates
+              </button>
+            </div>
+
+            {activeTab === 'projects' && (
+              <div className="admin-nav-project-views" role="tablist" aria-label="Project admin view">
+                <button
+                  type="button"
+                  className={projectView === 'form' ? 'active' : ''}
+                  onClick={() => {
+                    setActiveTab('projects')
+                    setProjectView('form')
+                  }}
+                >
+                  {editingItem.collection === 'projects' ? 'Edit Project' : 'Add Project'}
+                </button>
+                <button
+                  type="button"
+                  className={projectView === 'library' ? 'active' : ''}
+                  onClick={() => {
+                    setActiveTab('projects')
+                    setProjectView('library')
+                    if (editingItem.collection === 'projects') resetProjectForm()
+                  }}
+                >
+                  All Projects
+                  <span>{sortedProjects.length}</span>
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="admin-nav-actions">
@@ -467,29 +496,6 @@ const AdminPage = () => {
         {status.message && (
           <div className={`admin-status ${status.type}`}>
             {status.message}
-          </div>
-        )}
-
-        {activeTab === 'projects' && (
-          <div className="admin-project-menu" role="tablist" aria-label="Project admin view">
-            <button
-              type="button"
-              className={projectView === 'form' ? 'active' : ''}
-              onClick={() => setProjectView('form')}
-            >
-              {editingItem.collection === 'projects' ? 'Edit Project' : 'Add Project'}
-            </button>
-            <button
-              type="button"
-              className={projectView === 'library' ? 'active' : ''}
-              onClick={() => {
-                setProjectView('library')
-                if (editingItem.collection === 'projects') resetProjectForm()
-              }}
-            >
-              All Projects
-              <span>{sortedProjects.length}</span>
-            </button>
           </div>
         )}
 
