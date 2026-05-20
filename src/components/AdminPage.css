@@ -924,6 +924,10 @@
   gap: 1.15rem;
 }
 
+.admin-nav-menu-toggle {
+  display: none;
+}
+
 .admin-nav-brand {
   min-width: 0;
   display: inline-flex;
@@ -1581,13 +1585,13 @@
 
 @media (max-width: 900px) {
   .admin-page-dashboard {
-    padding-top: 8.1rem;
+    padding-top: 5.8rem;
   }
 
   .admin-navbar {
     top: 0.8rem;
     width: min(calc(100% - 1.4rem), 760px);
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     gap: 0.7rem;
     border-radius: 22px;
     padding: 0.62rem;
@@ -1598,16 +1602,118 @@
   }
 
   .admin-nav-tabs {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-self: stretch;
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0.45rem;
+    right: 0.45rem;
+    z-index: 2;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.28rem 0.72rem;
+    grid-template-columns: 1fr;
+    gap: 0.18rem;
+    padding: 0.42rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    background: rgba(9, 15, 17, 0.96);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+    backdrop-filter: blur(16px);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .admin-nav-tabs.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .admin-nav-tabs button {
+    justify-content: space-between;
+    min-height: 42px;
+    padding: 0.58rem 0.72rem;
+    border-radius: 13px;
+    font-size: 0.76rem;
+  }
+
+  .admin-nav-tabs button.active {
+    color: #ffffff;
+    background: rgba(0, 209, 255, 0.1);
+  }
+
+  .admin-nav-tabs button::after {
+    left: 0.72rem;
+    right: auto;
+    bottom: 0.5rem;
+    width: 24px;
+  }
+
+  .admin-nav-menu-toggle {
+    grid-column: 3;
+    grid-row: 1;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.48rem;
+    border: 1px solid rgba(0, 209, 255, 0.26);
+    border-radius: 999px;
+    padding: 0.54rem 0.78rem;
+    color: #001015;
+    background: #00d1ff;
+    font-family: inherit;
+    font-size: 0.74rem;
+    font-weight: 900;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .admin-nav-menu-toggle i,
+  .admin-nav-menu-toggle i::before,
+  .admin-nav-menu-toggle i::after {
+    width: 14px;
+    height: 2px;
+    display: block;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .admin-nav-menu-toggle i {
+    position: relative;
+  }
+
+  .admin-nav-menu-toggle i::before,
+  .admin-nav-menu-toggle i::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+
+  .admin-nav-menu-toggle i::before {
+    top: -5px;
+  }
+
+  .admin-nav-menu-toggle i::after {
+    top: 5px;
+  }
+
+  .admin-nav-menu-toggle.active i {
+    background: transparent;
+  }
+
+  .admin-nav-menu-toggle.active i::before {
+    top: 0;
+    transform: rotate(45deg);
+  }
+
+  .admin-nav-menu-toggle.active i::after {
+    top: 0;
+    transform: rotate(-45deg);
   }
 
   .admin-nav-actions {
     grid-column: 2;
+    grid-row: 1;
   }
 
   .admin-page-login {
@@ -1733,7 +1839,7 @@
   }
 
   .admin-page-dashboard {
-    padding: 10.2rem 0.75rem 1rem;
+    padding: 5.25rem 0.75rem 1rem;
   }
 
   .admin-navbar {
@@ -1763,16 +1869,21 @@
     font-size: 0.68rem;
   }
 
-  .admin-nav-tabs {
-    padding: 0;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.3rem 0.62rem;
+  .admin-nav-menu-toggle {
+    min-height: 34px;
+    padding: 0.46rem 0.58rem;
+    font-size: 0.68rem;
   }
 
   .admin-nav-tabs button {
-    min-height: 34px;
-    padding: 0.4rem 0;
+    min-height: 40px;
+    padding: 0.54rem 0.66rem;
     font-size: 0.68rem;
+  }
+
+  .admin-nav-tabs span {
+    min-width: 17px;
+    height: 17px;
   }
 
   .admin-dashboard-heading {
@@ -1991,5 +2102,23 @@
 
   .admin-page-dashboard .admin-list-item > div {
     min-width: 0;
+  }
+}
+
+@media (max-width: 430px) {
+  .admin-nav-brand strong,
+  .admin-nav-menu-toggle span {
+    display: none;
+  }
+
+  .admin-nav-menu-toggle {
+    width: 34px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .admin-nav-site {
+    display: none;
   }
 }

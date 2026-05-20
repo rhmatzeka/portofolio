@@ -59,6 +59,7 @@ const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('projects')
   const [projectView, setProjectView] = useState('form')
   const [certificateView, setCertificateView] = useState('form')
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false)
   const [projectForm, setProjectForm] = useState(emptyProject)
   const [certificateForm, setCertificateForm] = useState(emptyCertificate)
   const [projectMedia, setProjectMedia] = useState(null)
@@ -386,6 +387,34 @@ const AdminPage = () => {
       ? 'Review, edit, or delete certificates shown on the public portfolio.'
       : 'Create certificate entries with issuer, skills, credential links, and images.'
 
+  const adminNavLabel = dashboardTitle
+
+  const selectProjectForm = () => {
+    setActiveTab('projects')
+    setProjectView('form')
+    setIsAdminMenuOpen(false)
+  }
+
+  const selectProjectLibrary = () => {
+    setActiveTab('projects')
+    setProjectView('library')
+    if (editingItem.collection === 'projects') resetProjectForm()
+    setIsAdminMenuOpen(false)
+  }
+
+  const selectCertificateForm = () => {
+    setActiveTab('certificates')
+    setCertificateView('form')
+    setIsAdminMenuOpen(false)
+  }
+
+  const selectCertificateLibrary = () => {
+    setActiveTab('certificates')
+    setCertificateView('library')
+    if (editingItem.collection === 'certificates') resetCertificateForm()
+    setIsAdminMenuOpen(false)
+  }
+
   return (
     <main className={`admin-page ${isAuthenticated ? 'admin-page-dashboard' : 'admin-page-login'}`}>
       {isAuthenticated && (
@@ -395,25 +424,30 @@ const AdminPage = () => {
             <strong>Admin</strong>
           </a>
 
-          <div className="admin-nav-tabs" role="tablist" aria-label="Admin content view">
+          <button
+            type="button"
+            className={`admin-nav-menu-toggle ${isAdminMenuOpen ? 'active' : ''}`}
+            aria-label={`Toggle admin menu. Current view: ${adminNavLabel}`}
+            aria-expanded={isAdminMenuOpen}
+            aria-controls="admin-nav-tabs"
+            onClick={() => setIsAdminMenuOpen((currentState) => !currentState)}
+          >
+            <span>Menu</span>
+            <i aria-hidden="true" />
+          </button>
+
+          <div id="admin-nav-tabs" className={`admin-nav-tabs ${isAdminMenuOpen ? 'open' : ''}`} role="tablist" aria-label="Admin content view">
             <button
               type="button"
               className={activeTab === 'projects' && projectView === 'form' ? 'active' : ''}
-              onClick={() => {
-                setActiveTab('projects')
-                setProjectView('form')
-              }}
+              onClick={selectProjectForm}
             >
               {activeTab === 'projects' && editingItem.collection === 'projects' ? 'Edit Project' : 'Add Project'}
             </button>
             <button
               type="button"
               className={activeTab === 'projects' && projectView === 'library' ? 'active' : ''}
-              onClick={() => {
-                setActiveTab('projects')
-                setProjectView('library')
-                if (editingItem.collection === 'projects') resetProjectForm()
-              }}
+              onClick={selectProjectLibrary}
             >
               All Projects
               <span>{sortedProjects.length}</span>
@@ -421,21 +455,14 @@ const AdminPage = () => {
             <button
               type="button"
               className={activeTab === 'certificates' && certificateView === 'form' ? 'active' : ''}
-              onClick={() => {
-                setActiveTab('certificates')
-                setCertificateView('form')
-              }}
+              onClick={selectCertificateForm}
             >
               {activeTab === 'certificates' && editingItem.collection === 'certificates' ? 'Edit Certificate' : 'Add Certificate'}
             </button>
             <button
               type="button"
               className={activeTab === 'certificates' && certificateView === 'library' ? 'active' : ''}
-              onClick={() => {
-                setActiveTab('certificates')
-                setCertificateView('library')
-                if (editingItem.collection === 'certificates') resetCertificateForm()
-              }}
+              onClick={selectCertificateLibrary}
             >
               All Certificates
               <span>{certificates.length}</span>
