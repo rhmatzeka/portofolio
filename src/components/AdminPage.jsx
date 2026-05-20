@@ -58,6 +58,7 @@ const AdminPage = () => {
   const [content, setContent] = useState({ projects: [], certificates: [] })
   const [activeTab, setActiveTab] = useState('projects')
   const [projectView, setProjectView] = useState('form')
+  const [certificateView, setCertificateView] = useState('form')
   const [projectForm, setProjectForm] = useState(emptyProject)
   const [certificateForm, setCertificateForm] = useState(emptyCertificate)
   const [projectMedia, setProjectMedia] = useState(null)
@@ -68,9 +69,7 @@ const AdminPage = () => {
   const projectMediaInputRef = useRef(null)
 
   const sortedProjects = useMemo(() => sortProjects(content.projects), [content.projects])
-  const visibleItems = useMemo(() => (
-    activeTab === 'projects' ? sortedProjects : content[activeTab] || []
-  ), [activeTab, content, sortedProjects])
+  const certificates = useMemo(() => content.certificates || [], [content.certificates])
   const projectStackPreview = useMemo(() => (
     normalizeCsv(projectForm.stack).map((tech) => ({
       name: getCanonicalStackName(tech),
@@ -274,6 +273,7 @@ const AdminPage = () => {
 
     if (saved) {
       resetCertificateForm()
+      setCertificateView('library')
       event.currentTarget.reset()
     }
   }
@@ -304,6 +304,7 @@ const AdminPage = () => {
     }
 
     setCertificateImage(null)
+    setCertificateView('form')
     setCertificateForm({
       id: item.id,
       title: item.title || '',
@@ -369,6 +370,22 @@ const AdminPage = () => {
     })
   }
 
+  const dashboardTitle = activeTab === 'projects'
+    ? projectView === 'library'
+      ? 'All Projects'
+      : editingItem.collection === 'projects' ? 'Edit Project' : 'Add Project'
+    : certificateView === 'library'
+      ? 'All Certificates'
+      : editingItem.collection === 'certificates' ? 'Edit Certificate' : 'Add Certificate'
+
+  const dashboardDescription = activeTab === 'projects'
+    ? projectView === 'library'
+      ? 'Review, reorder, edit, or delete projects shown on the public portfolio.'
+      : 'Create project entries with media, links, tech stack, and dashboard order.'
+    : certificateView === 'library'
+      ? 'Review, edit, or delete certificates shown on the public portfolio.'
+      : 'Create certificate entries with issuer, skills, credential links, and images.'
+
   return (
     <main className={`admin-page ${isAuthenticated ? 'admin-page-dashboard' : 'admin-page-login'}`}>
       {isAuthenticated && (
@@ -387,7 +404,7 @@ const AdminPage = () => {
                 setProjectView('form')
               }}
             >
-              {editingItem.collection === 'projects' ? 'Edit Project' : 'Add Project'}
+              {activeTab === 'projects' && editingItem.collection === 'projects' ? 'Edit Project' : 'Add Project'}
             </button>
             <button
               type="button"
@@ -403,10 +420,25 @@ const AdminPage = () => {
             </button>
             <button
               type="button"
-              className={activeTab === 'certificates' ? 'active' : ''}
-              onClick={() => setActiveTab('certificates')}
+              className={activeTab === 'certificates' && certificateView === 'form' ? 'active' : ''}
+              onClick={() => {
+                setActiveTab('certificates')
+                setCertificateView('form')
+              }}
             >
-              Certificates
+              {activeTab === 'certificates' && editingItem.collection === 'certificates' ? 'Edit Certificate' : 'Add Certificate'}
+            </button>
+            <button
+              type="button"
+              className={activeTab === 'certificates' && certificateView === 'library' ? 'active' : ''}
+              onClick={() => {
+                setActiveTab('certificates')
+                setCertificateView('library')
+                if (editingItem.collection === 'certificates') resetCertificateForm()
+              }}
+            >
+              All Certificates
+              <span>{certificates.length}</span>
             </button>
           </div>
 
@@ -471,12 +503,8 @@ const AdminPage = () => {
           <>
         <div className="admin-dashboard-heading">
           <span>Content Manager</span>
-          <h1>{activeTab === 'projects' ? 'Projects' : 'Certificates'}</h1>
-          <p>
-            {activeTab === 'projects'
-              ? 'Add, edit, and order projects shown on the public portfolio.'
-              : 'Manage certificates and credentials shown on the public portfolio.'}
-          </p>
+          <h1>{dashboardTitle}</h1>
+          <p>{dashboardDescription}</p>
         </div>
 
         {status.message && (
@@ -557,8 +585,64 @@ const AdminPage = () => {
               </div>
             )}
           </section>
+        ) : activeTab === 'certificates' && certificateView === 'library' ? (
+          <section className="admin-project-library">
+            <div className="admin-library-header">
+              <div>
+                <span className="admin-library-kicker">Credentials</span>
+                <h2>All Certificates</h2>
+                <p>Review certificate details, edit entries, or remove credentials from the portfolio.</p>
+              </div>
+              <button type="button" onClick={() => setCertificateView('form')}>
+                Add New Certificate
+              </button>
+            </div>
+
+            {certificates.length ? (
+              <div className="admin-project-board">
+                {certificates.map((certificate) => (
+                  <article key={certificate.id} className="admin-project-card admin-certificate-card">
+                    <button type="button" className="admin-project-media" onClick={() => editItem('certificates', certificate)} aria-label={`Edit ${certificate.title}`}>
+                      {certificate.image ? (
+                        <img src={certificate.image} alt="" />
+                      ) : null}
+                      <span>{certificate.title?.slice(0, 1) || 'C'}</span>
+                    </button>
+
+                    <div className="admin-project-main admin-certificate-main">
+                      <div className="admin-project-copy">
+                        <span className="admin-project-rank">{certificate.issuer || 'Certificate'}</span>
+                        <h3>{certificate.title}</h3>
+                        <p>{[certificate.issuedAt, ...(certificate.skills || [])].filter(Boolean).join(' / ') || 'Saved credential'}</p>
+                      </div>
+                    </div>
+
+                    <div className="admin-project-actions">
+                      {certificate.credentialUrl && (
+                        <a href={certificate.credentialUrl} target="_blank" rel="noopener noreferrer" className="admin-view-btn">
+                          View
+                        </a>
+                      )}
+                      <button type="button" className="admin-edit-btn" onClick={() => editItem('certificates', certificate)} disabled={isSaving}>
+                        Edit
+                      </button>
+                      <button type="button" className="admin-delete-btn" onClick={() => deleteItem('certificates', certificate.id)} disabled={isSaving}>
+                        Delete
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="admin-library-empty">
+                <h3>No certificates yet</h3>
+                <p>Add your first certificate, then manage every credential here.</p>
+                <button type="button" onClick={() => setCertificateView('form')}>Add Certificate</button>
+              </div>
+            )}
+          </section>
         ) : (
-        <div className={activeTab === 'projects' ? 'admin-single-panel' : 'admin-grid'}>
+        <div className="admin-single-panel">
           {activeTab === 'projects' ? (
             <form className="admin-form" onSubmit={handleProjectSubmit}>
               <div className="admin-form-title-row">
@@ -765,58 +849,6 @@ const AdminPage = () => {
               </button>
             </form>
           )}
-
-	          {activeTab === 'certificates' && (
-	          <aside className="admin-list">
-            <div className="admin-list-header">
-              <h2>Saved {activeTab}</h2>
-              <span>{visibleItems.length}</span>
-            </div>
-
-            {visibleItems.length ? (
-              <div className="admin-list-items">
-                {visibleItems.map((item) => (
-                  <article
-                    key={item.id}
-                    className={`admin-list-item ${editingItem.collection === activeTab && editingItem.id === item.id ? 'is-editing' : ''}`}
-                  >
-                    <button type="button" className="admin-list-thumb" onClick={() => editItem(activeTab, item)} aria-label={`Edit ${item.title}`}>
-                      {item.mediaType === 'video' && item.mediaUrl ? (
-                        <video src={item.mediaUrl} muted playsInline preload="metadata" aria-hidden="true" />
-                      ) : (
-                        (item.mediaUrl || item.image) ? (
-                          <img
-                            src={item.mediaUrl || item.image}
-                            alt=""
-                            onError={(event) => {
-                              event.currentTarget.style.display = 'none'
-                              event.currentTarget.parentElement?.classList.add('has-broken-media')
-                            }}
-                          />
-                        ) : null
-                      )}
-                      <span>{item.title?.slice(0, 1) || 'P'}</span>
-                    </button>
-                    <div>
-                      <h3>{item.title}</h3>
-                      <p>{item.tech || item.issuer || item.issuedAt || 'Saved content'}</p>
-                    </div>
-                    <div className="admin-list-actions">
-                      <button type="button" className="admin-edit-btn" onClick={() => editItem(activeTab, item)} disabled={isSaving}>
-                        Edit
-                      </button>
-                      <button type="button" className="admin-delete-btn" onClick={() => deleteItem(activeTab, item.id)} disabled={isSaving}>
-                        Delete
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ) : (
-            <p className="admin-empty">No admin content saved yet.</p>
-            )}
-	          </aside>
-	          )}
 	        </div>
 	        )}
           </>
