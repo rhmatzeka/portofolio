@@ -176,7 +176,7 @@ const AdminPage = () => {
       setPassword(loginPassword)
       setLoginPassword('')
       setIsAuthenticated(true)
-      setStatus({ type: 'success', message: 'Logged in.' })
+      setStatus({ type: '', message: '' })
     } catch (error) {
       setStatus({ type: 'error', message: error.message || 'Login failed.' })
     } finally {
@@ -371,15 +371,50 @@ const AdminPage = () => {
 
   return (
     <main className={`admin-page ${isAuthenticated ? 'admin-page-dashboard' : 'admin-page-login'}`}>
-      <section className="admin-shell">
-        <header className="admin-header">
-          <div>
-            <span className="admin-kicker">RahmatDev Admin</span>
-            <h1>Portfolio Content</h1>
-            <p>Add projects and certificates without editing React files manually.</p>
+      {isAuthenticated && (
+        <nav className="admin-navbar" aria-label="Admin navigation">
+          <a href="/" className="admin-nav-brand">
+            <span>RahmatDev</span>
+            <strong>Admin</strong>
+          </a>
+
+          <div className="admin-nav-links" role="tablist" aria-label="Admin content type">
+            <button
+              type="button"
+              className={activeTab === 'projects' ? 'active' : ''}
+              onClick={() => setActiveTab('projects')}
+            >
+              Projects
+            </button>
+            <button
+              type="button"
+              className={activeTab === 'certificates' ? 'active' : ''}
+              onClick={() => setActiveTab('certificates')}
+            >
+              Certificates
+            </button>
           </div>
-          <a href="/" className="admin-home-link">Back to site</a>
-        </header>
+
+          <div className="admin-nav-actions">
+            <a href="/" className="admin-nav-site">Back to site</a>
+            <button type="button" className="admin-nav-logout" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        </nav>
+      )}
+
+      <section className="admin-shell">
+        {!isAuthenticated && (
+          <header className="admin-header">
+            <div>
+              <span className="admin-kicker">RahmatDev Admin</span>
+              <h1>Portfolio Content</h1>
+              <p>Add projects and certificates without editing React files manually.</p>
+            </div>
+            <a href="/" className="admin-home-link">Back to site</a>
+          </header>
+        )}
 
         {!isAuthenticated ? (
           <form className="admin-login-card" onSubmit={handleLogin}>
@@ -409,15 +444,7 @@ const AdminPage = () => {
               {isSaving ? 'Checking...' : 'Login'}
             </button>
           </form>
-        ) : (
-          <div className="admin-session-card">
-            <div>
-              <span>Logged in</span>
-              <p>Admin dashboard is unlocked for this browser session.</p>
-            </div>
-            <button type="button" onClick={handleLogout}>Logout</button>
-          </div>
-        )}
+        ) : null}
 
         {!isAuthenticated && status.message && (
           <div className={`admin-status ${status.type}`}>
@@ -427,22 +454,14 @@ const AdminPage = () => {
 
         {!isAuthenticated ? null : (
           <>
-
-        <div className="admin-tabs" role="tablist" aria-label="Admin content type">
-          <button
-            type="button"
-            className={activeTab === 'projects' ? 'active' : ''}
-            onClick={() => setActiveTab('projects')}
-          >
-            Projects
-          </button>
-          <button
-            type="button"
-            className={activeTab === 'certificates' ? 'active' : ''}
-            onClick={() => setActiveTab('certificates')}
-          >
-            Certificates
-          </button>
+        <div className="admin-dashboard-heading">
+          <span>Content Manager</span>
+          <h1>{activeTab === 'projects' ? 'Projects' : 'Certificates'}</h1>
+          <p>
+            {activeTab === 'projects'
+              ? 'Add, edit, and order projects shown on the public portfolio.'
+              : 'Manage certificates and credentials shown on the public portfolio.'}
+          </p>
         </div>
 
         {status.message && (
