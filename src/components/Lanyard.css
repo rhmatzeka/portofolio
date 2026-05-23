@@ -17,7 +17,7 @@
   position: relative;
   z-index: 5;
   display: block;
-  background: #000000;
+  background: transparent;
   touch-action: none;
 }
 

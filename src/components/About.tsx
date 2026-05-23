@@ -94,7 +94,7 @@ const About = () => {
           <div className="about-avatar-glow" />
           <LanyardBoundary fallback={<AvatarFallback />}>
             <Suspense fallback={<div className="lanyard-loading" aria-hidden="true" />}>
-              <Lanyard />
+              <Lanyard transparent />
             </Suspense>
           </LanyardBoundary>
         </motion.div>
