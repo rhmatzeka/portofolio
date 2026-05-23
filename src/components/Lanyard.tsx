@@ -99,6 +99,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const ang = new THREE.Vector3()
   const rot = new THREE.Vector3()
   const dir = new THREE.Vector3()
+  const cardAnchor = new THREE.Vector3()
+  const cardAnchorOffset = new THREE.Vector3(0, 1.5, 0)
+  const cardRotation = new THREE.Quaternion()
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
   const cardScale = isMobile ? 2.72 : 3.1
   const colliderScale = cardScale / 1.05
@@ -153,7 +156,13 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
         )
       })
-      curve.points[0].copy(j3.current.translation())
+      const cardTranslation = card.current.translation()
+      const cardQuaternion = card.current.rotation()
+      cardAnchor
+        .copy(cardAnchorOffset)
+        .applyQuaternion(cardRotation.set(cardQuaternion.x, cardQuaternion.y, cardQuaternion.z, cardQuaternion.w))
+        .add(cardTranslation)
+      curve.points[0].copy(cardAnchor)
       curve.points[1].copy(j2.current.lerped)
       curve.points[2].copy(j1.current.lerped)
       curve.points[3].copy(fixed.current.translation())
