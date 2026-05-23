@@ -26,8 +26,8 @@
 .about-lanyard-stage {
   flex-shrink: 0;
   position: relative;
-  width: clamp(430px, 44vw, 700px);
-  height: clamp(560px, 54vw, 760px);
+  width: clamp(440px, 44vw, 720px);
+  height: clamp(640px, 58vw, 840px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -348,7 +348,7 @@
   
   .about-lanyard-stage {
     width: min(100vw, 520px);
-    height: 560px;
+    height: 620px;
   }
   
   .about-content {
@@ -421,7 +421,7 @@
   }
   
   .about-lanyard-stage {
-    height: 470px;
+    height: 520px;
   }
   
   .about-content {

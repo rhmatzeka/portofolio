@@ -1,242 +1,69 @@
 // @ts-nocheck
-/* eslint-disable react/no-unknown-property */
-'use client'
-import { Suspense, useEffect, useRef, useState } from 'react'
-import { Canvas, extend, useFrame } from '@react-three/fiber'
-import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei'
-import {
-  BallCollider,
-  CuboidCollider,
-  Physics,
-  RigidBody,
-  useRopeJoint,
-  useSphericalJoint
-} from '@react-three/rapier'
-import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
-import * as THREE from 'three'
-import cardGLB from '../assets/lanyard/card.glb'
-import lanyard from '../assets/lanyard/lanyard.png'
+import { useRef, useState } from 'react'
+import killuaAvatar from '../assets/images/kiluatitle.png'
 import './Lanyard.css'
 
-extend({ MeshLineGeometry, MeshLineMaterial })
+export default function Lanyard() {
+  const dragStart = useRef(null)
+  const [offset, setOffset] = useState({ x: 0, y: 0 })
+  const [dragging, setDragging] = useState(false)
 
-export default function Lanyard({
-  position = [0, 0, 28],
-  gravity = [0, -40, 0],
-  fov = 17,
-  transparent = false
-}) {
-  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768)
+  const handlePointerDown = (event) => {
+    event.currentTarget.setPointerCapture(event.pointerId)
+    dragStart.current = {
+      pointerX: event.clientX,
+      pointerY: event.clientY,
+      x: offset.x,
+      y: offset.y
+    }
+    setDragging(true)
+  }
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  const handlePointerMove = (event) => {
+    if (!dragStart.current) return
+
+    const nextX = dragStart.current.x + event.clientX - dragStart.current.pointerX
+    const nextY = dragStart.current.y + event.clientY - dragStart.current.pointerY
+
+    setOffset({
+      x: Math.max(-260, Math.min(260, nextX)),
+      y: Math.max(-180, Math.min(220, nextY))
+    })
+  }
+
+  const stopDragging = (event) => {
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+    dragStart.current = null
+    setDragging(false)
+  }
 
   return (
     <div className="lanyard-wrapper">
-      <Canvas
-        camera={{ position, fov }}
-        dpr={[1, isMobile ? 1.5 : 2]}
-        gl={{ alpha: transparent, antialias: true }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)
-          gl.domElement.style.background = transparent ? 'transparent' : '#000000'
+      <div
+        className={`lanyard-rig${dragging ? ' is-dragging' : ''}`}
+        style={{
+          '--lanyard-x': `${offset.x}px`,
+          '--lanyard-y': `${offset.y}px`
         }}
       >
-        <ambientLight intensity={Math.PI} />
-        <Suspense fallback={null}>
-          <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
-            <Band isMobile={isMobile} />
-          </Physics>
-          <Environment blur={0.75}>
-            <Lightformer
-              intensity={2}
-              color="white"
-              position={[0, -1, 5]}
-              rotation={[0, 0, Math.PI / 3]}
-              scale={[100, 0.1, 1]}
-            />
-            <Lightformer
-              intensity={3}
-              color="white"
-              position={[-1, -1, 1]}
-              rotation={[0, 0, Math.PI / 3]}
-              scale={[100, 0.1, 1]}
-            />
-            <Lightformer
-              intensity={3}
-              color="white"
-              position={[1, 1, 1]}
-              rotation={[0, 0, Math.PI / 3]}
-              scale={[100, 0.1, 1]}
-            />
-            <Lightformer
-              intensity={10}
-              color="white"
-              position={[-10, 0, 14]}
-              rotation={[0, Math.PI / 2, Math.PI / 3]}
-              scale={[100, 10, 1]}
-            />
-          </Environment>
-        </Suspense>
-      </Canvas>
+        <div className="lanyard-loop" />
+        <div className="lanyard-cord" />
+        <div className="lanyard-strap" />
+        <div
+          className="lanyard-card"
+          role="img"
+          aria-label="Killua lanyard card"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={stopDragging}
+          onPointerCancel={stopDragging}
+        >
+          <div className="lanyard-card-glow" />
+          <img src={killuaAvatar} alt="" draggable="false" />
+        </div>
+      </div>
     </div>
   )
 }
-
-function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
-  const band = useRef()
-  const fixed = useRef()
-  const j1 = useRef()
-  const j2 = useRef()
-  const j3 = useRef()
-  const card = useRef()
-  const vec = new THREE.Vector3()
-  const ang = new THREE.Vector3()
-  const rot = new THREE.Vector3()
-  const dir = new THREE.Vector3()
-  const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
-  const cardScale = isMobile ? 2.15 : 3.25
-  const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [-1.02, 3.1, 0] : [-1.28, 3.35, 0]
-  const jointStep = isMobile ? 0.7 : 0.82
-  const cardStartX = isMobile ? 2.22 : 2.62
-  const { nodes, materials } = useGLTF(cardGLB)
-  const texture = useTexture(lanyard)
-  const killuaTexture = useTexture('/kiluatitle.png')
-  const [curve] = useState(
-    () =>
-      new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
-  )
-  const [dragged, drag] = useState(false)
-  const [hovered, hover] = useState(false)
-
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1])
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1])
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1])
-  useSphericalJoint(j3, card, [
-    [0, 0, 0],
-    [0, 1.5, 0]
-  ])
-
-  useEffect(() => {
-    if (hovered) {
-      document.body.style.cursor = dragged ? 'grabbing' : 'grab'
-      return () => {
-        document.body.style.cursor = 'auto'
-      }
-    }
-
-    return undefined
-  }, [hovered, dragged])
-
-  useFrame((state, delta) => {
-    if (dragged) {
-      vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera)
-      dir.copy(vec).sub(state.camera.position).normalize()
-      vec.add(dir.multiplyScalar(state.camera.position.length()))
-      ;[card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp())
-      card.current?.setNextKinematicTranslation({ x: vec.x - dragged.x, y: vec.y - dragged.y, z: vec.z - dragged.z })
-    }
-
-    if (fixed.current) {
-      ;[j1, j2].forEach((ref) => {
-        if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation())
-        const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())))
-        ref.current.lerped.lerp(
-          ref.current.translation(),
-          delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
-        )
-      })
-      curve.points[0].copy(j3.current.translation())
-      curve.points[1].copy(j2.current.lerped)
-      curve.points[2].copy(j1.current.lerped)
-      curve.points[3].copy(fixed.current.translation())
-      band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32))
-      ang.copy(card.current.angvel())
-      rot.copy(card.current.rotation())
-      card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z })
-    }
-  })
-
-  curve.curveType = 'chordal'
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-  killuaTexture.colorSpace = THREE.SRGBColorSpace
-  killuaTexture.wrapS = killuaTexture.wrapT = THREE.ClampToEdgeWrapping
-
-  return (
-    <>
-      <group position={anchorPosition}>
-        <RigidBody ref={fixed} {...segmentProps} type="fixed" />
-        <RigidBody position={[jointStep, 0, 0]} ref={j1} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[jointStep * 2, 0, 0]} ref={j2} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[jointStep * 3, 0, 0]} ref={j3} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[cardStartX, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
-          <CuboidCollider args={[0.8 * colliderScale, 1.125 * colliderScale, 0.02]} />
-          <group
-            scale={cardScale}
-            position={[0, -1.05, -0.05]}
-            onPointerOver={() => hover(true)}
-            onPointerOut={() => hover(false)}
-            onPointerUp={(e) => {
-              e.target.releasePointerCapture(e.pointerId)
-              drag(false)
-            }}
-            onPointerDown={(e) => {
-              e.target.setPointerCapture(e.pointerId)
-              drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())))
-            }}
-          >
-            <mesh geometry={nodes.card.geometry}>
-              <meshPhysicalMaterial
-                color="#101316"
-                map={materials.base.map}
-                map-anisotropy={16}
-                clearcoat={isMobile ? 0.25 : 0.65}
-                clearcoatRoughness={0.22}
-                roughness={0.62}
-                metalness={0.18}
-              />
-            </mesh>
-            <mesh position={[0, -0.48, 0.018]}>
-              <planeGeometry args={[0.62, 0.62]} />
-              <meshBasicMaterial
-                map={killuaTexture}
-                transparent
-                alphaTest={0.08}
-                depthWrite={false}
-                toneMapped={false}
-              />
-            </mesh>
-            <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
-            <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
-          </group>
-        </RigidBody>
-      </group>
-      <mesh ref={band}>
-        <meshLineGeometry />
-        <meshLineMaterial
-          color="white"
-          depthTest={false}
-          resolution={isMobile ? [1000, 2000] : [1000, 1000]}
-          useMap
-          map={texture}
-          repeat={[-4, 1]}
-          lineWidth={isMobile ? 2.35 : 3.25}
-        />
-      </mesh>
-    </>
-  )
-}
-
-useGLTF.preload(cardGLB)
-useTexture.preload(lanyard)
-useTexture.preload('/kiluatitle.png')

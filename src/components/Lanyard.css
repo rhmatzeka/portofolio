@@ -3,31 +3,216 @@
   z-index: 0;
   width: 100%;
   height: 100%;
-  min-height: 520px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 660px;
   overflow: visible;
-  transform: none;
-  transform-origin: center top;
+  background: transparent;
+  touch-action: none;
 }
 
-.lanyard-wrapper canvas {
-  display: block;
-  background: #000000;
-  touch-action: none;
+.lanyard-rig {
+  --lanyard-x: 0px;
+  --lanyard-y: 0px;
+  position: absolute;
+  top: -56px;
+  left: 50%;
+  width: 360px;
+  height: 760px;
+  transform: translate3d(calc(-50% + var(--lanyard-x)), var(--lanyard-y), 0);
+  transform-origin: top center;
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.lanyard-rig.is-dragging {
+  transition: none;
+}
+
+.lanyard-loop {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 86px;
+  height: 118px;
+  border: 3px solid rgba(255, 255, 255, 0.54);
+  border-bottom-color: transparent;
+  border-radius: 999px 999px 42px 42px;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 0 14px rgba(0, 209, 255, 0.16));
+}
+
+.lanyard-cord {
+  position: absolute;
+  top: 82px;
+  left: 50%;
+  width: 4px;
+  height: 188px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(0, 209, 255, 0.32));
+  transform: translateX(-50%);
+  box-shadow: 0 0 14px rgba(0, 209, 255, 0.2);
+}
+
+.lanyard-strap {
+  position: absolute;
+  top: 222px;
+  left: 50%;
+  width: 54px;
+  height: 220px;
+  border-radius: 0 0 5px 5px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 24%, transparent 76%, rgba(255, 255, 255, 0.08)),
+    linear-gradient(180deg, #080909, #020303);
+  transform: translateX(-50%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 12px 34px rgba(0, 0, 0, 0.38);
+}
+
+.lanyard-strap::before,
+.lanyard-strap::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 18%, #f5f7f8 19% 26%, transparent 27%),
+    conic-gradient(from 40deg, transparent 0 12%, #f5f7f8 13% 18%, transparent 19% 31%, #f5f7f8 32% 37%, transparent 38% 50%, #f5f7f8 51% 56%, transparent 57% 69%, #f5f7f8 70% 75%, transparent 76%);
+  opacity: 0.9;
+}
+
+.lanyard-strap::before {
+  top: 34px;
+}
+
+.lanyard-strap::after {
+  bottom: 38px;
+}
+
+.lanyard-card {
+  position: absolute;
+  top: 402px;
+  left: 50%;
+  width: 320px;
+  height: 420px;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: grab;
+  pointer-events: auto;
+  user-select: none;
+  transform: translateX(-50%) rotate(-1.5deg);
+  background:
+    radial-gradient(circle at 80% 22%, rgba(0, 209, 255, 0.18), transparent 36%),
+    linear-gradient(145deg, #22282b 0%, #0b0d0f 56%, #020303 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 26px 54px rgba(0, 0, 0, 0.44),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.lanyard-rig.is-dragging .lanyard-card {
+  cursor: grabbing;
+}
+
+.lanyard-card::before {
+  content: '';
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  width: 74px;
+  height: 44px;
+  border-radius: 999px;
+  border: 7px solid #030405;
+  border-bottom: 0;
+  transform: translateX(-50%);
+  z-index: 3;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.lanyard-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 54px;
+  height: 58px;
+  background: #020303;
+  transform: translateX(-50%);
+  z-index: 2;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.lanyard-card-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(130deg, rgba(255, 255, 255, 0.16), transparent 34%),
+    radial-gradient(circle at 38% 74%, rgba(0, 209, 255, 0.12), transparent 38%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lanyard-card img {
+  position: absolute;
+  right: -18px;
+  bottom: 8px;
+  width: 112%;
+  height: 92%;
+  object-fit: contain;
+  object-position: right bottom;
+  user-select: none;
+  pointer-events: none;
+  filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.24));
 }
 
 @media (max-width: 768px) {
   .lanyard-wrapper {
-    min-height: 430px;
-    transform: none;
+    min-height: 560px;
+  }
+
+  .lanyard-rig {
+    width: 300px;
+    height: 650px;
+    top: -44px;
+  }
+
+  .lanyard-card {
+    top: 356px;
+    width: 260px;
+    height: 340px;
+    border-radius: 18px;
+  }
+
+  .lanyard-strap {
+    top: 202px;
+    height: 188px;
+    width: 46px;
   }
 }
 
 @media (max-width: 480px) {
   .lanyard-wrapper {
-    min-height: 360px;
-    transform: none;
+    min-height: 470px;
+  }
+
+  .lanyard-rig {
+    width: 250px;
+    height: 570px;
+    top: -38px;
+  }
+
+  .lanyard-card {
+    top: 326px;
+    width: 220px;
+    height: 292px;
+  }
+
+  .lanyard-strap {
+    top: 188px;
+    height: 166px;
+    width: 42px;
   }
 }
