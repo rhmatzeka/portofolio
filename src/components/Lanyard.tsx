@@ -108,7 +108,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const anchorPosition = isMobile ? [0.02, 3.68, 0] : [0.2, 4.12, 0]
   const cardStartX = isMobile ? 2.9 : 2.62
   const jointStep = cardStartX / 3
-  const cardHookY = -1.05 + cardScale * 1.03
+  const cardHookY = -1.05 + cardScale * 1.18
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const killuaTexture = useTexture(killuaCard)
@@ -242,6 +242,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
             </mesh>
             <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
             <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
+            <mesh position={[0, 1.02, 0.075]} renderOrder={9}>
+              <boxGeometry args={[0.052, 0.38, 0.03]} />
+              <meshStandardMaterial color="#030303" roughness={0.62} metalness={0.08} />
+            </mesh>
             <mesh position={[0, 0.52, 0.08]} visible={false}>
               <planeGeometry args={[1.18, 1.35]} />
               <meshBasicMaterial transparent opacity={0} />
