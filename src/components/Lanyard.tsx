@@ -108,7 +108,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const anchorPosition = isMobile ? [0.02, 3.68, 0] : [0.2, 4.12, 0]
   const cardStartX = isMobile ? 2.9 : 2.62
   const jointStep = cardStartX / 3
-  const cardHookY = -1.05 + cardScale * 1.17
+  const cardHookY = -1.05 + cardScale * 1.03
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const killuaTexture = useTexture(killuaCard)
@@ -125,7 +125,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1])
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-    [0, cardHookY, 0]
+    [0, 1.5, 0]
   ])
 
   useEffect(() => {
@@ -167,6 +167,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       curve.points[1].copy(j2.current.lerped)
       curve.points[2].copy(j1.current.lerped)
       curve.points[3].copy(fixed.current.translation())
+      curve.points.forEach((point) => {
+        point.z = -0.08
+      })
       band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32))
       decorationPoints.forEach((point, index) => {
         const decoration = decorations.current[index]
@@ -269,7 +272,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
         <meshLineGeometry />
         <meshLineMaterial
           color="#070707"
-          depthTest={false}
+          depthTest
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           transparent
           opacity={0.52}

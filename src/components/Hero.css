@@ -2,6 +2,7 @@
   position: relative;
   z-index: 2;
   width: 100%;
+  margin-top: clamp(2.5rem, 6vh, 5rem);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -163,6 +164,7 @@
 
 @media (max-width: 768px) {
   .hero-wrapper {
+    margin-top: 2.25rem;
     gap: 2rem;
   }
   
@@ -209,6 +211,7 @@
 
 @media (max-width: 480px) {
   .hero-wrapper {
+    margin-top: 1.5rem;
     gap: 1.5rem;
   }
   
