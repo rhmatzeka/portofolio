@@ -100,7 +100,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const rot = new THREE.Vector3()
   const dir = new THREE.Vector3()
   const cardAnchor = new THREE.Vector3()
-  const cardAnchorOffset = new THREE.Vector3(0, 1.5, 0)
+  const cardAnchorOffset = new THREE.Vector3()
   const cardRotation = new THREE.Quaternion()
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
   const cardScale = isMobile ? 2.72 : 3.1
@@ -108,6 +108,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const anchorPosition = isMobile ? [0.02, 3.68, 0] : [0.2, 4.12, 0]
   const cardStartX = isMobile ? 2.9 : 2.62
   const jointStep = cardStartX / 3
+  const cardHookY = -1.05 + cardScale * 1.17
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const killuaTexture = useTexture(killuaCard)
@@ -159,7 +160,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       const cardTranslation = card.current.translation()
       const cardQuaternion = card.current.rotation()
       cardAnchor
-        .copy(cardAnchorOffset)
+        .copy(cardAnchorOffset.set(0, cardHookY, 0))
         .applyQuaternion(cardRotation.set(cardQuaternion.x, cardQuaternion.y, cardQuaternion.z, cardQuaternion.w))
         .add(cardTranslation)
       curve.points[0].copy(cardAnchor)
