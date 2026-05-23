@@ -168,7 +168,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       curve.points[2].copy(j1.current.lerped)
       curve.points[3].copy(fixed.current.translation())
       curve.points.forEach((point) => {
-        point.z = -0.08
+        point.z = -0.2
       })
       band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32))
       decorationPoints.forEach((point, index) => {
@@ -236,7 +236,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
                 map={killuaTexture}
                 transparent
                 alphaTest={0.02}
-                depthWrite={false}
+                depthWrite
                 toneMapped={false}
               />
             </mesh>
@@ -272,11 +272,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           />
         </sprite>
       ))}
-      <mesh ref={band}>
+      <mesh ref={band} renderOrder={0}>
         <meshLineGeometry />
         <meshLineMaterial
           color="#070707"
           depthTest
+          depthWrite
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           transparent
           opacity={0.52}
