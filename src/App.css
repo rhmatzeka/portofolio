@@ -121,12 +121,12 @@
   }
 
   .hero-section {
-    min-height: 100svh;
+    min-height: 82svh;
     justify-content: center;
   }
 
   #about {
-    padding-top: 2.75rem;
+    padding-top: 0.75rem;
   }
   
   .hero-section .spline-iframe {
@@ -149,7 +149,7 @@
   }
 
   #about {
-    padding-top: 2.25rem;
+    padding-top: 0.5rem;
   }
 
   .hero-section .spline-iframe {

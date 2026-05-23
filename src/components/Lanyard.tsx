@@ -125,7 +125,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1])
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-    [0, 1.5, 0]
+    [0, cardHookY, 0]
   ])
 
   useEffect(() => {
@@ -239,6 +239,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
             </mesh>
             <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
             <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
+            <mesh position={[0, 0.52, 0.08]} visible={false}>
+              <planeGeometry args={[1.18, 1.35]} />
+              <meshBasicMaterial transparent opacity={0} />
+            </mesh>
           </group>
         </RigidBody>
       </group>
