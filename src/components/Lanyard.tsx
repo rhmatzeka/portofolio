@@ -22,9 +22,9 @@ import './Lanyard.css'
 extend({ MeshLineGeometry, MeshLineMaterial })
 
 export default function Lanyard({
-  position = [0, 0, 26],
+  position = [0, 0, 25],
   gravity = [0, -40, 0],
-  fov = 22,
+  fov = 21,
   transparent = false
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768)
@@ -99,11 +99,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const rot = new THREE.Vector3()
   const dir = new THREE.Vector3()
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
-  const cardScale = isMobile ? 1.45 : 2.35
+  const cardScale = isMobile ? 1.56 : 2.55
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [-0.8, 3.05, 0] : [-1.05, 3.2, 0]
-  const jointStep = isMobile ? 0.62 : 0.72
-  const cardStartX = isMobile ? 1.95 : 2.35
+  const anchorPosition = isMobile ? [-0.84, 3.22, 0] : [-1.1, 3.48, 0]
+  const jointStep = isMobile ? 0.64 : 0.74
+  const cardStartX = isMobile ? 2.02 : 2.44
   const { nodes, materials } = useGLTF(cardGLB)
   const texture = useTexture(lanyard)
   const killuaTexture = useTexture(killuaCard)
