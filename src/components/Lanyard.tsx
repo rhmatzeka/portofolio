@@ -99,11 +99,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const rot = new THREE.Vector3()
   const dir = new THREE.Vector3()
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
-  const cardScale = isMobile ? 2.08 : 2.55
+  const cardScale = isMobile ? 2.42 : 2.55
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [-1.02, 3.58, 0] : [-1.1, 3.48, 0]
-  const jointStep = isMobile ? 0.72 : 0.74
-  const cardStartX = isMobile ? 2.34 : 2.44
+  const anchorPosition = isMobile ? [-0.7, 3.98, 0] : [-1.1, 3.48, 0]
+  const jointStep = isMobile ? 0.74 : 0.74
+  const cardStartX = isMobile ? 2.74 : 2.44
   const { nodes, materials } = useGLTF(cardGLB)
   const texture = useTexture(lanyard)
   const killuaTexture = useTexture(killuaCard)
@@ -206,8 +206,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
                 metalness={0.16}
               />
             </mesh>
-            <mesh position={[0, 0.48, 0.018]}>
-              <planeGeometry args={[0.7, 0.7]} />
+            <mesh position={[0, 0.26, 0.018]}>
+              <planeGeometry args={[0.78, 0.98]} />
               <meshBasicMaterial
                 map={killuaTexture}
                 transparent
