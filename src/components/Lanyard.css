@@ -21,12 +21,12 @@
 
 @media (max-width: 768px) {
   .lanyard-wrapper {
-    min-height: 520px;
+    min-height: 580px;
   }
 }
 
 @media (max-width: 480px) {
   .lanyard-wrapper {
-    min-height: 430px;
+    min-height: 500px;
   }
 }
