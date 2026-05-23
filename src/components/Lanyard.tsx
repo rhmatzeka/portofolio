@@ -102,9 +102,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
   const cardScale = isMobile ? 2.72 : 3.1
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [0.3, 3.42, 0] : [0.2, 4.12, 0]
+  const anchorPosition = isMobile ? [0.02, 3.68, 0] : [0.2, 4.12, 0]
   const jointStep = isMobile ? 0.74 : 0.74
-  const cardStartX = isMobile ? 2.98 : 2.62
+  const cardStartX = isMobile ? 2.9 : 2.62
   const { nodes, materials } = useGLTF(cardGLB)
   const killuaTexture = useTexture(killuaCard)
   const killuaTitleTexture = useTexture(killuaTitle)
