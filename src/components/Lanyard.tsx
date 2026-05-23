@@ -103,8 +103,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const cardScale = isMobile ? 2.72 : 3.1
   const colliderScale = cardScale / 1.05
   const anchorPosition = isMobile ? [0.02, 3.68, 0] : [0.2, 4.12, 0]
-  const jointStep = isMobile ? 0.74 : 0.74
   const cardStartX = isMobile ? 2.9 : 2.62
+  const jointStep = cardStartX / 3
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const killuaTexture = useTexture(killuaCard)

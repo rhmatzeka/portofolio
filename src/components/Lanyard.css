@@ -25,6 +25,10 @@
   .lanyard-wrapper {
     min-height: 640px;
   }
+
+  .lanyard-wrapper canvas {
+    touch-action: pan-y;
+  }
 }
 
 @media (max-width: 480px) {

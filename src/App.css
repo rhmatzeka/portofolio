@@ -48,6 +48,7 @@
 }
 
 .hero-section {
+  min-height: 84svh;
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 28%, rgba(0, 209, 255, 0.16), transparent 34%),
@@ -89,7 +90,7 @@
 
 #about {
   min-height: auto;
-  padding-top: clamp(2rem, 3vw, 3.5rem);
+  padding-top: clamp(0.75rem, 1.6vw, 2rem);
   justify-content: flex-start;
 }
 
