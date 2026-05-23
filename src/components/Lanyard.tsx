@@ -15,8 +15,8 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
 import * as THREE from 'three'
 import cardGLB from '../assets/lanyard/card.glb'
-import lanyard from '../assets/lanyard/lanyard.png'
 import killuaCard from '../assets/images/k.jpg'
+import killuaTitle from '../assets/images/kiluatitle.png'
 import './Lanyard.css'
 
 extend({ MeshLineGeometry, MeshLineMaterial })
@@ -94,6 +94,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const j2 = useRef()
   const j3 = useRef()
   const card = useRef()
+  const decorations = useRef([])
   const vec = new THREE.Vector3()
   const ang = new THREE.Vector3()
   const rot = new THREE.Vector3()
@@ -105,8 +106,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const jointStep = isMobile ? 0.74 : 0.74
   const cardStartX = isMobile ? 2.74 : 2.44
   const { nodes, materials } = useGLTF(cardGLB)
-  const texture = useTexture(lanyard)
   const killuaTexture = useTexture(killuaCard)
+  const killuaTitleTexture = useTexture(killuaTitle)
   const [curve] = useState(
     () =>
       new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
@@ -156,6 +157,13 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       curve.points[2].copy(j1.current.lerped)
       curve.points[3].copy(fixed.current.translation())
       band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32))
+      ;[0.2, 0.44, 0.68, 0.92].forEach((point, index) => {
+        const decoration = decorations.current[index]
+        if (decoration) {
+          decoration.position.copy(curve.getPoint(point))
+          decoration.position.z += 0.06
+        }
+      })
       ang.copy(card.current.angvel())
       rot.copy(card.current.rotation())
       card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z })
@@ -163,8 +171,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   })
 
   curve.curveType = 'chordal'
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping
   killuaTexture.colorSpace = THREE.SRGBColorSpace
+  killuaTitleTexture.colorSpace = THREE.SRGBColorSpace
 
   return (
     <>
@@ -221,16 +229,34 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           </group>
         </RigidBody>
       </group>
+      {[0, 1, 2, 3].map((index) => (
+        <sprite
+          key={index}
+          ref={(element) => {
+            decorations.current[index] = element
+          }}
+          scale={isMobile ? [0.38, 0.22, 1] : [0.42, 0.25, 1]}
+          renderOrder={20}
+        >
+          <spriteMaterial
+            map={killuaTitleTexture}
+            transparent
+            alphaTest={0.04}
+            depthTest={false}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </sprite>
+      ))}
       <mesh ref={band}>
         <meshLineGeometry />
         <meshLineMaterial
-          color="white"
+          color="#070707"
           depthTest={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
-          useMap
-          map={texture}
-          repeat={[-4, 1]}
-          lineWidth={isMobile ? 1.6 : 2.2}
+          transparent
+          opacity={0.82}
+          lineWidth={isMobile ? 1.25 : 1.6}
         />
       </mesh>
     </>
@@ -238,5 +264,5 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
 }
 
 useGLTF.preload(cardGLB)
-useTexture.preload(lanyard)
 useTexture.preload(killuaCard)
+useTexture.preload(killuaTitle)
