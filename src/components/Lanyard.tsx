@@ -102,9 +102,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
   const cardScale = isMobile ? 2.42 : 2.55
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [0.12, 4.24, 0] : [-0.45, 3.82, 0]
+  const anchorPosition = isMobile ? [0.5, 4.26, 0] : [0.38, 3.82, 0]
   const jointStep = isMobile ? 0.74 : 0.74
-  const cardStartX = isMobile ? 2.95 : 2.65
+  const cardStartX = isMobile ? 3.05 : 2.72
   const { nodes, materials } = useGLTF(cardGLB)
   const killuaTexture = useTexture(killuaCard)
   const killuaTitleTexture = useTexture(killuaTitle)
@@ -172,6 +172,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
 
   curve.curveType = 'chordal'
   killuaTexture.colorSpace = THREE.SRGBColorSpace
+  killuaTexture.offset.set(0.08, 0.035)
+  killuaTexture.repeat.set(0.84, 0.9)
   killuaTitleTexture.colorSpace = THREE.SRGBColorSpace
 
   return (
@@ -214,8 +216,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
                 metalness={0.16}
               />
             </mesh>
-            <mesh position={[0, 0.515, 0.012]} renderOrder={8}>
-              <planeGeometry args={[0.704, 0.956]} />
+            <mesh position={[0, 0.523, 0.014]} renderOrder={8}>
+              <planeGeometry args={[0.716, 0.992]} />
               <meshBasicMaterial
                 map={killuaTexture}
                 transparent
