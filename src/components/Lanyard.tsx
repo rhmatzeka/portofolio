@@ -102,9 +102,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
   const cardScale = isMobile ? 2.42 : 2.55
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [-0.05, 4.06, 0] : [-1.1, 3.48, 0]
+  const anchorPosition = isMobile ? [0.12, 4.24, 0] : [-0.45, 3.82, 0]
   const jointStep = isMobile ? 0.74 : 0.74
-  const cardStartX = isMobile ? 2.85 : 2.44
+  const cardStartX = isMobile ? 2.95 : 2.65
   const { nodes, materials } = useGLTF(cardGLB)
   const killuaTexture = useTexture(killuaCard)
   const killuaTitleTexture = useTexture(killuaTitle)
@@ -171,7 +171,6 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   })
 
   curve.curveType = 'chordal'
-  killuaTexture.flipY = false
   killuaTexture.colorSpace = THREE.SRGBColorSpace
   killuaTitleTexture.colorSpace = THREE.SRGBColorSpace
 
@@ -207,12 +206,22 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial
                 color="#101316"
-                map={killuaTexture}
+                map={materials.base.map}
                 map-anisotropy={16}
                 clearcoat={isMobile ? 0.25 : 0.7}
                 clearcoatRoughness={0.2}
                 roughness={0.58}
                 metalness={0.16}
+              />
+            </mesh>
+            <mesh position={[0, 0.515, 0.012]} renderOrder={8}>
+              <planeGeometry args={[0.704, 0.956]} />
+              <meshBasicMaterial
+                map={killuaTexture}
+                transparent
+                alphaTest={0.02}
+                depthWrite={false}
+                toneMapped={false}
               />
             </mesh>
             <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
