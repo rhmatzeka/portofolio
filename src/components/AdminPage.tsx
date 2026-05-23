@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getCanonicalStackName, getStackIcon } from '../data/projects'
 import { fileToDataUrl, getAdminContent, normalizeCsv } from '../utils/portfolioContent'

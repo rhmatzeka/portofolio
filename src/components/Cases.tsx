@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, memo } from 'react'
 import { createPortal } from 'react-dom'

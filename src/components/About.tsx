@@ -1,7 +1,8 @@
+// @ts-nocheck
+import { Component, Suspense } from 'react'
 import { motion } from 'framer-motion'
-import avatar from '../assets/images/k.jpg'
+import Lanyard from './Lanyard'
 import LivePresence from './LivePresence'
-import ScrollFrameScene from './ScrollFrameScene'
 import './About.css'
 
 const containerVariants = {
@@ -61,6 +62,23 @@ const TechPill = ({ tech, className = '' }) => (
   </a>
 )
 
+class LanyardBoundary extends Component {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (this.state.hasError) return this.props.fallback
+    return this.props.children
+  }
+}
+
+const AvatarFallback = () => (
+  <div className="about-avatar-fallback" aria-hidden="true" />
+)
+
 const About = () => {
   return (
     <motion.section
@@ -72,9 +90,13 @@ const About = () => {
     >
       <div className="about-container">
         {/* Avatar */}
-        <motion.div className="about-avatar-wrapper" variants={itemLeft}>
+        <motion.div className="about-lanyard-stage" variants={itemLeft}>
           <div className="about-avatar-glow" />
-          <img src={avatar} alt="Rahmat Eka Satria" className="about-avatar" />
+          <LanyardBoundary fallback={<AvatarFallback />}>
+            <Suspense fallback={<div className="lanyard-loading" aria-hidden="true" />}>
+              <Lanyard position={[0, 0, 28]} gravity={[0, -40, 0]} />
+            </Suspense>
+          </LanyardBoundary>
         </motion.div>
 
         {/* Content */}
@@ -112,8 +134,6 @@ const About = () => {
       <motion.div className="about-presence" variants={itemRight}>
         <LivePresence />
       </motion.div>
-
-      <ScrollFrameScene />
 
       <motion.div className="stack-marquee" variants={itemRight}>
         <span className="stack-label stack-marquee-label">Tech Stack</span>

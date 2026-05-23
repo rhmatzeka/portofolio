@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: center;
   gap: 5rem;
-  overflow: clip;
+  overflow: visible;
 }
 
 .about-presence {
@@ -22,36 +22,55 @@
   pointer-events: auto;
 }
 
-/* Left - Avatar */
-.about-avatar-wrapper {
+/* Left - Lanyard */
+.about-lanyard-stage {
   flex-shrink: 0;
   position: relative;
+  width: clamp(430px, 44vw, 700px);
+  height: clamp(560px, 54vw, 760px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  cursor: grab;
+  overflow: visible;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(0, 209, 255, 0.13), transparent 44%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.98), #000000);
 }
 
-.about-avatar {
-  width: clamp(180px, 24vw, 300px);
-  height: clamp(230px, 30vw, 380px);
-  border-radius: 30px;
-  object-fit: cover;
-  object-position: center top;
-  border: 1px solid rgba(0, 209, 255, 0.3);
-  box-shadow: 0 0 40px rgba(0, 209, 255, 0.15);
-  display: block;
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s ease;
-}
-
-.about-avatar-wrapper:hover .about-avatar {
-  transform: translateY(-6px);
-  box-shadow: 0 22px 54px rgba(0, 209, 255, 0.18);
+.about-lanyard-stage:active {
+  cursor: grabbing;
 }
 
 .about-avatar-glow {
   position: absolute;
-  inset: -2px;
-  border-radius: 32px;
-  background: linear-gradient(135deg, rgba(0, 209, 255, 0.3), transparent 60%);
+  inset: 10% 4% 4%;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 48% 36%, rgba(0, 209, 255, 0.2), transparent 42%),
+    radial-gradient(circle at 56% 68%, rgba(255, 255, 255, 0.1), transparent 42%);
   z-index: -1;
-  filter: blur(10px);
+  filter: blur(18px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.lanyard-loading,
+.about-avatar-fallback {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lanyard-loading {
+  background:
+    radial-gradient(circle at 50% 44%, rgba(0, 209, 255, 0.16), transparent 42%),
+    #000000;
 }
 
 /* Right - Content */
@@ -305,6 +324,7 @@
     flex-direction: column;
     gap: 3rem;
     text-align: center;
+    overflow: visible;
   }
   
   .about-stats {
@@ -326,12 +346,9 @@
     gap: 2.5rem;
   }
   
-  .about-avatar {
-    border-radius: 20px;
-  }
-  
-  .about-avatar-glow {
-    border-radius: 22px;
+  .about-lanyard-stage {
+    width: min(100vw, 520px);
+    height: 560px;
   }
   
   .about-content {
@@ -403,12 +420,8 @@
     gap: 2rem;
   }
   
-  .about-avatar {
-    border-radius: 16px;
-  }
-  
-  .about-avatar-glow {
-    border-radius: 18px;
+  .about-lanyard-stage {
+    height: 470px;
   }
   
   .about-content {
@@ -476,7 +489,6 @@
     transform: none;
   }
 
-  .about-avatar-wrapper:hover .about-avatar,
   .stat:hover {
     transform: none;
   }
@@ -490,7 +502,6 @@
 
   .stack-tag,
   .stack-icon,
-  .about-avatar,
   .stat {
     transition: none;
   }

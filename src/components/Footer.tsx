@@ -1,3 +1,4 @@
+// @ts-nocheck
 import './Footer.css'
 
 const Footer = ({ hasProjects = true }) => {

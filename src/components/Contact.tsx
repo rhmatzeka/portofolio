@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'

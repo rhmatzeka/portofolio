@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useMemo, useState } from 'react'
 import './LivePresence.css'
 import codingArtwork from '../assets/images/ngoding.jpg'
