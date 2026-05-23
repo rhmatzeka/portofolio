@@ -1,172 +1,242 @@
 // @ts-nocheck
-import { useEffect, useRef, useState } from 'react'
+/* eslint-disable react/no-unknown-property */
+'use client'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { Canvas, extend, useFrame } from '@react-three/fiber'
+import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei'
+import {
+  BallCollider,
+  CuboidCollider,
+  Physics,
+  RigidBody,
+  useRopeJoint,
+  useSphericalJoint
+} from '@react-three/rapier'
+import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
+import * as THREE from 'three'
+import cardGLB from '../assets/lanyard/card.glb'
+import lanyard from '../assets/lanyard/lanyard.png'
 import killuaCard from '../assets/kiluaanimated/ezgif-frame-017.png'
 import './Lanyard.css'
 
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+extend({ MeshLineGeometry, MeshLineMaterial })
 
-const getCordPath = ({ x, y }) => {
-  const anchorX = 280
-  const anchorY = 0
-  const attachX = 280 + x
-  const attachY = 292 + y
-  const curvePull = clamp(x * 0.5, -90, 90)
+export default function Lanyard({
+  position = [0, 0, 26],
+  gravity = [0, -40, 0],
+  fov = 22,
+  transparent = false
+}) {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768)
 
-  return `M ${anchorX} ${anchorY} C ${anchorX + curvePull} ${anchorY + 145}, ${attachX - curvePull} ${attachY - 145}, ${attachX} ${attachY}`
-}
-
-export default function Lanyard() {
-  const frameRef = useRef(null)
-  const dragStart = useRef(null)
-  const positionRef = useRef({ x: 0, y: 0 })
-  const velocityRef = useRef({ x: 0, y: 0 })
-  const lastPointerRef = useRef(null)
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [dragging, setDragging] = useState(false)
-
-  const syncPosition = (nextPosition) => {
-    positionRef.current = nextPosition
-    setPosition(nextPosition)
-  }
-
-  const stopSpring = () => {
-    if (frameRef.current) {
-      cancelAnimationFrame(frameRef.current)
-      frameRef.current = null
-    }
-  }
-
-  const startSpring = () => {
-    stopSpring()
-
-    let previousTime = performance.now()
-
-    const tick = (time) => {
-      const delta = Math.min((time - previousTime) / 16.67, 2)
-      previousTime = time
-
-      const current = positionRef.current
-      const velocity = velocityRef.current
-      const stiffness = 0.08
-      const damping = 0.84
-
-      velocity.x = (velocity.x - current.x * stiffness * delta) * damping
-      velocity.y = (velocity.y - current.y * stiffness * delta) * damping
-
-      const next = {
-        x: current.x + velocity.x * delta,
-        y: current.y + velocity.y * delta
-      }
-
-      syncPosition(next)
-
-      if (Math.abs(next.x) > 0.35 || Math.abs(next.y) > 0.35 || Math.abs(velocity.x) > 0.35 || Math.abs(velocity.y) > 0.35) {
-        frameRef.current = requestAnimationFrame(tick)
-      } else {
-        velocityRef.current = { x: 0, y: 0 }
-        syncPosition({ x: 0, y: 0 })
-        frameRef.current = null
-      }
-    }
-
-    frameRef.current = requestAnimationFrame(tick)
-  }
-
-  const handlePointerDown = (event) => {
-    stopSpring()
-    event.currentTarget.setPointerCapture(event.pointerId)
-    const now = performance.now()
-
-    dragStart.current = {
-      pointerX: event.clientX,
-      pointerY: event.clientY,
-      x: positionRef.current.x,
-      y: positionRef.current.y
-    }
-    lastPointerRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-      time: now
-    }
-    velocityRef.current = { x: 0, y: 0 }
-    setDragging(true)
-  }
-
-  const handlePointerMove = (event) => {
-    if (!dragStart.current) return
-
-    const now = performance.now()
-    const nextPosition = {
-      x: clamp(dragStart.current.x + event.clientX - dragStart.current.pointerX, -260, 260),
-      y: clamp(dragStart.current.y + event.clientY - dragStart.current.pointerY, -170, 230)
-    }
-
-    const lastPointer = lastPointerRef.current
-    if (lastPointer) {
-      const deltaTime = Math.max(now - lastPointer.time, 16)
-      velocityRef.current = {
-        x: clamp(((event.clientX - lastPointer.x) / deltaTime) * 10, -32, 32),
-        y: clamp(((event.clientY - lastPointer.y) / deltaTime) * 10, -32, 32)
-      }
-    }
-
-    lastPointerRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-      time: now
-    }
-    syncPosition(nextPosition)
-  }
-
-  const stopDragging = (event) => {
-    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
-    }
-    dragStart.current = null
-    lastPointerRef.current = null
-    setDragging(false)
-    startSpring()
-  }
-
-  useEffect(() => () => stopSpring(), [])
-
-  const tilt = clamp(position.x / 14, -16, 16)
-  const cordPath = getCordPath(position)
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   return (
     <div className="lanyard-wrapper">
-      <div className={`lanyard-rig${dragging ? ' is-dragging' : ''}`}>
-        <svg className="lanyard-cord-svg" viewBox="0 0 560 760" aria-hidden="true">
-          <path className="lanyard-cord-shadow" d={cordPath} />
-          <path className="lanyard-cord-main" d={cordPath} />
-        </svg>
-
-        <div className="lanyard-anchor" />
-
-        <div
-          className="lanyard-card-group"
-          style={{
-            '--lanyard-x': `${position.x}px`,
-            '--lanyard-y': `${position.y}px`,
-            '--lanyard-tilt': `${tilt}deg`
-          }}
-        >
-          <div className="lanyard-clip" />
-          <div className="lanyard-strap" />
-          <div
-            className="lanyard-card"
-            role="img"
-            aria-label="Killua lanyard card"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={stopDragging}
-            onPointerCancel={stopDragging}
-          >
-            <img src={killuaCard} alt="" draggable="false" />
-            <div className="lanyard-card-shine" />
-          </div>
-        </div>
-      </div>
+      <Canvas
+        camera={{ position, fov }}
+        dpr={[1, isMobile ? 1.5 : 2]}
+        gl={{ alpha: transparent, antialias: true }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)
+          gl.domElement.style.background = transparent ? 'transparent' : '#000000'
+        }}
+      >
+        <ambientLight intensity={Math.PI} />
+        <Suspense fallback={null}>
+          <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
+            <Band isMobile={isMobile} />
+          </Physics>
+          <Environment blur={0.75}>
+            <Lightformer
+              intensity={2}
+              color="white"
+              position={[0, -1, 5]}
+              rotation={[0, 0, Math.PI / 3]}
+              scale={[100, 0.1, 1]}
+            />
+            <Lightformer
+              intensity={3}
+              color="white"
+              position={[-1, -1, 1]}
+              rotation={[0, 0, Math.PI / 3]}
+              scale={[100, 0.1, 1]}
+            />
+            <Lightformer
+              intensity={3}
+              color="white"
+              position={[1, 1, 1]}
+              rotation={[0, 0, Math.PI / 3]}
+              scale={[100, 0.1, 1]}
+            />
+            <Lightformer
+              intensity={10}
+              color="white"
+              position={[-10, 0, 14]}
+              rotation={[0, Math.PI / 2, Math.PI / 3]}
+              scale={[100, 10, 1]}
+            />
+          </Environment>
+        </Suspense>
+      </Canvas>
     </div>
   )
 }
+
+function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
+  const band = useRef()
+  const fixed = useRef()
+  const j1 = useRef()
+  const j2 = useRef()
+  const j3 = useRef()
+  const card = useRef()
+  const vec = new THREE.Vector3()
+  const ang = new THREE.Vector3()
+  const rot = new THREE.Vector3()
+  const dir = new THREE.Vector3()
+  const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
+  const cardScale = isMobile ? 1.45 : 2.35
+  const colliderScale = cardScale / 1.05
+  const anchorPosition = isMobile ? [-0.8, 3.05, 0] : [-1.05, 3.2, 0]
+  const jointStep = isMobile ? 0.62 : 0.72
+  const cardStartX = isMobile ? 1.95 : 2.35
+  const { nodes, materials } = useGLTF(cardGLB)
+  const texture = useTexture(lanyard)
+  const killuaTexture = useTexture(killuaCard)
+  const [curve] = useState(
+    () =>
+      new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
+  )
+  const [dragged, drag] = useState(false)
+  const [hovered, hover] = useState(false)
+
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1])
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1])
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1])
+  useSphericalJoint(j3, card, [
+    [0, 0, 0],
+    [0, 1.5, 0]
+  ])
+
+  useEffect(() => {
+    if (hovered) {
+      document.body.style.cursor = dragged ? 'grabbing' : 'grab'
+      return () => {
+        document.body.style.cursor = 'auto'
+      }
+    }
+
+    return undefined
+  }, [hovered, dragged])
+
+  useFrame((state, delta) => {
+    if (dragged) {
+      vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera)
+      dir.copy(vec).sub(state.camera.position).normalize()
+      vec.add(dir.multiplyScalar(state.camera.position.length()))
+      ;[card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp())
+      card.current?.setNextKinematicTranslation({ x: vec.x - dragged.x, y: vec.y - dragged.y, z: vec.z - dragged.z })
+    }
+
+    if (fixed.current) {
+      ;[j1, j2].forEach((ref) => {
+        if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation())
+        const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())))
+        ref.current.lerped.lerp(
+          ref.current.translation(),
+          delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
+        )
+      })
+      curve.points[0].copy(j3.current.translation())
+      curve.points[1].copy(j2.current.lerped)
+      curve.points[2].copy(j1.current.lerped)
+      curve.points[3].copy(fixed.current.translation())
+      band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32))
+      ang.copy(card.current.angvel())
+      rot.copy(card.current.rotation())
+      card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z })
+    }
+  })
+
+  curve.curveType = 'chordal'
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+  killuaTexture.colorSpace = THREE.SRGBColorSpace
+
+  return (
+    <>
+      <group position={anchorPosition}>
+        <RigidBody ref={fixed} {...segmentProps} type="fixed" />
+        <RigidBody position={[jointStep, 0, 0]} ref={j1} {...segmentProps}>
+          <BallCollider args={[0.1]} />
+        </RigidBody>
+        <RigidBody position={[jointStep * 2, 0, 0]} ref={j2} {...segmentProps}>
+          <BallCollider args={[0.1]} />
+        </RigidBody>
+        <RigidBody position={[jointStep * 3, 0, 0]} ref={j3} {...segmentProps}>
+          <BallCollider args={[0.1]} />
+        </RigidBody>
+        <RigidBody position={[cardStartX, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
+          <CuboidCollider args={[0.8 * colliderScale, 1.125 * colliderScale, 0.02]} />
+          <group
+            scale={cardScale}
+            position={[0, -1.05, -0.05]}
+            onPointerOver={() => hover(true)}
+            onPointerOut={() => hover(false)}
+            onPointerUp={(event) => {
+              event.target.releasePointerCapture(event.pointerId)
+              drag(false)
+            }}
+            onPointerDown={(event) => {
+              event.target.setPointerCapture(event.pointerId)
+              drag(new THREE.Vector3().copy(event.point).sub(vec.copy(card.current.translation())))
+            }}
+          >
+            <mesh geometry={nodes.card.geometry}>
+              <meshPhysicalMaterial
+                color="#101316"
+                map={materials.base.map}
+                map-anisotropy={16}
+                clearcoat={isMobile ? 0.25 : 0.7}
+                clearcoatRoughness={0.2}
+                roughness={0.58}
+                metalness={0.16}
+              />
+            </mesh>
+            <mesh position={[0, 0.52, 0.018]}>
+              <planeGeometry args={[0.7, 0.95]} />
+              <meshBasicMaterial
+                map={killuaTexture}
+                transparent
+                alphaTest={0.02}
+                depthWrite={false}
+                toneMapped={false}
+              />
+            </mesh>
+            <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
+            <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
+          </group>
+        </RigidBody>
+      </group>
+      <mesh ref={band}>
+        <meshLineGeometry />
+        <meshLineMaterial
+          color="white"
+          depthTest={false}
+          resolution={isMobile ? [1000, 2000] : [1000, 1000]}
+          useMap
+          map={texture}
+          repeat={[-4, 1]}
+          lineWidth={isMobile ? 1.6 : 2.2}
+        />
+      </mesh>
+    </>
+  )
+}
+
+useGLTF.preload(cardGLB)
+useTexture.preload(lanyard)
+useTexture.preload(killuaCard)
