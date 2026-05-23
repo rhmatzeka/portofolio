@@ -9,11 +9,13 @@
 .about-container {
   width: 100%;
   max-width: 100%;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: clamp(0.75rem, 1.8vw, 2rem);
   overflow: visible;
+  transform: translateX(clamp(-70px, -3vw, -36px));
 }
 
 .about-presence {
@@ -26,6 +28,7 @@
 .about-lanyard-stage {
   flex-shrink: 0;
   position: relative;
+  z-index: 4;
   width: clamp(560px, 54vw, 960px);
   height: clamp(640px, 58vw, 840px);
   display: flex;
@@ -329,6 +332,7 @@
     gap: 1rem;
     text-align: center;
     overflow: visible;
+    transform: none;
   }
 
   .about-content {
