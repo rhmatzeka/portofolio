@@ -87,6 +87,12 @@
   contain-intrinsic-size: 900px;
 }
 
+#about {
+  min-height: auto;
+  padding-top: clamp(2rem, 3vw, 3.5rem);
+  justify-content: flex-start;
+}
+
 .hero-section::after {
   content: '';
   position: absolute;

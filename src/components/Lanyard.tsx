@@ -105,6 +105,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const anchorPosition = isMobile ? [0.02, 3.68, 0] : [0.2, 4.12, 0]
   const jointStep = isMobile ? 0.74 : 0.74
   const cardStartX = isMobile ? 2.9 : 2.62
+  const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const killuaTexture = useTexture(killuaCard)
   const killuaTitleTexture = useTexture(killuaTitle)
@@ -157,7 +158,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       curve.points[2].copy(j1.current.lerped)
       curve.points[3].copy(fixed.current.translation())
       band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32))
-      ;[0.2, 0.44, 0.68, 0.92].forEach((point, index) => {
+      decorationPoints.forEach((point, index) => {
         const decoration = decorations.current[index]
         if (decoration) {
           decoration.position.copy(curve.getPoint(point))
@@ -231,13 +232,13 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           </group>
         </RigidBody>
       </group>
-      {[0, 1, 2, 3].map((index) => (
+      {decorationPoints.map((_, index) => (
         <sprite
           key={index}
           ref={(element) => {
             decorations.current[index] = element
           }}
-          scale={isMobile ? [0.38, 0.22, 1] : [0.42, 0.25, 1]}
+          scale={isMobile ? [0.34, 0.2, 1] : [0.38, 0.23, 1]}
           renderOrder={20}
         >
           <spriteMaterial
@@ -257,8 +258,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           depthTest={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           transparent
-          opacity={0.82}
-          lineWidth={isMobile ? 1.25 : 1.6}
+          opacity={0.52}
+          lineWidth={isMobile ? 0.72 : 0.9}
         />
       </mesh>
     </>
