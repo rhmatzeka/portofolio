@@ -242,9 +242,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
             </mesh>
             <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
             <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
-            <mesh position={[0, 1.02, 0.075]} renderOrder={9}>
-              <boxGeometry args={[0.052, 0.38, 0.03]} />
-              <meshStandardMaterial color="#030303" roughness={0.62} metalness={0.08} />
+            <mesh position={[0, 1, 0.075]} renderOrder={9}>
+              <boxGeometry args={[0.028, 0.32, 0.018]} />
+              <meshBasicMaterial color="#000000" />
             </mesh>
             <mesh position={[0, 0.52, 0.08]} visible={false}>
               <planeGeometry args={[1.18, 1.35]} />
