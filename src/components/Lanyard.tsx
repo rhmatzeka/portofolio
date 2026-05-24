@@ -106,8 +106,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
   const cardScale = isMobile ? 1.92 : 2.14
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [0.02, 3.35, 0] : [0.02, 3.16, 0]
-  const ropeSegmentLength = isMobile ? 0.78 : 0.68
+  const anchorPosition = isMobile ? [0.02, 2.25, 0] : [0.02, 3.16, 0]
+  const ropeSegmentLength = isMobile ? 0.48 : 0.68
   const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.2
   const rigX = isMobile ? 0 : 0.22
@@ -302,11 +302,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           depthWrite={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           transparent
-          opacity={0.95}
+          opacity={1}
           useMap
           map={lanyardTexture}
-          repeat={[-5, 1]}
-          lineWidth={isMobile ? 0.58 : 0.68}
+          repeat={[-4, 1]}
+          lineWidth={isMobile ? 0.9 : 1.08}
         />
       </mesh>
     </>
