@@ -15,6 +15,7 @@
   justify-content: center;
   gap: clamp(0.75rem, 1.8vw, 2rem);
   overflow: visible;
+  isolation: isolate;
   transform: translateX(clamp(-70px, -3vw, -36px));
 }
 
@@ -28,7 +29,7 @@
 .about-lanyard-stage {
   flex-shrink: 0;
   position: relative;
-  z-index: 4;
+  z-index: 20;
   width: clamp(560px, 54vw, 960px);
   height: clamp(640px, 58vw, 840px);
   display: flex;
@@ -84,7 +85,7 @@
   gap: 2.5rem;
   margin-left: clamp(-8rem, -5vw, -3rem);
   position: relative;
-  z-index: 1;
+  z-index: 4;
 }
 
 .about-tagline {
@@ -359,13 +360,15 @@
 
   .about-container {
     gap: 0.75rem;
+    align-items: center;
   }
   
   .about-lanyard-stage {
     width: min(100vw, 620px);
-    height: 680px;
+    height: clamp(560px, 118vw, 660px);
     margin-left: 0;
-    padding-top: 285px;
+    margin-bottom: clamp(0.5rem, 2vw, 1.25rem);
+    padding-top: clamp(170px, 34vw, 250px);
     transform: none;
   }
 
@@ -375,6 +378,7 @@
   
   .about-content {
     gap: 1.8rem;
+    width: min(100%, 560px);
   }
   
   .about-tagline {
@@ -444,9 +448,10 @@
   
   .about-lanyard-stage {
     width: 100vw;
-    height: 630px;
+    height: clamp(500px, 128vw, 600px);
     margin-left: 0;
-    padding-top: 255px;
+    margin-bottom: 0.75rem;
+    padding-top: clamp(145px, 38vw, 210px);
     transform: none;
   }
 

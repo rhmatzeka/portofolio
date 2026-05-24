@@ -150,6 +150,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
     return undefined
   }, [hovered, dragged])
 
+  useEffect(() => {
+    document.body.classList.toggle('is-lanyard-dragging', Boolean(dragged))
+    return () => document.body.classList.remove('is-lanyard-dragging')
+  }, [dragged])
+
   useFrame((state, delta) => {
     if (dragged) {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera)
@@ -237,11 +242,18 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
             onPointerUp={(event) => {
-              event.target.releasePointerCapture(event.pointerId)
+              event.target.releasePointerCapture?.(event.pointerId)
+              drag(false)
+            }}
+            onPointerCancel={() => {
+              drag(false)
+            }}
+            onLostPointerCapture={() => {
               drag(false)
             }}
             onPointerDown={(event) => {
-              event.target.setPointerCapture(event.pointerId)
+              event.stopPropagation()
+              event.target.setPointerCapture?.(event.pointerId)
               drag(new THREE.Vector3().copy(event.point).sub(vec.copy(card.current.translation())))
             }}
           >
