@@ -15,9 +15,9 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
 import * as THREE from 'three'
 import cardGLB from '../assets/lanyard/card.glb'
+import killuaIcon from '../assets/lanyard/killua-icon.png'
 import lanyardTextureSrc from '../assets/lanyard/lanyard.png'
 import killuaCard from '../assets/images/k.jpg'
-import killuaTitle from '../assets/images/kiluatitle.png'
 import './Lanyard.css'
 
 extend({ MeshLineGeometry, MeshLineMaterial })
@@ -96,6 +96,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const j3 = useRef()
   const card = useRef()
   const decorations = useRef([])
+  const introStart = useRef(null)
   const vec = new THREE.Vector3()
   const ang = new THREE.Vector3()
   const rot = new THREE.Vector3()
@@ -104,17 +105,18 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const cardAnchorOffset = new THREE.Vector3()
   const cardRotation = new THREE.Quaternion()
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
-  const cardScale = isMobile ? 2.2 : 2.5
+  const cardScale = isMobile ? 2.08 : 2.36
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [0.02, 4.08, 0] : [0.02, 4.28, 0]
-  const cardStartX = isMobile ? 2.08 : 1.95
-  const jointStep = cardStartX / 3
+  const anchorPosition = isMobile ? [0.02, 3.58, 0] : [0.02, 4.72, 0]
+  const ropeSegmentLength = isMobile ? 0.9 : 0.72
+  const cardStartX = ropeSegmentLength * 3 + (isMobile ? 0.12 : 0.1)
+  const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.18
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const lanyardTexture = useTexture(lanyardTextureSrc)
   const killuaTexture = useTexture(killuaCard)
-  const killuaTitleTexture = useTexture(killuaTitle)
+  const killuaIconTexture = useTexture(killuaIcon)
   const [curve] = useState(
     () =>
       new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
@@ -122,9 +124,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const [dragged, drag] = useState(false)
   const [hovered, hover] = useState(false)
 
-  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1])
-  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1])
-  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1])
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], ropeSegmentLength])
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], ropeSegmentLength])
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], ropeSegmentLength])
   useSphericalJoint(j3, card, [
     [0, 0, 0],
     [0, cardHookY, 0]
@@ -142,6 +144,24 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   }, [hovered, dragged])
 
   useFrame((state, delta) => {
+    if (fixed.current) {
+      if (introStart.current === null) introStart.current = state.clock.elapsedTime
+      const elapsed = state.clock.elapsedTime - introStart.current
+      const decay = Math.exp(-elapsed * 1.55)
+      const introActive = elapsed < 2.8 && !dragged
+
+      if (introActive) {
+        fixed.current.setNextKinematicTranslation({
+          x: Math.sin(elapsed * 10.5) * decay * (isMobile ? 0.14 : 0.2),
+          y: Math.abs(Math.sin(elapsed * 12)) * decay * (isMobile ? 0.025 : 0.045),
+          z: 0
+        })
+        ;[card, j1, j2, j3].forEach((ref) => ref.current?.wakeUp())
+      } else {
+        fixed.current.setNextKinematicTranslation({ x: 0, y: 0, z: 0 })
+      }
+    }
+
     if (dragged) {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera)
       dir.copy(vec).sub(state.camera.position).normalize()
@@ -192,12 +212,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   killuaTexture.colorSpace = THREE.SRGBColorSpace
   killuaTexture.offset.set(0.08, 0.035)
   killuaTexture.repeat.set(0.84, 0.9)
-  killuaTitleTexture.colorSpace = THREE.SRGBColorSpace
+  killuaIconTexture.colorSpace = THREE.SRGBColorSpace
 
   return (
     <>
       <group position={anchorPosition}>
-        <RigidBody ref={fixed} {...segmentProps} type="fixed" />
+        <RigidBody ref={fixed} {...segmentProps} type="kinematicPosition" />
         <RigidBody position={[jointStep, 0, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
@@ -259,11 +279,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           ref={(element) => {
             decorations.current[index] = element
           }}
-          scale={isMobile ? [0.34, 0.2, 1] : [0.38, 0.23, 1]}
+          scale={isMobile ? [0.24, 0.2, 1] : [0.28, 0.23, 1]}
           renderOrder={20}
         >
           <spriteMaterial
-            map={killuaTitleTexture}
+            map={killuaIconTexture}
             transparent
             alphaTest={0.04}
             depthTest={false}
@@ -292,6 +312,6 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
 }
 
 useGLTF.preload(cardGLB)
+useTexture.preload(killuaIcon)
 useTexture.preload(lanyardTextureSrc)
 useTexture.preload(killuaCard)
-useTexture.preload(killuaTitle)
