@@ -15,6 +15,7 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
 import * as THREE from 'three'
 import cardGLB from '../assets/lanyard/card.glb'
+import lanyardTextureSrc from '../assets/lanyard/lanyard.png'
 import killuaCard from '../assets/images/k.jpg'
 import killuaTitle from '../assets/images/kiluatitle.png'
 import './Lanyard.css'
@@ -103,14 +104,15 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const cardAnchorOffset = new THREE.Vector3()
   const cardRotation = new THREE.Quaternion()
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
-  const cardScale = isMobile ? 2.72 : 3.1
+  const cardScale = isMobile ? 2.2 : 2.5
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [0.02, 3.68, 0] : [0.2, 4.12, 0]
-  const cardStartX = isMobile ? 2.9 : 2.62
+  const anchorPosition = isMobile ? [0.02, 4.08, 0] : [0.02, 4.28, 0]
+  const cardStartX = isMobile ? 2.08 : 1.95
   const jointStep = cardStartX / 3
   const cardHookY = -1.05 + cardScale * 1.18
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
+  const lanyardTexture = useTexture(lanyardTextureSrc)
   const killuaTexture = useTexture(killuaCard)
   const killuaTitleTexture = useTexture(killuaTitle)
   const [curve] = useState(
@@ -125,7 +127,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1])
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-    [0, 1.5, 0]
+    [0, cardHookY, 0]
   ])
 
   useEffect(() => {
@@ -185,6 +187,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   })
 
   curve.curveType = 'chordal'
+  lanyardTexture.wrapS = lanyardTexture.wrapT = THREE.RepeatWrapping
+  lanyardTexture.anisotropy = 16
   killuaTexture.colorSpace = THREE.SRGBColorSpace
   killuaTexture.offset.set(0.08, 0.035)
   killuaTexture.repeat.set(0.84, 0.9)
@@ -271,13 +275,16 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       <mesh ref={band} renderOrder={0}>
         <meshLineGeometry />
         <meshLineMaterial
-          color="#070707"
-          depthTest
-          depthWrite
+          color="white"
+          depthTest={false}
+          depthWrite={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           transparent
-          opacity={0.52}
-          lineWidth={isMobile ? 0.72 : 0.9}
+          opacity={0.95}
+          useMap
+          map={lanyardTexture}
+          repeat={[-5, 1]}
+          lineWidth={isMobile ? 0.64 : 0.78}
         />
       </mesh>
     </>
@@ -285,5 +292,6 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
 }
 
 useGLTF.preload(cardGLB)
+useTexture.preload(lanyardTextureSrc)
 useTexture.preload(killuaCard)
 useTexture.preload(killuaTitle)
