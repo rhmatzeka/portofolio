@@ -363,13 +363,14 @@
   
   .about-lanyard-stage {
     width: min(100vw, 620px);
-    height: 390px;
+    height: 680px;
     margin-left: 0;
-    transform: translateY(325px);
+    padding-top: 285px;
+    transform: none;
   }
 
   .about-presence {
-    margin-top: -2.2rem;
+    margin-top: 0;
   }
   
   .about-content {
@@ -443,13 +444,14 @@
   
   .about-lanyard-stage {
     width: 100vw;
-    height: 360px;
+    height: 630px;
     margin-left: 0;
-    transform: translateY(305px);
+    padding-top: 255px;
+    transform: none;
   }
 
   .about-presence {
-    margin-top: -2rem;
+    margin-top: 0;
   }
   
   .about-content {

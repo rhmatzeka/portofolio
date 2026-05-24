@@ -23,7 +23,7 @@
 
 @media (max-width: 768px) {
   .lanyard-wrapper {
-    min-height: 640px;
+    min-height: 0;
   }
 
   .lanyard-wrapper canvas {
@@ -33,6 +33,6 @@
 
 @media (max-width: 480px) {
   .lanyard-wrapper {
-    min-height: 580px;
+    min-height: 0;
   }
 }
