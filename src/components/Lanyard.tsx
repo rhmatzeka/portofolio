@@ -107,7 +107,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
   const cardScale = isMobile ? 2.08 : 2.36
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [0.02, 3.46, 0] : [0.02, 4.95, 0]
+  const anchorPosition = isMobile ? [0.02, 2.65, 0] : [0.02, 1.95, 0]
   const ropeSegmentLength = isMobile ? 0.58 : 0.5
   const cardStartX = ropeSegmentLength * 3 + (isMobile ? 0.12 : 0.1)
   const jointStep = ropeSegmentLength
