@@ -2,7 +2,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 4rem;
+  gap: 2.25rem;
   pointer-events: auto;
 }
 
@@ -20,7 +20,7 @@
 
 .about-presence {
   width: min(100%, 648px);
-  margin: 0 auto;
+  margin: -1.5rem auto 0;
   pointer-events: auto;
 }
 
@@ -303,7 +303,7 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .about-shell {
-    gap: 3.5rem;
+    gap: 2rem;
   }
 
   .about-container {
@@ -323,7 +323,7 @@
 
 @media (max-width: 900px) {
   .about-shell {
-    gap: 3rem;
+    gap: 1.8rem;
   }
 
   .about-container {
@@ -354,7 +354,7 @@
 
 @media (max-width: 768px) {
   .about-shell {
-    gap: 2.6rem;
+    gap: 1.35rem;
   }
 
   .about-container {
@@ -363,9 +363,13 @@
   
   .about-lanyard-stage {
     width: min(100vw, 620px);
-    height: 470px;
+    height: 390px;
     margin-left: 0;
     transform: translateY(325px);
+  }
+
+  .about-presence {
+    margin-top: -2.2rem;
   }
   
   .about-content {
@@ -430,7 +434,7 @@
 
 @media (max-width: 480px) {
   .about-shell {
-    gap: 2.2rem;
+    gap: 1.1rem;
   }
 
   .about-container {
@@ -439,9 +443,13 @@
   
   .about-lanyard-stage {
     width: 100vw;
-    height: 430px;
+    height: 360px;
     margin-left: 0;
     transform: translateY(305px);
+  }
+
+  .about-presence {
+    margin-top: -2rem;
   }
   
   .about-content {
