@@ -23,9 +23,9 @@ import './Lanyard.css'
 extend({ MeshLineGeometry, MeshLineMaterial })
 
 export default function Lanyard({
-  position = [0, 0, 20],
+  position = [0, 0, 42],
   gravity = [0, -40, 0],
-  fov = 20,
+  fov = 10,
   transparent = true
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768)
@@ -104,14 +104,14 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const cardAnchor = new THREE.Vector3()
   const cardAnchorOffset = new THREE.Vector3()
   const cardRotation = new THREE.Quaternion()
-  const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
+  const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 8, linearDamping: 8 }
   const cardScale = isMobile ? 1.92 : 2.14
   const colliderScale = cardScale / 1.05
   const anchorPosition = isMobile ? [0.02, 3.35, 0] : [0.02, 3.16, 0]
   const ropeSegmentLength = isMobile ? 0.58 : 0.5
   const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.2
-  const rigX = isMobile ? 0 : ropeSegmentLength * 3 + 0.1
+  const rigX = isMobile ? 0 : -0.9
   const cardStartY = -(jointStep * 3 + cardHookY)
   const visualHookX = 0
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
@@ -155,13 +155,13 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
     if (dragged) {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera)
       dir.copy(vec).sub(state.camera.position).normalize()
-      vec.add(dir.multiplyScalar(state.camera.position.length()))
+      vec.add(dir.multiplyScalar(state.camera.position.length() * (isMobile ? 1.35 : 1.65)))
       ;[card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp())
       card.current?.setNextKinematicTranslation({ x: vec.x - dragged.x, y: vec.y - dragged.y, z: vec.z - dragged.z })
     }
 
     if (fixed.current) {
-      ;[j1, j2].forEach((ref) => {
+      ;[j1, j2, j3].forEach((ref) => {
         if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation())
         const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())))
         ref.current.lerped.lerp(
@@ -176,7 +176,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
         .applyQuaternion(cardRotation.set(cardQuaternion.x, cardQuaternion.y, cardQuaternion.z, cardQuaternion.w))
         .add(cardTranslation)
       curve.points[0].copy(cardAnchor)
-      curve.points[1].copy(j3.current.translation())
+      curve.points[1].copy(j3.current.lerped)
       curve.points[2].copy(j2.current.lerped)
       curve.points[3].copy(j1.current.lerped)
       curve.points[4].copy(fixed.current.translation())
@@ -199,9 +199,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
         ;[card, j1, j2, j3].forEach((ref) => ref.current?.wakeUp())
       }
       card.current.setAngvel({
-        x: ang.x + introSwing * (isMobile ? 0.26 : 0.36),
-        y: ang.y - rot.y * 0.25,
-        z: ang.z + introSwing * (isMobile ? 0.44 : 0.62)
+        x: (ang.x + introSwing * (isMobile ? 0.26 : 0.36)) * 0.68,
+        y: (ang.y - rot.y * 0.25) * 0.68,
+        z: (ang.z + introSwing * (isMobile ? 0.44 : 0.62)) * 0.68
       })
     }
   })

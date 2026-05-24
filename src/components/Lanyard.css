@@ -27,7 +27,7 @@
   }
 
   .lanyard-wrapper canvas {
-    touch-action: pan-y;
+    touch-action: none;
   }
 }
 
