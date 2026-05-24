@@ -281,7 +281,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           ref={(element) => {
             decorations.current[index] = element
           }}
-          scale={isMobile ? [0.22, 0.18, 1] : [0.24, 0.2, 1]}
+          scale={isMobile ? [0.28, 0.24, 1] : [0.34, 0.29, 1]}
           renderOrder={20}
         >
           <spriteMaterial
@@ -306,7 +306,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           useMap
           map={lanyardTexture}
           repeat={[-4, 1]}
-          lineWidth={isMobile ? 0.9 : 1.08}
+          lineWidth={isMobile ? 1.65 : 2.05}
         />
       </mesh>
     </>
