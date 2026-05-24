@@ -111,7 +111,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const ropeSegmentLength = isMobile ? 0.58 : 0.5
   const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.2
-  const rigX = ropeSegmentLength * 3 + (isMobile ? 0.12 : 0.1)
+  const rigX = isMobile ? 0 : ropeSegmentLength * 3 + 0.1
   const cardStartY = -(jointStep * 3 + cardHookY)
   const visualHookX = 0
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]

@@ -358,7 +358,7 @@
   }
   
   .about-lanyard-stage {
-    width: min(128vw, 700px);
+    width: min(100vw, 620px);
     height: 620px;
     margin-left: 0;
     transform: translateY(205px);
@@ -434,7 +434,7 @@
   }
   
   .about-lanyard-stage {
-    width: 132vw;
+    width: 100vw;
     height: 570px;
     margin-left: 0;
     transform: translateY(180px);
