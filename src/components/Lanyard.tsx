@@ -105,13 +105,14 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const cardAnchorOffset = new THREE.Vector3()
   const cardRotation = new THREE.Quaternion()
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
-  const cardScale = isMobile ? 2.08 : 2.36
+  const cardScale = isMobile ? 1.92 : 2.14
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [0.02, 3.15, 0] : [0.02, 2.75, 0]
+  const anchorPosition = isMobile ? [0.02, 3.35, 0] : [0.02, 3.16, 0]
   const ropeSegmentLength = isMobile ? 0.58 : 0.5
   const cardStartX = ropeSegmentLength * 3 + (isMobile ? 0.12 : 0.1)
   const jointStep = ropeSegmentLength
-  const cardHookY = -1.05 + cardScale * 1.18
+  const cardHookX = cardScale * -0.175
+  const cardHookY = -1.05 + cardScale * 1.2
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const lanyardTexture = useTexture(lanyardTextureSrc)
@@ -135,7 +136,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], ropeSegmentLength])
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-    [0, cardHookY, 0]
+    [cardHookX, cardHookY, 0]
   ])
 
   useEffect(() => {
@@ -170,7 +171,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       const cardTranslation = card.current.translation()
       const cardQuaternion = card.current.rotation()
       cardAnchor
-        .copy(cardAnchorOffset.set(0, cardHookY, 0))
+        .copy(cardAnchorOffset.set(cardHookX, cardHookY, 0))
         .applyQuaternion(cardRotation.set(cardQuaternion.x, cardQuaternion.y, cardQuaternion.z, cardQuaternion.w))
         .add(cardTranslation)
       curve.points[0].copy(cardAnchor)
@@ -280,7 +281,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           ref={(element) => {
             decorations.current[index] = element
           }}
-          scale={isMobile ? [0.24, 0.2, 1] : [0.28, 0.23, 1]}
+          scale={isMobile ? [0.22, 0.18, 1] : [0.24, 0.2, 1]}
           renderOrder={20}
         >
           <spriteMaterial
@@ -305,7 +306,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           useMap
           map={lanyardTexture}
           repeat={[-5, 1]}
-          lineWidth={isMobile ? 0.64 : 0.78}
+          lineWidth={isMobile ? 0.58 : 0.68}
         />
       </mesh>
     </>
