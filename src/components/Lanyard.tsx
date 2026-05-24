@@ -112,7 +112,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const cardStartX = ropeSegmentLength * 3 + (isMobile ? 0.12 : 0.1)
   const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.2
-  const clipCenterOffset = 0.175
+  const visualHookX = cardScale * -0.175
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const lanyardTexture = useTexture(lanyardTextureSrc)
@@ -171,7 +171,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       const cardTranslation = card.current.translation()
       const cardQuaternion = card.current.rotation()
       cardAnchor
-        .copy(cardAnchorOffset.set(0, cardHookY, 0))
+        .copy(cardAnchorOffset.set(visualHookX, cardHookY, 0))
         .applyQuaternion(cardRotation.set(cardQuaternion.x, cardQuaternion.y, cardQuaternion.z, cardQuaternion.w))
         .add(cardTranslation)
       curve.points[0].copy(cardAnchor)
@@ -266,8 +266,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
                 toneMapped={false}
               />
             </mesh>
-            <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} position={[clipCenterOffset, 0, 0]} />
-            <mesh geometry={nodes.clamp.geometry} material={materials.metal} position={[clipCenterOffset, 0, 0]} />
+            <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
+            <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
             <mesh position={[0, 0.52, 0.08]} visible={false}>
               <planeGeometry args={[1.18, 1.35]} />
               <meshBasicMaterial transparent opacity={0} />
