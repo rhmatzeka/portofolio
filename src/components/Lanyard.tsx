@@ -23,10 +23,10 @@ import './Lanyard.css'
 extend({ MeshLineGeometry, MeshLineMaterial })
 
 export default function Lanyard({
-  position = [0, 0, 25],
+  position = [0, 0, 20],
   gravity = [0, -40, 0],
-  fov = 21,
-  transparent = false
+  fov = 20,
+  transparent = true
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768)
 
@@ -107,7 +107,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
   const cardScale = isMobile ? 2.08 : 2.36
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [0.02, 2.65, 0] : [0.02, 1.95, 0]
+  const anchorPosition = isMobile ? [0.02, 2.95, 0] : [0.02, 2.25, 0]
   const ropeSegmentLength = isMobile ? 0.58 : 0.5
   const cardStartX = ropeSegmentLength * 3 + (isMobile ? 0.12 : 0.1)
   const jointStep = ropeSegmentLength

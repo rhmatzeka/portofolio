@@ -361,7 +361,7 @@
     width: min(128vw, 700px);
     height: 620px;
     margin-left: 0;
-    transform: translateY(245px);
+    transform: translateY(205px);
   }
   
   .about-content {
@@ -437,7 +437,7 @@
     width: 132vw;
     height: 570px;
     margin-left: 0;
-    transform: translateY(218px);
+    transform: translateY(180px);
   }
   
   .about-content {
