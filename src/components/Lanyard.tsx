@@ -119,7 +119,13 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const killuaIconTexture = useTexture(killuaIcon)
   const [curve] = useState(
     () =>
-      new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
+      new THREE.CatmullRomCurve3([
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3(),
+        new THREE.Vector3()
+      ])
   )
   const [dragged, drag] = useState(false)
   const [hovered, hover] = useState(false)
@@ -168,9 +174,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
         .applyQuaternion(cardRotation.set(cardQuaternion.x, cardQuaternion.y, cardQuaternion.z, cardQuaternion.w))
         .add(cardTranslation)
       curve.points[0].copy(cardAnchor)
-      curve.points[1].copy(j2.current.lerped)
-      curve.points[2].copy(j1.current.lerped)
-      curve.points[3].copy(fixed.current.translation())
+      curve.points[1].copy(j3.current.translation())
+      curve.points[2].copy(j2.current.lerped)
+      curve.points[3].copy(j1.current.lerped)
+      curve.points[4].copy(fixed.current.translation())
       curve.points.forEach((point) => {
         point.z = -0.2
       })

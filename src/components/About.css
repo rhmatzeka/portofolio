@@ -38,7 +38,7 @@
   cursor: grab;
   overflow: visible;
   background: transparent;
-  transform: translateY(clamp(-76px, -5vw, -48px));
+  transform: translateY(clamp(-34px, -2.2vw, -20px));
 }
 
 .about-lanyard-stage:active {
@@ -361,7 +361,7 @@
     width: min(128vw, 700px);
     height: 620px;
     margin-left: 0;
-    transform: translateY(10px);
+    transform: translateY(112px);
   }
   
   .about-content {
@@ -437,7 +437,7 @@
     width: 132vw;
     height: 570px;
     margin-left: 0;
-    transform: translateY(14px);
+    transform: translateY(118px);
   }
   
   .about-content {
