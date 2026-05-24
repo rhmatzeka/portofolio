@@ -109,10 +109,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const colliderScale = cardScale / 1.05
   const anchorPosition = isMobile ? [0.02, 3.35, 0] : [0.02, 3.16, 0]
   const ropeSegmentLength = isMobile ? 0.58 : 0.5
-  const cardStartX = ropeSegmentLength * 3 + (isMobile ? 0.12 : 0.1)
   const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.2
-  const visualHookX = cardScale * -0.175
+  const rigX = ropeSegmentLength * 3 + (isMobile ? 0.12 : 0.1)
+  const cardStartY = -(jointStep * 3 + cardHookY)
+  const visualHookX = 0
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const lanyardTexture = useTexture(lanyardTextureSrc)
@@ -193,10 +194,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       ang.copy(card.current.angvel())
       rot.copy(card.current.rotation())
       if (introStart.current === null) introStart.current = state.clock.elapsedTime
-      const introElapsed = state.clock.elapsedTime - introStart.current
-      const introSwing = introElapsed < 2.6 && !dragged
-        ? Math.sin(introElapsed * 9.5) * Math.exp(-introElapsed * 1.35)
-        : 0
+      const introSwing = 0
       if (introSwing) {
         ;[card, j1, j2, j3].forEach((ref) => ref.current?.wakeUp())
       }
@@ -219,17 +217,17 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   return (
     <>
       <group position={anchorPosition}>
-        <RigidBody ref={fixed} {...segmentProps} type="fixed" />
-        <RigidBody position={[jointStep, 0, 0]} ref={j1} {...segmentProps}>
+        <RigidBody position={[rigX, 0, 0]} ref={fixed} {...segmentProps} type="fixed" />
+        <RigidBody position={[rigX, -jointStep, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[jointStep * 2, 0, 0]} ref={j2} {...segmentProps}>
+        <RigidBody position={[rigX, -jointStep * 2, 0]} ref={j2} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[jointStep * 3, 0, 0]} ref={j3} {...segmentProps}>
+        <RigidBody position={[rigX, -jointStep * 3, 0]} ref={j3} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[cardStartX, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
+        <RigidBody position={[rigX, cardStartY, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
           <CuboidCollider args={[0.8 * colliderScale, 1.125 * colliderScale, 0.02]} />
           <group
             scale={cardScale}
