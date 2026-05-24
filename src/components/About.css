@@ -421,11 +421,16 @@ body.is-lanyard-dragging .about-lanyard-stage {
   
   .about-lanyard-stage {
     width: min(100vw, 620px);
-    height: clamp(760px, 120vw, 960px);
+    height: clamp(560px, 118vw, 660px);
     margin-left: 0;
-    margin-bottom: clamp(-320px, -40vw, -240px);
+    margin-bottom: clamp(0.5rem, 2vw, 1.25rem);
     padding-top: clamp(170px, 34vw, 250px);
     transform: none;
+  }
+
+  body.is-lanyard-dragging .about-lanyard-stage {
+    height: clamp(760px, 120vw, 960px);
+    margin-bottom: clamp(-320px, -40vw, -240px);
   }
 
   .about-presence {
@@ -504,11 +509,16 @@ body.is-lanyard-dragging .about-lanyard-stage {
   
   .about-lanyard-stage {
     width: 100vw;
-    height: clamp(820px, 205vw, 960px);
+    height: clamp(500px, 128vw, 600px);
     margin-left: 0;
-    margin-bottom: clamp(-390px, -78vw, -300px);
+    margin-bottom: 0.75rem;
     padding-top: clamp(145px, 38vw, 210px);
     transform: none;
+  }
+
+  body.is-lanyard-dragging .about-lanyard-stage {
+    height: clamp(820px, 205vw, 960px);
+    margin-bottom: clamp(-390px, -72vw, -300px);
   }
 
   .about-presence {
