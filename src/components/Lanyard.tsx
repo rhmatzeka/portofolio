@@ -107,8 +107,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
   const cardScale = isMobile ? 2.08 : 2.36
   const colliderScale = cardScale / 1.05
-  const anchorPosition = isMobile ? [0.02, 3.58, 0] : [0.02, 4.72, 0]
-  const ropeSegmentLength = isMobile ? 0.9 : 0.72
+  const anchorPosition = isMobile ? [0.02, 3.46, 0] : [0.02, 4.95, 0]
+  const ropeSegmentLength = isMobile ? 0.58 : 0.5
   const cardStartX = ropeSegmentLength * 3 + (isMobile ? 0.12 : 0.1)
   const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.18
@@ -144,24 +144,6 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   }, [hovered, dragged])
 
   useFrame((state, delta) => {
-    if (fixed.current) {
-      if (introStart.current === null) introStart.current = state.clock.elapsedTime
-      const elapsed = state.clock.elapsedTime - introStart.current
-      const decay = Math.exp(-elapsed * 1.55)
-      const introActive = elapsed < 2.8 && !dragged
-
-      if (introActive) {
-        fixed.current.setNextKinematicTranslation({
-          x: Math.sin(elapsed * 10.5) * decay * (isMobile ? 0.14 : 0.2),
-          y: Math.abs(Math.sin(elapsed * 12)) * decay * (isMobile ? 0.025 : 0.045),
-          z: 0
-        })
-        ;[card, j1, j2, j3].forEach((ref) => ref.current?.wakeUp())
-      } else {
-        fixed.current.setNextKinematicTranslation({ x: 0, y: 0, z: 0 })
-      }
-    }
-
     if (dragged) {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera)
       dir.copy(vec).sub(state.camera.position).normalize()
@@ -202,7 +184,19 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       })
       ang.copy(card.current.angvel())
       rot.copy(card.current.rotation())
-      card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z })
+      if (introStart.current === null) introStart.current = state.clock.elapsedTime
+      const introElapsed = state.clock.elapsedTime - introStart.current
+      const introSwing = introElapsed < 2.6 && !dragged
+        ? Math.sin(introElapsed * 9.5) * Math.exp(-introElapsed * 1.35)
+        : 0
+      if (introSwing) {
+        ;[card, j1, j2, j3].forEach((ref) => ref.current?.wakeUp())
+      }
+      card.current.setAngvel({
+        x: ang.x + introSwing * (isMobile ? 0.26 : 0.36),
+        y: ang.y - rot.y * 0.25,
+        z: ang.z + introSwing * (isMobile ? 0.44 : 0.62)
+      })
     }
   })
 
@@ -217,7 +211,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   return (
     <>
       <group position={anchorPosition}>
-        <RigidBody ref={fixed} {...segmentProps} type="kinematicPosition" />
+        <RigidBody ref={fixed} {...segmentProps} type="fixed" />
         <RigidBody position={[jointStep, 0, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />
         </RigidBody>
