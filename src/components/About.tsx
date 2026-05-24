@@ -11,8 +11,31 @@ const containerVariants = {
 }
 
 const itemLeft = {
-  initial: { opacity: 0, y: 28, scale: 0.98 },
-  in: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.64, ease: [0.16, 1, 0.3, 1] } }
+  initial: { opacity: 0 },
+  in: { opacity: 1, transition: { duration: 0.2 } }
+}
+
+const lanyardPop = {
+  initial: {
+    opacity: 0,
+    y: 120,
+    scale: 0.72,
+    rotate: -8,
+    filter: 'blur(12px)'
+  },
+  in: {
+    opacity: 1,
+    y: [120, -30, 16, -8, 3, 0],
+    scale: [0.72, 1.1, 0.94, 1.04, 0.99, 1],
+    rotate: [-8, 5, -3, 2, -0.8, 0],
+    filter: ['blur(12px)', 'blur(0px)', 'blur(0px)', 'blur(0px)', 'blur(0px)', 'blur(0px)'],
+    transition: {
+      delay: 0.12,
+      duration: 1.18,
+      times: [0, 0.42, 0.62, 0.78, 0.9, 1],
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
 }
 
 const itemRight = {
@@ -86,17 +109,19 @@ const About = () => {
       variants={containerVariants}
       initial="initial"
       whileInView="in"
-      viewport={{ once: true, amount: 0.02, margin: '0px 0px -8% 0px' }}
+      viewport={{ once: true, amount: 0.16, margin: '0px 0px -8% 0px' }}
     >
       <div className="about-container">
         {/* Avatar */}
         <motion.div className="about-lanyard-stage" variants={itemLeft}>
-          <div className="about-avatar-glow" />
-          <LanyardBoundary fallback={<AvatarFallback />}>
-            <Suspense fallback={<div className="lanyard-loading" aria-hidden="true" />}>
-              <Lanyard transparent />
-            </Suspense>
-          </LanyardBoundary>
+          <motion.div className="about-lanyard-pop" variants={lanyardPop}>
+            <div className="about-avatar-glow" />
+            <LanyardBoundary fallback={<AvatarFallback />}>
+              <Suspense fallback={<div className="lanyard-loading" aria-hidden="true" />}>
+                <Lanyard transparent />
+              </Suspense>
+            </LanyardBoundary>
+          </motion.div>
         </motion.div>
 
         {/* Content */}
