@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Component, Suspense } from 'react'
+import { Component, Suspense, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import Lanyard from './Lanyard'
 import LivePresence from './LivePresence'
@@ -13,29 +13,6 @@ const containerVariants = {
 const itemLeft = {
   initial: { opacity: 0 },
   in: { opacity: 1, transition: { duration: 0.2 } }
-}
-
-const lanyardPop = {
-  initial: {
-    opacity: 0,
-    y: 120,
-    scale: 0.72,
-    rotate: -8,
-    filter: 'blur(12px)'
-  },
-  in: {
-    opacity: 1,
-    y: [120, -30, 16, -8, 3, 0],
-    scale: [0.72, 1.1, 0.94, 1.04, 0.99, 1],
-    rotate: [-8, 5, -3, 2, -0.8, 0],
-    filter: ['blur(12px)', 'blur(0px)', 'blur(0px)', 'blur(0px)', 'blur(0px)', 'blur(0px)'],
-    transition: {
-      delay: 0.12,
-      duration: 1.18,
-      times: [0, 0.42, 0.62, 0.78, 0.9, 1],
-      ease: [0.16, 1, 0.3, 1]
-    }
-  }
 }
 
 const itemRight = {
@@ -103,8 +80,29 @@ const AvatarFallback = () => (
 )
 
 const About = () => {
+  const aboutRef = useRef(null)
+  const [showLanyard, setShowLanyard] = useState(false)
+
+  useEffect(() => {
+    if (!aboutRef.current || showLanyard) return undefined
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowLanyard(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.18, rootMargin: '0px 0px -12% 0px' }
+    )
+
+    observer.observe(aboutRef.current)
+    return () => observer.disconnect()
+  }, [showLanyard])
+
   return (
     <motion.section
+      ref={aboutRef}
       className="about-shell"
       variants={containerVariants}
       initial="initial"
@@ -114,14 +112,14 @@ const About = () => {
       <div className="about-container">
         {/* Avatar */}
         <motion.div className="about-lanyard-stage" variants={itemLeft}>
-          <motion.div className="about-lanyard-pop" variants={lanyardPop}>
+          <div className={`about-lanyard-pop ${showLanyard ? 'is-visible' : ''}`}>
             <div className="about-avatar-glow" />
             <LanyardBoundary fallback={<AvatarFallback />}>
               <Suspense fallback={<div className="lanyard-loading" aria-hidden="true" />}>
                 <Lanyard transparent />
               </Suspense>
             </LanyardBoundary>
-          </motion.div>
+          </div>
         </motion.div>
 
         {/* Content */}
