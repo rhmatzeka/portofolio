@@ -38,7 +38,7 @@
   cursor: grab;
   overflow: visible;
   background: transparent;
-  transform: none;
+  transform: translateX(clamp(-72px, -3.5vw, -36px));
 }
 
 .about-lanyard-stage:active {
@@ -337,6 +337,10 @@
   .about-content {
     margin-left: 0;
   }
+
+  .about-lanyard-stage {
+    transform: none;
+  }
   
   .about-stats {
     justify-content: center;
@@ -359,7 +363,7 @@
   
   .about-lanyard-stage {
     width: min(100vw, 620px);
-    height: 620px;
+    height: 470px;
     margin-left: 0;
     transform: translateY(205px);
   }
@@ -435,7 +439,7 @@
   
   .about-lanyard-stage {
     width: 100vw;
-    height: 570px;
+    height: 430px;
     margin-left: 0;
     transform: translateY(180px);
   }
