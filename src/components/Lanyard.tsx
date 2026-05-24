@@ -1,7 +1,7 @@
 // @ts-nocheck
 /* eslint-disable react/no-unknown-property */
 'use client'
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, extend, useFrame } from '@react-three/fiber'
 import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei'
 import {
@@ -21,6 +21,113 @@ import killuaCard from '../assets/images/k.jpg'
 import './Lanyard.css'
 
 extend({ MeshLineGeometry, MeshLineMaterial })
+
+function drawRoundedRect(context, x, y, width, height, radius) {
+  const maxRadius = Math.min(radius, width / 2, height / 2)
+
+  context.beginPath()
+  context.moveTo(x + maxRadius, y)
+  context.lineTo(x + width - maxRadius, y)
+  context.quadraticCurveTo(x + width, y, x + width, y + maxRadius)
+  context.lineTo(x + width, y + height - maxRadius)
+  context.quadraticCurveTo(x + width, y + height, x + width - maxRadius, y + height)
+  context.lineTo(x + maxRadius, y + height)
+  context.quadraticCurveTo(x, y + height, x, y + height - maxRadius)
+  context.lineTo(x, y + maxRadius)
+  context.quadraticCurveTo(x, y, x + maxRadius, y)
+  context.closePath()
+}
+
+function createFrontCardTexture(sourceTexture) {
+  const canvas = document.createElement('canvas')
+  canvas.width = 1024
+  canvas.height = 1408
+  const context = canvas.getContext('2d')
+  const image = sourceTexture.image
+  const radius = 58
+
+  context.clearRect(0, 0, canvas.width, canvas.height)
+  drawRoundedRect(context, 0, 0, canvas.width, canvas.height, radius)
+  context.clip()
+  const sourceWidth = image.naturalWidth || image.width
+  const sourceHeight = image.naturalHeight || image.height
+  const cropX = sourceWidth * 0.08
+  const cropY = sourceHeight * 0.035
+  const cropWidth = sourceWidth * 0.84
+  const cropHeight = sourceHeight * 0.9
+
+  context.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, canvas.width, canvas.height)
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.anisotropy = 16
+  texture.needsUpdate = true
+  return texture
+}
+
+function createBackCardTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = 1024
+  canvas.height = 1408
+  const context = canvas.getContext('2d')
+  const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height)
+
+  gradient.addColorStop(0, '#071114')
+  gradient.addColorStop(0.48, '#0b1820')
+  gradient.addColorStop(1, '#020304')
+  drawRoundedRect(context, 0, 0, canvas.width, canvas.height, 58)
+  context.clip()
+  context.fillStyle = gradient
+  context.fillRect(0, 0, canvas.width, canvas.height)
+
+  context.strokeStyle = 'rgba(0, 209, 255, 0.52)'
+  context.lineWidth = 22
+  drawRoundedRect(context, 42, 42, canvas.width - 84, canvas.height - 84, 46)
+  context.stroke()
+
+  context.fillStyle = 'rgba(0, 209, 255, 0.12)'
+  context.beginPath()
+  context.arc(512, 365, 170, 0, Math.PI * 2)
+  context.fill()
+  context.strokeStyle = 'rgba(255, 255, 255, 0.16)'
+  context.lineWidth = 8
+  context.stroke()
+
+  context.fillStyle = '#ffffff'
+  context.font = '700 132px Arial, sans-serif'
+  context.textAlign = 'center'
+  context.textBaseline = 'middle'
+  context.fillText('R', 512, 365)
+
+  context.fillStyle = '#00d1ff'
+  context.font = '800 78px Arial, sans-serif'
+  context.fillText('RAHMAT', 512, 675)
+
+  context.fillStyle = '#ffffff'
+  context.font = '700 58px Arial, sans-serif'
+  context.fillText('EKA SATRIA', 512, 755)
+
+  context.fillStyle = 'rgba(255, 255, 255, 0.7)'
+  context.font = '600 38px Arial, sans-serif'
+  context.fillText('FULLSTACK DEVELOPER', 512, 875)
+  context.fillText('WEB3  /  UI  /  AI', 512, 940)
+
+  context.fillStyle = 'rgba(0, 209, 255, 0.18)'
+  context.fillRect(185, 1070, 654, 3)
+
+  context.fillStyle = 'rgba(255, 255, 255, 0.82)'
+  context.font = '700 34px Arial, sans-serif'
+  context.fillText('RAHMATDEV PORTFOLIO', 512, 1165)
+  context.fillStyle = 'rgba(255, 255, 255, 0.48)'
+  context.font = '600 28px Arial, sans-serif'
+  context.fillText('github.com/rhmatzeka', 512, 1228)
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.anisotropy = 16
+  texture.needsUpdate = true
+  return texture
+}
 
 export default function Lanyard({
   position = [0, 0, 42],
@@ -118,6 +225,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const lanyardTexture = useTexture(lanyardTextureSrc)
   const killuaTexture = useTexture(killuaCard)
   const killuaIconTexture = useTexture(killuaIcon)
+  const frontCardTexture = useMemo(() => createFrontCardTexture(killuaTexture), [killuaTexture])
+  const backCardTexture = useMemo(() => createBackCardTexture(), [])
   const [curve] = useState(
     () =>
       new THREE.CatmullRomCurve3([
@@ -217,9 +326,14 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   lanyardTexture.wrapS = lanyardTexture.wrapT = THREE.RepeatWrapping
   lanyardTexture.anisotropy = 16
   killuaTexture.colorSpace = THREE.SRGBColorSpace
-  killuaTexture.offset.set(0.08, 0.035)
-  killuaTexture.repeat.set(0.84, 0.9)
   killuaIconTexture.colorSpace = THREE.SRGBColorSpace
+
+  useEffect(() => {
+    return () => {
+      frontCardTexture.dispose()
+      backCardTexture.dispose()
+    }
+  }, [frontCardTexture, backCardTexture])
 
   return (
     <>
@@ -271,9 +385,19 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
             <mesh position={[0, 0.522, 0.014]} renderOrder={8}>
               <planeGeometry args={[0.716, 0.986]} />
               <meshBasicMaterial
-                map={killuaTexture}
+                map={frontCardTexture}
                 transparent
-                alphaTest={0.02}
+                alphaTest={0.08}
+                depthWrite
+                toneMapped={false}
+              />
+            </mesh>
+            <mesh position={[0, 0.522, -0.014]} rotation={[0, Math.PI, 0]} renderOrder={8}>
+              <planeGeometry args={[0.716, 0.986]} />
+              <meshBasicMaterial
+                map={backCardTexture}
+                transparent
+                alphaTest={0.08}
                 depthWrite
                 toneMapped={false}
               />
