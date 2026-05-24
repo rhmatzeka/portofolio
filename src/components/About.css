@@ -38,7 +38,7 @@
   cursor: grab;
   overflow: visible;
   background: transparent;
-  transform: translateX(clamp(-320px, -14vw, -220px));
+  transform: translateX(clamp(-240px, -10vw, -150px));
 }
 
 .about-lanyard-stage:active {

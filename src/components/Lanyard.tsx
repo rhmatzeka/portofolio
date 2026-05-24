@@ -100,10 +100,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const vec = new THREE.Vector3()
   const ang = new THREE.Vector3()
   const rot = new THREE.Vector3()
-  const dir = new THREE.Vector3()
   const cardAnchor = new THREE.Vector3()
   const cardAnchorOffset = new THREE.Vector3()
   const cardRotation = new THREE.Quaternion()
+  const dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0)
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 8, linearDamping: 8 }
   const cardScale = isMobile ? 1.92 : 2.14
   const colliderScale = cardScale / 1.05
@@ -111,7 +111,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const ropeSegmentLength = isMobile ? 0.58 : 0.5
   const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.2
-  const rigX = isMobile ? 0 : -0.9
+  const rigX = isMobile ? 0 : -0.55
   const cardStartY = -(jointStep * 3 + cardHookY)
   const visualHookX = 0
   const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
@@ -153,11 +153,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
 
   useFrame((state, delta) => {
     if (dragged) {
-      vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera)
-      dir.copy(vec).sub(state.camera.position).normalize()
-      vec.add(dir.multiplyScalar(state.camera.position.length() * (isMobile ? 1.35 : 1.65)))
+      const currentZ = card.current?.translation()?.z || 0
+      dragPlane.constant = -currentZ
+      state.raycaster.ray.intersectPlane(dragPlane, vec)
       ;[card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp())
-      card.current?.setNextKinematicTranslation({ x: vec.x - dragged.x, y: vec.y - dragged.y, z: vec.z - dragged.z })
+      card.current?.setNextKinematicTranslation({ x: vec.x - dragged.x, y: vec.y - dragged.y, z: currentZ })
     }
 
     if (fixed.current) {
@@ -187,8 +187,12 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       decorationPoints.forEach((point, index) => {
         const decoration = decorations.current[index]
         if (decoration) {
-          decoration.position.copy(curve.getPoint(point))
-          decoration.position.z += 0.06
+          if (!decoration.lerped) decoration.lerped = new THREE.Vector3().copy(curve.getPoint(point))
+          if (!decoration.target) decoration.target = new THREE.Vector3()
+          curve.getPoint(point, decoration.target)
+          decoration.target.z += 0.06
+          decoration.lerped.lerp(decoration.target, Math.min(1, delta * 18))
+          decoration.position.copy(decoration.lerped)
         }
       })
       ang.copy(card.current.angvel())
