@@ -428,11 +428,6 @@ body.is-lanyard-dragging .about-lanyard-stage {
     transform: none;
   }
 
-  body.is-lanyard-dragging .about-lanyard-stage {
-    height: clamp(760px, 120vw, 960px);
-    margin-bottom: clamp(-320px, -40vw, -240px);
-  }
-
   .about-presence {
     margin-top: 0;
   }
@@ -514,11 +509,6 @@ body.is-lanyard-dragging .about-lanyard-stage {
     margin-bottom: 0.75rem;
     padding-top: clamp(145px, 38vw, 210px);
     transform: none;
-  }
-
-  body.is-lanyard-dragging .about-lanyard-stage {
-    height: clamp(820px, 205vw, 960px);
-    margin-bottom: clamp(-390px, -72vw, -300px);
   }
 
   .about-presence {
