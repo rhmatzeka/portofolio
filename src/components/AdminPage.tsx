@@ -480,25 +480,17 @@ const AdminPage = () => {
       )}
 
       <section className="admin-shell">
-        {!isAuthenticated && (
-          <header className="admin-header">
-            <div>
-              <span className="admin-kicker">RahmatDev Admin</span>
-              <h1>Portfolio Content</h1>
-              <p>Add projects and certificates without editing React files manually.</p>
-            </div>
-            <a href="/" className="admin-home-link">Back to site</a>
-          </header>
-        )}
-
         {!isAuthenticated ? (
           <form className="admin-login-card" onSubmit={handleLogin}>
-            <div className="admin-login-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="2" />
-                <path d="M12 14v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+            <div className="admin-login-top">
+              <div className="admin-login-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="2" />
+                  <path d="M12 14v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </div>
+              <a href="/" className="admin-home-link">Back to site</a>
             </div>
             <div className="admin-login-copy">
               <h2>Admin Login</h2>
