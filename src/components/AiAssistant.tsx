@@ -62,6 +62,28 @@ const SendIcon = () => (
   </svg>
 )
 
+const ChatIcon = () => (
+  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M5.3 18.5 4 22l4.2-2.1c1.1.4 2.4.6 3.8.6 5 0 9-3.1 9-7s-4-7-9-7-9 3.1-9 7c0 1.9.9 3.6 2.3 4.9Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M8.2 13h.1M12 13h.1M15.8 13h.1" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+  </svg>
+)
+
+const WalkIcon = () => (
+  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="m9 4 2.8 2.8-2.1 3.5 3.2 2.2 3.1-1.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M12.4 12.7 10.8 17l-3.6 1.5M13.1 13.1 16 16.8l2.7 1.2M13.7 4.4a1.7 1.7 0 1 1-3.4 0 1.7 1.7 0 0 1 3.4 0Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+const HomeIcon = () => (
+  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 11.4 12 4l8 7.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M6.8 10.3V20h10.4v-9.7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M10 20v-5.2h4V20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
 const cleanAssistantText = (value) => (
   value
     .replace(/\*\*(.*?)\*\*/g, '$1')
@@ -84,6 +106,7 @@ const AiAssistant = () => {
   const launcherPhaseRef = useRef('idle')
   const launcherOffsetRef = useRef({ x: 0, y: 0 })
   const dropAnimationRef = useRef(null)
+  const roamTimeoutRef = useRef(null)
   const pendingWalkHomeRef = useRef(false)
   const dragRef = useRef({
     pointerId: null,
@@ -144,6 +167,11 @@ const AiAssistant = () => {
   }
 
   const cancelLauncherAnimation = () => {
+    if (roamTimeoutRef.current) {
+      window.clearTimeout(roamTimeoutRef.current)
+      roamTimeoutRef.current = null
+    }
+
     if (!dropAnimationRef.current) return
 
     window.cancelAnimationFrame(dropAnimationRef.current)
@@ -158,6 +186,46 @@ const AiAssistant = () => {
     tracker.blockClickTimeout = window.setTimeout(() => {
       tracker.blockClick = false
     }, duration)
+  }
+
+  const startWalkTo = (targetX, { minDuration = 2200, maxDuration = 9000, onComplete } = {}) => {
+    cancelLauncherAnimation()
+
+    const startX = launcherOffsetRef.current.x
+    const clampedTarget = clampLauncherOffset(targetX, 0)
+    const endX = clampedTarget.x
+    const distance = Math.abs(endX - startX)
+
+    if (distance < 1) {
+      setLauncherOffset({ x: endX, y: 0 })
+      dropAnimationRef.current = null
+      onComplete?.()
+      return
+    }
+
+    const duration = Math.min(maxDuration, Math.max(minDuration, (distance / LAUNCHER_WALK_SPEED) * 1000))
+    const startTime = performance.now()
+
+    setWalkDirection(endX < startX ? 'left' : 'right')
+    setLauncherPhaseState('walking')
+
+    const step = (time) => {
+      const progress = Math.min(1, (time - startTime) / duration)
+      const x = startX + (endX - startX) * progress
+
+      setLauncherOffset({ x, y: 0 })
+
+      if (progress >= 1) {
+        setLauncherOffset({ x: endX, y: 0 })
+        dropAnimationRef.current = null
+        onComplete?.()
+        return
+      }
+
+      dropAnimationRef.current = window.requestAnimationFrame(step)
+    }
+
+    dropAnimationRef.current = window.requestAnimationFrame(step)
   }
 
   const startWalkHome = () => {
@@ -178,29 +246,45 @@ const AiAssistant = () => {
       return
     }
 
-    const duration = Math.min(9000, Math.max(2600, (Math.abs(startX) / LAUNCHER_WALK_SPEED) * 1000))
-    const startTime = performance.now()
+    startWalkTo(0, {
+      minDuration: 2600,
+      maxDuration: 9000,
+      onComplete: () => setLauncherPhaseState('idle')
+    })
+  }
 
-    setWalkDirection(startX > 0 ? 'left' : 'right')
-    setLauncherPhaseState('walking')
+  const startRoamWalk = () => {
+    if (isDizzyRef.current || dragRef.current.pointerId !== null) return
 
-    const step = (time) => {
-      const progress = Math.min(1, (time - startTime) / duration)
-      const x = startX * (1 - progress)
+    pendingWalkHomeRef.current = false
+    resetShakeTracker()
+    cancelLauncherAnimation()
+    setLauncherOffset({ x: launcherOffsetRef.current.x, y: 0 })
 
-      setLauncherOffset({ x, y: 0 })
+    const viewportWidth = window.innerWidth || 1024
+    const maxLeft = Math.max(0, viewportWidth - 132)
+    const farLeft = -Math.min(maxLeft, Math.max(150, Math.min(360, viewportWidth * 0.34)))
+    const midLeft = -Math.min(maxLeft, Math.max(80, Math.min(180, viewportWidth * 0.16)))
+    const startX = launcherOffsetRef.current.x
+    const targets = Math.abs(startX) < 24 ? [farLeft, midLeft, 0] : [0, farLeft, 0]
 
-      if (progress >= 1) {
-        setLauncherOffset({ x: 0, y: 0 })
-        setLauncherPhaseState('idle')
-        dropAnimationRef.current = null
-        return
-      }
+    const walkTarget = (index) => {
+      const targetX = targets[index]
+      startWalkTo(targetX, {
+        minDuration: 2400,
+        maxDuration: 8500,
+        onComplete: () => {
+          if (index >= targets.length - 1) {
+            setLauncherPhaseState('idle')
+            return
+          }
 
-      dropAnimationRef.current = window.requestAnimationFrame(step)
+          roamTimeoutRef.current = window.setTimeout(() => walkTarget(index + 1), 360)
+        }
+      })
     }
 
-    dropAnimationRef.current = window.requestAnimationFrame(step)
+    walkTarget(0)
   }
 
   const finishLauncherLanding = (landingX) => {
@@ -441,11 +525,31 @@ const AiAssistant = () => {
     openAssistant()
   }
 
+  const handleBubbleClick = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    openAssistant()
+  }
+
+  const handleRoamClick = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    startRoamWalk()
+  }
+
+  const handleHomeControlClick = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    resetShakeTracker()
+    startWalkHome()
+  }
+
   useEffect(() => () => {
     const tracker = shakeRef.current
     if (tracker.resetTimeout) window.clearTimeout(tracker.resetTimeout)
     if (tracker.dizzyTimeout) window.clearTimeout(tracker.dizzyTimeout)
     if (tracker.blockClickTimeout) window.clearTimeout(tracker.blockClickTimeout)
+    if (roamTimeoutRef.current) window.clearTimeout(roamTimeoutRef.current)
     if (dropAnimationRef.current) window.cancelAnimationFrame(dropAnimationRef.current)
   }, [])
 
@@ -597,25 +701,59 @@ const AiAssistant = () => {
         )}
       </AnimatePresence>
 
-      <button
-        className={`ai-toggle ${launcherPhase === 'grabbed' ? 'is-grabbed' : ''} ${launcherPhase === 'falling' || launcherOffset.y < -8 ? 'is-lifted' : ''} ${launcherPhase === 'walking' ? 'is-walking-back' : ''}`}
-        type="button"
+      <div
+        className={`ai-launcher-rig ${launcherPhase === 'walking' ? 'is-roaming' : ''}`}
         style={{ transform: `translate3d(${launcherOffset.x}px, ${launcherOffset.y}px, 0)` }}
-        onClick={handleToggleClick}
-        onPointerDown={handleLauncherPointerDown}
-        onPointerMove={handleLauncherPointerMove}
-        onPointerUp={handleLauncherPointerEnd}
-        onPointerCancel={handleLauncherPointerEnd}
-        onPointerLeave={handleLauncherPointerLeave}
-        aria-label="Open AI assistant"
       >
-        <AssistantMark
-          isDizzy={isDizzy}
-          isFloating={launcherPhase === 'grabbed' || launcherPhase === 'falling' || launcherOffset.y < -8}
-          isWalking={launcherPhase === 'walking'}
-          walkDirection={walkDirection}
-        />
-      </button>
+        <button className="ai-speech-bubble" type="button" onClick={handleBubbleClick} aria-label="Open AI assistant chat">
+          <span>AI</span>
+        </button>
+
+        <div className="ai-character-controls" aria-label="AI assistant controls">
+          <button className="ai-character-action" type="button" onClick={handleBubbleClick} title="Chat" aria-label="Open chat">
+            <ChatIcon />
+          </button>
+          <button
+            className="ai-character-action"
+            type="button"
+            onClick={handleRoamClick}
+            title="Walk"
+            aria-label="Make character walk around"
+            disabled={isDizzy || launcherPhase === 'grabbed' || launcherPhase === 'falling'}
+          >
+            <WalkIcon />
+          </button>
+          <button
+            className="ai-character-action"
+            type="button"
+            onClick={handleHomeControlClick}
+            title="Home"
+            aria-label="Return character home"
+            disabled={launcherPhase === 'grabbed' || launcherPhase === 'falling'}
+          >
+            <HomeIcon />
+          </button>
+        </div>
+
+        <button
+          className={`ai-toggle ${launcherPhase === 'grabbed' ? 'is-grabbed' : ''} ${launcherPhase === 'falling' || launcherOffset.y < -8 ? 'is-lifted' : ''} ${launcherPhase === 'walking' ? 'is-walking-back' : ''}`}
+          type="button"
+          onClick={handleToggleClick}
+          onPointerDown={handleLauncherPointerDown}
+          onPointerMove={handleLauncherPointerMove}
+          onPointerUp={handleLauncherPointerEnd}
+          onPointerCancel={handleLauncherPointerEnd}
+          onPointerLeave={handleLauncherPointerLeave}
+          aria-label="Open AI assistant"
+        >
+          <AssistantMark
+            isDizzy={isDizzy}
+            isFloating={launcherPhase === 'grabbed' || launcherPhase === 'falling' || launcherOffset.y < -8}
+            isWalking={launcherPhase === 'walking'}
+            walkDirection={walkDirection}
+          />
+        </button>
+      </div>
     </div>
   )
 }
