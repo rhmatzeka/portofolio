@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import killuaIdleOpen from '../assets/killua-ai/killua-idle-still.png'
 import killuaIdleBlink from '../assets/killua-ai/killua-idle-blink.png'
+import killuaWalkSprite from '../assets/killua-ai/killua-walk-stable.png'
 import killuaDizzySprite from '../assets/killua-ai/killua-dizzy-stable.png'
 import './AiAssistant.css'
 
@@ -23,22 +24,22 @@ const DIZZY_DURATION_MS = 2300
 const SHAKE_RESET_MS = 520
 const DRAG_START_DISTANCE = 6
 const LAUNCHER_GRAVITY = 2200
-const LAUNCHER_HORIZONTAL_SPRING = 24
-const LAUNCHER_DAMPING = 0.82
-const LAUNCHER_FLOOR_BOUNCE = 0.28
+const LAUNCHER_WALK_SPEED = 360
 
-const AssistantMark = ({ compact = false, isDizzy = false }) => (
+const AssistantMark = ({ compact = false, isDizzy = false, isWalking = false, walkDirection = 'right' }) => (
   <span
-    className={`ai-mark killua-ai-mark ${compact ? 'compact' : ''} ${isDizzy ? 'is-dizzy' : 'is-idle'}`}
+    className={`ai-mark killua-ai-mark ${compact ? 'compact' : ''} ${isDizzy ? 'is-dizzy' : 'is-idle'} ${isWalking ? 'is-walking' : ''} ${walkDirection === 'left' ? 'is-walking-left' : ''}`}
     style={{
       '--killua-idle-open': `url(${killuaIdleOpen})`,
       '--killua-idle-blink': `url(${killuaIdleBlink})`,
+      '--killua-walk-sheet': `url(${killuaWalkSprite})`,
       '--killua-dizzy-sheet': `url(${killuaDizzySprite})`
     }}
     aria-hidden="true"
   >
     <span className="killua-sprite killua-sprite-idle" />
     <span className="killua-sprite killua-sprite-blink" />
+    <span className="killua-sprite killua-sprite-walk" />
     <span className="killua-sprite killua-sprite-dizzy" />
   </span>
 )
@@ -70,7 +71,8 @@ const AiAssistant = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [isDizzy, setIsDizzy] = useState(false)
   const [launcherOffset, setLauncherOffsetState] = useState({ x: 0, y: 0 })
-  const [isLauncherGrabbed, setIsLauncherGrabbed] = useState(false)
+  const [launcherPhase, setLauncherPhase] = useState('idle')
+  const [walkDirection, setWalkDirection] = useState('right')
   const inputRef = useRef(null)
   const launcherOffsetRef = useRef({ x: 0, y: 0 })
   const dropAnimationRef = useRef(null)
@@ -121,7 +123,7 @@ const AiAssistant = () => {
     setLauncherOffsetState(roundedOffset)
   }
 
-  const cancelDropAnimation = () => {
+  const cancelLauncherAnimation = () => {
     if (!dropAnimationRef.current) return
 
     window.cancelAnimationFrame(dropAnimationRef.current)
@@ -138,42 +140,75 @@ const AiAssistant = () => {
     }, duration)
   }
 
-  const startDropAnimation = ({ vx = 0, vy = 0 } = {}) => {
-    cancelDropAnimation()
+  const startWalkHome = () => {
+    const startX = launcherOffsetRef.current.x
+
+    if (Math.abs(startX) < 1) {
+      setLauncherOffset({ x: 0, y: 0 })
+      setLauncherPhase('idle')
+      return
+    }
+
+    const duration = Math.min(1800, Math.max(420, (Math.abs(startX) / LAUNCHER_WALK_SPEED) * 1000))
+    const startTime = performance.now()
+
+    setWalkDirection(startX > 0 ? 'left' : 'right')
+    setLauncherPhase('walking')
+
+    const step = (time) => {
+      const progress = Math.min(1, (time - startTime) / duration)
+      const x = startX * (1 - progress)
+
+      setLauncherOffset({ x, y: 0 })
+
+      if (progress >= 1) {
+        setLauncherOffset({ x: 0, y: 0 })
+        setLauncherPhase('idle')
+        dropAnimationRef.current = null
+        return
+      }
+
+      dropAnimationRef.current = window.requestAnimationFrame(step)
+    }
+
+    dropAnimationRef.current = window.requestAnimationFrame(step)
+  }
+
+  const startDropAnimation = ({ vy = 0 } = {}) => {
+    cancelLauncherAnimation()
 
     let x = launcherOffsetRef.current.x
     let y = launcherOffsetRef.current.y
-    let velocityX = Math.max(-1400, Math.min(1400, vx))
     let velocityY = Math.max(-1600, Math.min(1600, vy))
     let previousTime = performance.now()
+
+    setLauncherPhase('falling')
+
+    if (y >= 0) {
+      setLauncherOffset({ x, y: 0 })
+      startWalkHome()
+      return
+    }
 
     const step = (time) => {
       const deltaSeconds = Math.min(0.032, Math.max(0.001, (time - previousTime) / 1000))
       previousTime = time
 
       velocityY += LAUNCHER_GRAVITY * deltaSeconds
-      velocityX += -x * LAUNCHER_HORIZONTAL_SPRING * deltaSeconds
-      velocityX *= LAUNCHER_DAMPING
-
-      x += velocityX * deltaSeconds
       y += velocityY * deltaSeconds
 
-      if (y > 0) {
+      if (y >= 0) {
         y = 0
-        velocityY = Math.abs(velocityY) > 120 ? -velocityY * LAUNCHER_FLOOR_BOUNCE : 0
+        setLauncherOffset({ x, y })
+        dropAnimationRef.current = null
+        startWalkHome()
+        return
       }
 
       const clampedOffset = clampLauncherOffset(x, y)
-      if (clampedOffset.x !== x) velocityX = 0
       if (clampedOffset.y !== y && clampedOffset.y < 0) velocityY = 0
       x = clampedOffset.x
       y = clampedOffset.y
-
-      if (Math.abs(x) < 1 && Math.abs(velocityX) < 16 && y === 0 && Math.abs(velocityY) < 16) {
-        setLauncherOffset({ x: 0, y: 0 })
-        dropAnimationRef.current = null
-        return
-      }
 
       setLauncherOffset({ x, y })
       dropAnimationRef.current = window.requestAnimationFrame(step)
@@ -250,7 +285,8 @@ const AiAssistant = () => {
   }
 
   const handleLauncherPointerDown = (event) => {
-    cancelDropAnimation()
+    cancelLauncherAnimation()
+    setLauncherPhase('grabbed')
     handleShakePointerDown(event)
 
     const drag = dragRef.current
@@ -281,7 +317,7 @@ const AiAssistant = () => {
 
     if (!drag.hasDragged && Math.hypot(pointerDx, pointerDy) > DRAG_START_DISTANCE) {
       drag.hasDragged = true
-      setIsLauncherGrabbed(true)
+      setLauncherPhase('grabbed')
     }
 
     if (!drag.hasDragged) return
@@ -313,11 +349,12 @@ const AiAssistant = () => {
     }
 
     resetShakeTracker()
-    setIsLauncherGrabbed(false)
 
     if (wasDragged) {
       blockNextClick(520)
-      startDropAnimation({ vx: drag.vx, vy: drag.vy })
+      startDropAnimation({ vy: drag.vy })
+    } else {
+      setLauncherPhase('idle')
     }
 
     drag.hasDragged = false
@@ -494,7 +531,7 @@ const AiAssistant = () => {
       </AnimatePresence>
 
       <button
-        className={`ai-toggle ${isLauncherGrabbed ? 'is-grabbed' : ''} ${launcherOffset.y < -8 ? 'is-lifted' : ''}`}
+        className={`ai-toggle ${launcherPhase === 'grabbed' ? 'is-grabbed' : ''} ${launcherPhase === 'falling' || launcherOffset.y < -8 ? 'is-lifted' : ''} ${launcherPhase === 'walking' ? 'is-walking-back' : ''}`}
         type="button"
         style={{ transform: `translate3d(${launcherOffset.x}px, ${launcherOffset.y}px, 0)` }}
         onClick={handleToggleClick}
@@ -505,7 +542,7 @@ const AiAssistant = () => {
         onPointerLeave={handleLauncherPointerLeave}
         aria-label="Open AI assistant"
       >
-        <AssistantMark isDizzy={isDizzy} />
+        <AssistantMark isDizzy={isDizzy} isWalking={launcherPhase === 'walking'} walkDirection={walkDirection} />
       </button>
     </div>
   )
