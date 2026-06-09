@@ -1,8 +1,9 @@
 // @ts-nocheck
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import killuaIdleSprite from '../assets/killua-ai/killua-idle-stable.png'
-import killuaDizzySprite from '../assets/killua-ai/killua-dizzy.png'
+import killuaIdleOpen from '../assets/killua-ai/killua-idle-still.png'
+import killuaIdleBlink from '../assets/killua-ai/killua-idle-blink.png'
+import killuaDizzySprite from '../assets/killua-ai/killua-dizzy-stable.png'
 import './AiAssistant.css'
 
 const initialMessages = [
@@ -20,17 +21,25 @@ const suggestions = [
 
 const DIZZY_DURATION_MS = 2300
 const SHAKE_RESET_MS = 520
+const DRAG_START_DISTANCE = 6
+const LAUNCHER_GRAVITY = 2200
+const LAUNCHER_HORIZONTAL_SPRING = 24
+const LAUNCHER_DAMPING = 0.82
+const LAUNCHER_FLOOR_BOUNCE = 0.28
 
 const AssistantMark = ({ compact = false, isDizzy = false }) => (
   <span
     className={`ai-mark killua-ai-mark ${compact ? 'compact' : ''} ${isDizzy ? 'is-dizzy' : 'is-idle'}`}
     style={{
-      '--killua-idle-sheet': `url(${killuaIdleSprite})`,
+      '--killua-idle-open': `url(${killuaIdleOpen})`,
+      '--killua-idle-blink': `url(${killuaIdleBlink})`,
       '--killua-dizzy-sheet': `url(${killuaDizzySprite})`
     }}
     aria-hidden="true"
   >
-    <span className="killua-sprite" />
+    <span className="killua-sprite killua-sprite-idle" />
+    <span className="killua-sprite killua-sprite-blink" />
+    <span className="killua-sprite killua-sprite-dizzy" />
   </span>
 )
 
@@ -60,7 +69,24 @@ const AiAssistant = () => {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isDizzy, setIsDizzy] = useState(false)
+  const [launcherOffset, setLauncherOffsetState] = useState({ x: 0, y: 0 })
+  const [isLauncherGrabbed, setIsLauncherGrabbed] = useState(false)
   const inputRef = useRef(null)
+  const launcherOffsetRef = useRef({ x: 0, y: 0 })
+  const dropAnimationRef = useRef(null)
+  const dragRef = useRef({
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0,
+    lastOffsetX: 0,
+    lastOffsetY: 0,
+    lastTime: 0,
+    vx: 0,
+    vy: 0,
+    hasDragged: false
+  })
   const shakeRef = useRef({
     lastX: null,
     lastY: null,
@@ -72,6 +98,89 @@ const AiAssistant = () => {
     blockClick: false,
     blockClickTimeout: null
   })
+
+  const clampLauncherOffset = (x, y) => {
+    const viewportWidth = window.innerWidth || 1024
+    const viewportHeight = window.innerHeight || 768
+    const maxLeft = Math.max(0, viewportWidth - 132)
+    const maxUp = Math.max(0, viewportHeight - 172)
+
+    return {
+      x: Math.min(16, Math.max(-maxLeft, x)),
+      y: Math.min(22, Math.max(-maxUp, y))
+    }
+  }
+
+  const setLauncherOffset = (nextOffset) => {
+    const roundedOffset = {
+      x: Math.round(nextOffset.x),
+      y: Math.round(nextOffset.y)
+    }
+
+    launcherOffsetRef.current = roundedOffset
+    setLauncherOffsetState(roundedOffset)
+  }
+
+  const cancelDropAnimation = () => {
+    if (!dropAnimationRef.current) return
+
+    window.cancelAnimationFrame(dropAnimationRef.current)
+    dropAnimationRef.current = null
+  }
+
+  const blockNextClick = (duration = 420) => {
+    const tracker = shakeRef.current
+    tracker.blockClick = true
+
+    if (tracker.blockClickTimeout) window.clearTimeout(tracker.blockClickTimeout)
+    tracker.blockClickTimeout = window.setTimeout(() => {
+      tracker.blockClick = false
+    }, duration)
+  }
+
+  const startDropAnimation = ({ vx = 0, vy = 0 } = {}) => {
+    cancelDropAnimation()
+
+    let x = launcherOffsetRef.current.x
+    let y = launcherOffsetRef.current.y
+    let velocityX = Math.max(-1400, Math.min(1400, vx))
+    let velocityY = Math.max(-1600, Math.min(1600, vy))
+    let previousTime = performance.now()
+
+    const step = (time) => {
+      const deltaSeconds = Math.min(0.032, Math.max(0.001, (time - previousTime) / 1000))
+      previousTime = time
+
+      velocityY += LAUNCHER_GRAVITY * deltaSeconds
+      velocityX += -x * LAUNCHER_HORIZONTAL_SPRING * deltaSeconds
+      velocityX *= LAUNCHER_DAMPING
+
+      x += velocityX * deltaSeconds
+      y += velocityY * deltaSeconds
+
+      if (y > 0) {
+        y = 0
+        velocityY = Math.abs(velocityY) > 120 ? -velocityY * LAUNCHER_FLOOR_BOUNCE : 0
+      }
+
+      const clampedOffset = clampLauncherOffset(x, y)
+      if (clampedOffset.x !== x) velocityX = 0
+      if (clampedOffset.y !== y && clampedOffset.y < 0) velocityY = 0
+      x = clampedOffset.x
+      y = clampedOffset.y
+
+      if (Math.abs(x) < 1 && Math.abs(velocityX) < 16 && y === 0 && Math.abs(velocityY) < 16) {
+        setLauncherOffset({ x: 0, y: 0 })
+        dropAnimationRef.current = null
+        return
+      }
+
+      setLauncherOffset({ x, y })
+      dropAnimationRef.current = window.requestAnimationFrame(step)
+    }
+
+    dropAnimationRef.current = window.requestAnimationFrame(step)
+  }
 
   const resetShakeTracker = () => {
     const tracker = shakeRef.current
@@ -90,12 +199,7 @@ const AiAssistant = () => {
   const triggerDizzy = () => {
     const tracker = shakeRef.current
     resetShakeTracker()
-    tracker.blockClick = true
-
-    if (tracker.blockClickTimeout) window.clearTimeout(tracker.blockClickTimeout)
-    tracker.blockClickTimeout = window.setTimeout(() => {
-      tracker.blockClick = false
-    }, 420)
+    blockNextClick()
 
     setIsDizzy(true)
 
@@ -145,6 +249,84 @@ const AiAssistant = () => {
     }
   }
 
+  const handleLauncherPointerDown = (event) => {
+    cancelDropAnimation()
+    handleShakePointerDown(event)
+
+    const drag = dragRef.current
+    const offset = launcherOffsetRef.current
+    drag.pointerId = event.pointerId
+    drag.startX = event.clientX
+    drag.startY = event.clientY
+    drag.originX = offset.x
+    drag.originY = offset.y
+    drag.lastOffsetX = offset.x
+    drag.lastOffsetY = offset.y
+    drag.lastTime = performance.now()
+    drag.vx = 0
+    drag.vy = 0
+    drag.hasDragged = false
+
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+  }
+
+  const handleLauncherPointerMove = (event) => {
+    handleShakePointerMove(event)
+
+    const drag = dragRef.current
+    if (drag.pointerId !== event.pointerId) return
+
+    const pointerDx = event.clientX - drag.startX
+    const pointerDy = event.clientY - drag.startY
+
+    if (!drag.hasDragged && Math.hypot(pointerDx, pointerDy) > DRAG_START_DISTANCE) {
+      drag.hasDragged = true
+      setIsLauncherGrabbed(true)
+    }
+
+    if (!drag.hasDragged) return
+
+    event.preventDefault()
+
+    const nextOffset = clampLauncherOffset(drag.originX + pointerDx, drag.originY + pointerDy)
+    const now = performance.now()
+    const deltaSeconds = Math.min(0.05, Math.max(0.001, (now - drag.lastTime) / 1000))
+
+    drag.vx = (nextOffset.x - drag.lastOffsetX) / deltaSeconds
+    drag.vy = (nextOffset.y - drag.lastOffsetY) / deltaSeconds
+    drag.lastOffsetX = nextOffset.x
+    drag.lastOffsetY = nextOffset.y
+    drag.lastTime = now
+
+    setLauncherOffset(nextOffset)
+  }
+
+  const handleLauncherPointerEnd = (event) => {
+    const drag = dragRef.current
+    const wasDragged = drag.pointerId === event.pointerId && drag.hasDragged
+
+    if (drag.pointerId === event.pointerId) {
+      if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+        event.currentTarget.releasePointerCapture?.(event.pointerId)
+      }
+      drag.pointerId = null
+    }
+
+    resetShakeTracker()
+    setIsLauncherGrabbed(false)
+
+    if (wasDragged) {
+      blockNextClick(520)
+      startDropAnimation({ vx: drag.vx, vy: drag.vy })
+    }
+
+    drag.hasDragged = false
+  }
+
+  const handleLauncherPointerLeave = () => {
+    if (dragRef.current.pointerId === null) resetShakeTracker()
+  }
+
   const handleToggleClick = (event) => {
     if (shakeRef.current.blockClick) {
       event.preventDefault()
@@ -160,6 +342,7 @@ const AiAssistant = () => {
     if (tracker.resetTimeout) window.clearTimeout(tracker.resetTimeout)
     if (tracker.dizzyTimeout) window.clearTimeout(tracker.dizzyTimeout)
     if (tracker.blockClickTimeout) window.clearTimeout(tracker.blockClickTimeout)
+    if (dropAnimationRef.current) window.cancelAnimationFrame(dropAnimationRef.current)
   }, [])
 
   useEffect(() => {
@@ -311,12 +494,15 @@ const AiAssistant = () => {
       </AnimatePresence>
 
       <button
-        className="ai-toggle"
+        className={`ai-toggle ${isLauncherGrabbed ? 'is-grabbed' : ''} ${launcherOffset.y < -8 ? 'is-lifted' : ''}`}
         type="button"
+        style={{ transform: `translate3d(${launcherOffset.x}px, ${launcherOffset.y}px, 0)` }}
         onClick={handleToggleClick}
-        onPointerDown={handleShakePointerDown}
-        onPointerMove={handleShakePointerMove}
-        onPointerLeave={resetShakeTracker}
+        onPointerDown={handleLauncherPointerDown}
+        onPointerMove={handleLauncherPointerMove}
+        onPointerUp={handleLauncherPointerEnd}
+        onPointerCancel={handleLauncherPointerEnd}
+        onPointerLeave={handleLauncherPointerLeave}
         aria-label="Open AI assistant"
       >
         <AssistantMark isDizzy={isDizzy} />
