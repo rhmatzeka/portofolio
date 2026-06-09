@@ -321,7 +321,6 @@ const AiAssistant = () => {
         aria-label="Open AI assistant"
       >
         <AssistantMark isDizzy={isDizzy} />
-        <span className="ai-toggle-label">Ask AI</span>
       </motion.button>
     </div>
   )
