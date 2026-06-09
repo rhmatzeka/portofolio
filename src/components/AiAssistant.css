@@ -75,15 +75,15 @@
   z-index: 2;
   width: 31px;
   height: 46.5px;
-  background-image: var(--killua-idle-image);
+  background-image: var(--killua-idle-sheet);
   background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center bottom;
+  background-size: 400% 400%;
+  background-position: 0% 0%;
   filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.48));
   pointer-events: none;
   transform: translateX(-50%);
   transform-origin: 50% 82%;
-  animation: none;
+  animation: killuaIdleFrames 1.45s steps(1, end) infinite;
 }
 
 .ai-mark.compact .killua-sprite {
@@ -125,6 +125,25 @@
   75% {
     transform: translateX(-51%) rotate(4deg);
   }
+}
+
+@keyframes killuaIdleFrames {
+  0%, 6.24% { background-position: 0% 0%; }
+  6.25%, 12.49% { background-position: 33.333% 0%; }
+  12.5%, 18.74% { background-position: 66.667% 0%; }
+  18.75%, 24.99% { background-position: 100% 0%; }
+  25%, 31.24% { background-position: 0% 33.333%; }
+  31.25%, 37.49% { background-position: 33.333% 33.333%; }
+  37.5%, 43.74% { background-position: 66.667% 33.333%; }
+  43.75%, 49.99% { background-position: 100% 33.333%; }
+  50%, 56.24% { background-position: 0% 66.667%; }
+  56.25%, 62.49% { background-position: 33.333% 66.667%; }
+  62.5%, 68.74% { background-position: 66.667% 66.667%; }
+  68.75%, 74.99% { background-position: 100% 66.667%; }
+  75%, 81.24% { background-position: 0% 100%; }
+  81.25%, 87.49% { background-position: 33.333% 100%; }
+  87.5%, 93.74% { background-position: 66.667% 100%; }
+  93.75%, 100% { background-position: 100% 100%; }
 }
 
 @keyframes killuaDizzyFrames {

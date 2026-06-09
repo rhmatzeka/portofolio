@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import killuaIdleStill from '../assets/killua-ai/killua-idle-still.png'
+import killuaIdleSprite from '../assets/killua-ai/killua-idle-stable.png'
 import killuaDizzySprite from '../assets/killua-ai/killua-dizzy.png'
 import './AiAssistant.css'
 
@@ -25,7 +25,7 @@ const AssistantMark = ({ compact = false, isDizzy = false }) => (
   <span
     className={`ai-mark killua-ai-mark ${compact ? 'compact' : ''} ${isDizzy ? 'is-dizzy' : 'is-idle'}`}
     style={{
-      '--killua-idle-image': `url(${killuaIdleStill})`,
+      '--killua-idle-sheet': `url(${killuaIdleSprite})`,
       '--killua-dizzy-sheet': `url(${killuaDizzySprite})`
     }}
     aria-hidden="true"
