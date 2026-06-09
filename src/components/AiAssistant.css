@@ -122,7 +122,7 @@
 
 .killua-sprite-dizzy {
   background-image: var(--killua-dizzy-sheet);
-  background-size: 400% 200%;
+  background-size: 400% 100%;
   background-position: 0% 0%;
   opacity: 0;
 }
@@ -154,7 +154,9 @@
 
 .ai-mark.is-dizzy .killua-sprite-dizzy {
   opacity: 1;
-  animation: killuaDizzyFrames 0.72s steps(1, end) infinite;
+  animation:
+    killuaDizzyFrames 1.05s steps(1, end) infinite,
+    killuaDizzySway 0.42s ease-in-out infinite alternate;
 }
 
 .ai-mark.is-walking:not(.is-dizzy) .killua-sprite-idle,
@@ -179,14 +181,15 @@
 }
 
 @keyframes killuaDizzyFrames {
-  0%, 12.49% { background-position: 0% 0%; }
-  12.5%, 24.99% { background-position: 33.333% 0%; }
-  25%, 37.49% { background-position: 66.667% 0%; }
-  37.5%, 49.99% { background-position: 100% 0%; }
-  50%, 62.49% { background-position: 0% 100%; }
-  62.5%, 74.99% { background-position: 33.333% 100%; }
-  75%, 87.49% { background-position: 66.667% 100%; }
-  87.5%, 100% { background-position: 100% 100%; }
+  0%, 24.99% { background-position: 0% 0%; }
+  25%, 49.99% { background-position: 33.333% 0%; }
+  50%, 74.99% { background-position: 66.667% 0%; }
+  75%, 100% { background-position: 100% 0%; }
+}
+
+@keyframes killuaDizzySway {
+  0% { transform: translate3d(-50%, 0, 0) rotate(-2deg); }
+  100% { transform: translate3d(-50%, -1px, 0) rotate(2deg); }
 }
 
 @keyframes killuaWalkFrames {

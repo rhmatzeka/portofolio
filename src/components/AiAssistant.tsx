@@ -21,7 +21,10 @@ const suggestions = [
 ]
 
 const DIZZY_DURATION_MS = 2300
-const SHAKE_RESET_MS = 520
+const SHAKE_RESET_MS = 700
+const SHAKE_REQUIRED_TURNS = 5
+const SHAKE_REQUIRED_TRAVEL = 170
+const SHAKE_REQUIRED_SAMPLES = 6
 const DRAG_START_DISTANCE = 6
 const LAUNCHER_GRAVITY = 2200
 const LAUNCHER_WALK_SPEED = 70
@@ -98,6 +101,7 @@ const AiAssistant = () => {
     lastAxis: 0,
     turns: 0,
     travel: 0,
+    samples: 0,
     resetTimeout: null,
     dizzyTimeout: null,
     blockClick: false,
@@ -258,6 +262,7 @@ const AiAssistant = () => {
     tracker.lastAxis = 0
     tracker.turns = 0
     tracker.travel = 0
+    tracker.samples = 0
 
     if (tracker.resetTimeout) {
       window.clearTimeout(tracker.resetTimeout)
@@ -268,6 +273,8 @@ const AiAssistant = () => {
   const triggerDizzy = () => {
     const tracker = shakeRef.current
     resetShakeTracker()
+    if (isDizzyRef.current) return
+
     blockNextClick()
 
     setDizzyState(true)
@@ -294,6 +301,11 @@ const AiAssistant = () => {
   const handleShakePointerMove = (event) => {
     const tracker = shakeRef.current
 
+    if (isDizzyRef.current) {
+      resetShakeTracker()
+      return
+    }
+
     if (tracker.lastX === null || tracker.lastY === null) {
       tracker.lastX = event.clientX
       tracker.lastY = event.clientY
@@ -306,20 +318,29 @@ const AiAssistant = () => {
 
     if (distance < 3) return
 
-    const axis = Math.abs(dx) >= Math.abs(dy) ? Math.sign(dx) : Math.sign(dy)
-    if (axis && tracker.lastAxis && axis !== tracker.lastAxis && distance > 4) {
+    tracker.lastX = event.clientX
+    tracker.lastY = event.clientY
+
+    const horizontalDistance = Math.abs(dx)
+    if (horizontalDistance < 4 || horizontalDistance < Math.abs(dy) * 0.65) return
+
+    const axis = Math.sign(dx)
+    if (axis && tracker.lastAxis && axis !== tracker.lastAxis && horizontalDistance > 5) {
       tracker.turns += 1
     }
 
     tracker.lastAxis = axis || tracker.lastAxis
-    tracker.travel += distance
-    tracker.lastX = event.clientX
-    tracker.lastY = event.clientY
+    tracker.travel += horizontalDistance
+    tracker.samples += 1
 
     if (tracker.resetTimeout) window.clearTimeout(tracker.resetTimeout)
     tracker.resetTimeout = window.setTimeout(resetShakeTracker, SHAKE_RESET_MS)
 
-    if ((tracker.turns >= 3 && tracker.travel > 42) || (tracker.turns >= 2 && tracker.travel > 88)) {
+    if (
+      tracker.turns >= SHAKE_REQUIRED_TURNS &&
+      tracker.travel >= SHAKE_REQUIRED_TRAVEL &&
+      tracker.samples >= SHAKE_REQUIRED_SAMPLES
+    ) {
       triggerDizzy()
     }
   }
