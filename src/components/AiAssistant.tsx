@@ -74,8 +74,11 @@ const AiAssistant = () => {
   const [launcherPhase, setLauncherPhase] = useState('idle')
   const [walkDirection, setWalkDirection] = useState('right')
   const inputRef = useRef(null)
+  const isDizzyRef = useRef(false)
+  const launcherPhaseRef = useRef('idle')
   const launcherOffsetRef = useRef({ x: 0, y: 0 })
   const dropAnimationRef = useRef(null)
+  const pendingWalkHomeRef = useRef(false)
   const dragRef = useRef({
     pointerId: null,
     startX: 0,
@@ -100,6 +103,16 @@ const AiAssistant = () => {
     blockClick: false,
     blockClickTimeout: null
   })
+
+  const setDizzyState = (nextIsDizzy) => {
+    isDizzyRef.current = nextIsDizzy
+    setIsDizzy(nextIsDizzy)
+  }
+
+  const setLauncherPhaseState = (nextPhase) => {
+    launcherPhaseRef.current = nextPhase
+    setLauncherPhase(nextPhase)
+  }
 
   const clampLauncherOffset = (x, y) => {
     const viewportWidth = window.innerWidth || 1024
@@ -143,9 +156,18 @@ const AiAssistant = () => {
   const startWalkHome = () => {
     const startX = launcherOffsetRef.current.x
 
+    if (isDizzyRef.current) {
+      pendingWalkHomeRef.current = Math.abs(startX) >= 1
+      setLauncherOffset({ x: startX, y: 0 })
+      setLauncherPhaseState('dizzy')
+      return
+    }
+
+    pendingWalkHomeRef.current = false
+
     if (Math.abs(startX) < 1) {
       setLauncherOffset({ x: 0, y: 0 })
-      setLauncherPhase('idle')
+      setLauncherPhaseState('idle')
       return
     }
 
@@ -153,7 +175,7 @@ const AiAssistant = () => {
     const startTime = performance.now()
 
     setWalkDirection(startX > 0 ? 'left' : 'right')
-    setLauncherPhase('walking')
+    setLauncherPhaseState('walking')
 
     const step = (time) => {
       const progress = Math.min(1, (time - startTime) / duration)
@@ -163,7 +185,7 @@ const AiAssistant = () => {
 
       if (progress >= 1) {
         setLauncherOffset({ x: 0, y: 0 })
-        setLauncherPhase('idle')
+        setLauncherPhaseState('idle')
         dropAnimationRef.current = null
         return
       }
@@ -174,6 +196,21 @@ const AiAssistant = () => {
     dropAnimationRef.current = window.requestAnimationFrame(step)
   }
 
+  const finishLauncherLanding = (landingX) => {
+    const x = clampLauncherOffset(landingX, 0).x
+
+    setLauncherOffset({ x, y: 0 })
+    dropAnimationRef.current = null
+
+    if (isDizzyRef.current) {
+      pendingWalkHomeRef.current = Math.abs(x) >= 1
+      setLauncherPhaseState('dizzy')
+      return
+    }
+
+    startWalkHome()
+  }
+
   const startDropAnimation = ({ vy = 0 } = {}) => {
     cancelLauncherAnimation()
 
@@ -182,11 +219,10 @@ const AiAssistant = () => {
     let velocityY = Math.max(-1600, Math.min(1600, vy))
     let previousTime = performance.now()
 
-    setLauncherPhase('falling')
+    setLauncherPhaseState('falling')
 
     if (y >= 0) {
-      setLauncherOffset({ x, y: 0 })
-      startWalkHome()
+      finishLauncherLanding(x)
       return
     }
 
@@ -199,9 +235,7 @@ const AiAssistant = () => {
 
       if (y >= 0) {
         y = 0
-        setLauncherOffset({ x, y })
-        dropAnimationRef.current = null
-        startWalkHome()
+        finishLauncherLanding(x)
         return
       }
 
@@ -236,19 +270,25 @@ const AiAssistant = () => {
     resetShakeTracker()
     blockNextClick()
 
-    setIsDizzy(true)
+    setDizzyState(true)
 
     if (tracker.dizzyTimeout) window.clearTimeout(tracker.dizzyTimeout)
     tracker.dizzyTimeout = window.setTimeout(() => {
-      setIsDizzy(false)
+      setDizzyState(false)
       tracker.dizzyTimeout = null
-    }, DIZZY_DURATION_MS)
-  }
 
-  const handleShakePointerDown = (event) => {
-    resetShakeTracker()
-    shakeRef.current.lastX = event.clientX
-    shakeRef.current.lastY = event.clientY
+      const shouldWalkHome = pendingWalkHomeRef.current
+      pendingWalkHomeRef.current = false
+
+      if (shouldWalkHome && dragRef.current.pointerId === null) {
+        startWalkHome()
+        return
+      }
+
+      if (launcherPhaseRef.current === 'dizzy') {
+        setLauncherPhaseState('idle')
+      }
+    }, DIZZY_DURATION_MS)
   }
 
   const handleShakePointerMove = (event) => {
@@ -286,8 +326,9 @@ const AiAssistant = () => {
 
   const handleLauncherPointerDown = (event) => {
     cancelLauncherAnimation()
-    setLauncherPhase('grabbed')
-    handleShakePointerDown(event)
+    pendingWalkHomeRef.current = false
+    resetShakeTracker()
+    setLauncherPhaseState('grabbed')
 
     const drag = dragRef.current
     const offset = launcherOffsetRef.current
@@ -307,8 +348,6 @@ const AiAssistant = () => {
   }
 
   const handleLauncherPointerMove = (event) => {
-    handleShakePointerMove(event)
-
     const drag = dragRef.current
     if (drag.pointerId !== event.pointerId) return
 
@@ -317,12 +356,16 @@ const AiAssistant = () => {
 
     if (!drag.hasDragged && Math.hypot(pointerDx, pointerDy) > DRAG_START_DISTANCE) {
       drag.hasDragged = true
-      setLauncherPhase('grabbed')
+      resetShakeTracker()
+      shakeRef.current.lastX = event.clientX
+      shakeRef.current.lastY = event.clientY
+      setLauncherPhaseState('grabbed')
     }
 
     if (!drag.hasDragged) return
 
     event.preventDefault()
+    handleShakePointerMove(event)
 
     const nextOffset = clampLauncherOffset(drag.originX + pointerDx, drag.originY + pointerDy)
     const now = performance.now()
@@ -354,7 +397,7 @@ const AiAssistant = () => {
       blockNextClick(520)
       startDropAnimation({ vy: drag.vy })
     } else {
-      setLauncherPhase('idle')
+      setLauncherPhaseState(isDizzyRef.current ? 'dizzy' : 'idle')
     }
 
     drag.hasDragged = false

@@ -97,8 +97,9 @@
   background-position: center bottom;
   filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.48));
   pointer-events: none;
-  transform: translateX(-50%);
+  transform: translate3d(-50%, 0, 0);
   transform-origin: 50% 82%;
+  backface-visibility: hidden;
   opacity: 1;
 }
 
@@ -114,7 +115,7 @@
 
 .killua-sprite-walk {
   background-image: var(--killua-walk-sheet);
-  background-size: 400% 200%;
+  background-size: 400% 100%;
   background-position: 0% 0%;
   opacity: 0;
 }
@@ -165,11 +166,11 @@
 
 .ai-mark.is-walking:not(.is-dizzy) .killua-sprite-walk {
   opacity: 1;
-  animation: killuaWalkFrames 1.55s steps(1, end) infinite;
+  animation: killuaWalkFrames 1.3s steps(1, end) infinite;
 }
 
 .ai-mark.is-walking-left .killua-sprite-walk {
-  transform: translateX(-50%) scaleX(-1);
+  transform: translate3d(-50%, 0, 0) scaleX(-1);
 }
 
 @keyframes killuaBlink {
@@ -189,14 +190,10 @@
 }
 
 @keyframes killuaWalkFrames {
-  0%, 12.49% { background-position: 0% 0%; }
-  12.5%, 24.99% { background-position: 33.333% 0%; }
-  25%, 37.49% { background-position: 66.667% 0%; }
-  37.5%, 49.99% { background-position: 100% 0%; }
-  50%, 62.49% { background-position: 0% 100%; }
-  62.5%, 74.99% { background-position: 33.333% 100%; }
-  75%, 87.49% { background-position: 66.667% 100%; }
-  87.5%, 100% { background-position: 100% 100%; }
+  0%, 24.99% { background-position: 0% 0%; }
+  25%, 49.99% { background-position: 33.333% 0%; }
+  50%, 74.99% { background-position: 66.667% 0%; }
+  75%, 100% { background-position: 100% 0%; }
 }
 
 .ai-panel {
