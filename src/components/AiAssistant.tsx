@@ -24,7 +24,7 @@ const DIZZY_DURATION_MS = 2300
 const SHAKE_RESET_MS = 520
 const DRAG_START_DISTANCE = 6
 const LAUNCHER_GRAVITY = 2200
-const LAUNCHER_WALK_SPEED = 360
+const LAUNCHER_WALK_SPEED = 150
 
 const AssistantMark = ({ compact = false, isDizzy = false, isWalking = false, walkDirection = 'right' }) => (
   <span
@@ -149,7 +149,7 @@ const AiAssistant = () => {
       return
     }
 
-    const duration = Math.min(1800, Math.max(420, (Math.abs(startX) / LAUNCHER_WALK_SPEED) * 1000))
+    const duration = Math.min(3200, Math.max(900, (Math.abs(startX) / LAUNCHER_WALK_SPEED) * 1000))
     const startTime = performance.now()
 
     setWalkDirection(startX > 0 ? 'left' : 'right')
