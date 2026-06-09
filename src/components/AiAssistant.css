@@ -42,11 +42,11 @@
 }
 
 .ai-toggle.is-lifted .killua-sprite {
-  filter: drop-shadow(0 14px 13px rgba(0, 0, 0, 0.48));
+  filter: none;
 }
 
 .ai-toggle:focus-visible {
-  outline: 2px solid rgba(0, 209, 255, 0.7);
+  outline: 2px solid rgba(255, 255, 255, 0.7);
   outline-offset: 4px;
 }
 
@@ -93,7 +93,7 @@
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center bottom;
-  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.48));
+  filter: none;
   pointer-events: none;
   transform: translate3d(-50%, 0, 0);
   transform-origin: 50% 82%;
@@ -103,6 +103,7 @@
 
 .killua-sprite-idle {
   background-image: var(--killua-idle-open);
+  animation: killuaIdleHold 3.4s steps(1, end) infinite;
 }
 
 .killua-sprite-blink {
@@ -141,7 +142,7 @@
   bottom: 0;
   width: 96px;
   height: 144px;
-  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.48));
+  filter: none;
 }
 
 .ai-mark.is-dizzy .killua-sprite {
@@ -188,7 +189,7 @@
 
 .ai-mark.is-walking:not(.is-dizzy) .killua-sprite-walk {
   opacity: 1;
-  animation: killuaWalkFrames 1.3s steps(1, end) infinite;
+  animation: killuaWalkFrames 1.9s steps(1, end) infinite;
 }
 
 .ai-mark.is-walking-left .killua-sprite-walk {
@@ -198,6 +199,11 @@
 @keyframes killuaBlink {
   0%, 72.9%, 75.1%, 78.9%, 100% { opacity: 0; }
   73%, 75%, 79%, 81% { opacity: 1; }
+}
+
+@keyframes killuaIdleHold {
+  0%, 72.9%, 75.1%, 78.9%, 100% { opacity: 1; }
+  73%, 75%, 79%, 81% { opacity: 0; }
 }
 
 @keyframes killuaDizzyFrames {
