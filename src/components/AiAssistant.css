@@ -52,18 +52,20 @@
 
 .ai-mark {
   position: relative;
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 34px;
+  flex: 0 0 42px;
   border-radius: 50%;
   background:
     radial-gradient(circle at 35% 24%, rgba(255, 255, 255, 0.3), transparent 31%),
     linear-gradient(145deg, rgba(0, 209, 255, 0.2), rgba(0, 0, 0, 0.18));
   color: #21e6ff;
   box-shadow: 0 0 18px rgba(0, 209, 255, 0.18), inset 0 0 0 1px rgba(0, 209, 255, 0.2);
+  isolation: isolate;
+  overflow: visible;
 }
 
 .ai-mark::after {
@@ -76,20 +78,43 @@
   animation: aiMarkPulse 2.8s ease-in-out infinite;
 }
 
-.ai-mark svg {
-  width: 23px;
-  height: 23px;
-}
-
 .ai-mark.compact {
-  width: 42px;
-  height: 42px;
-  flex-basis: 42px;
+  width: 46px;
+  height: 46px;
+  flex-basis: 46px;
 }
 
-.ai-mark.compact svg {
-  width: 27px;
-  height: 27px;
+.killua-sprite {
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  z-index: 2;
+  width: 31px;
+  height: 46.5px;
+  background-image: var(--killua-idle-sheet);
+  background-repeat: no-repeat;
+  background-size: 400% 400%;
+  background-position: 0% 0%;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.48));
+  pointer-events: none;
+  transform: translateX(-50%);
+  transform-origin: 50% 82%;
+  animation:
+    killuaIdleFrames 1.35s steps(1, end) infinite,
+    killuaIdleFloat 1.35s ease-in-out infinite;
+}
+
+.ai-mark.compact .killua-sprite {
+  width: 34px;
+  height: 51px;
+}
+
+.ai-mark.is-dizzy .killua-sprite {
+  background-image: var(--killua-dizzy-sheet);
+  background-size: 400% 200%;
+  animation:
+    killuaDizzyFrames 0.72s steps(1, end) infinite,
+    killuaDizzyWobble 0.44s ease-in-out infinite;
 }
 
 @keyframes aiMarkPulse {
@@ -102,6 +127,64 @@
     transform: scale(1.08);
     opacity: 0.72;
   }
+}
+
+@keyframes killuaIdleFloat {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-1px) scale(1.01);
+  }
+}
+
+@keyframes killuaDizzyWobble {
+  0%, 100% {
+    transform: translateX(-50%) rotate(-4deg);
+  }
+
+  25% {
+    transform: translateX(-52%) rotate(5deg);
+  }
+
+  50% {
+    transform: translateX(-48%) rotate(-6deg);
+  }
+
+  75% {
+    transform: translateX(-51%) rotate(4deg);
+  }
+}
+
+@keyframes killuaIdleFrames {
+  0%, 6.24% { background-position: 0% 0%; }
+  6.25%, 12.49% { background-position: 33.333% 0%; }
+  12.5%, 18.74% { background-position: 66.667% 0%; }
+  18.75%, 24.99% { background-position: 100% 0%; }
+  25%, 31.24% { background-position: 0% 33.333%; }
+  31.25%, 37.49% { background-position: 33.333% 33.333%; }
+  37.5%, 43.74% { background-position: 66.667% 33.333%; }
+  43.75%, 49.99% { background-position: 100% 33.333%; }
+  50%, 56.24% { background-position: 0% 66.667%; }
+  56.25%, 62.49% { background-position: 33.333% 66.667%; }
+  62.5%, 68.74% { background-position: 66.667% 66.667%; }
+  68.75%, 74.99% { background-position: 100% 66.667%; }
+  75%, 81.24% { background-position: 0% 100%; }
+  81.25%, 87.49% { background-position: 33.333% 100%; }
+  87.5%, 93.74% { background-position: 66.667% 100%; }
+  93.75%, 100% { background-position: 100% 100%; }
+}
+
+@keyframes killuaDizzyFrames {
+  0%, 12.49% { background-position: 0% 0%; }
+  12.5%, 24.99% { background-position: 33.333% 0%; }
+  25%, 37.49% { background-position: 66.667% 0%; }
+  37.5%, 49.99% { background-position: 100% 0%; }
+  50%, 62.49% { background-position: 0% 100%; }
+  62.5%, 74.99% { background-position: 33.333% 100%; }
+  75%, 87.49% { background-position: 66.667% 100%; }
+  87.5%, 100% { background-position: 100% 100%; }
 }
 
 .ai-panel {
@@ -339,9 +422,14 @@
   }
 
   .ai-mark {
-    width: 31px;
-    height: 31px;
-    flex-basis: 31px;
+    width: 39px;
+    height: 39px;
+    flex-basis: 39px;
+  }
+
+  .killua-sprite {
+    width: 29px;
+    height: 43.5px;
   }
 
   .ai-panel {
@@ -392,6 +480,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ai-mark::after,
+  .killua-sprite,
   .ai-message.loading span {
     animation: none;
   }

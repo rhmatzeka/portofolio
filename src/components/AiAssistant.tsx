@@ -1,6 +1,8 @@
 // @ts-nocheck
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import killuaIdleSprite from '../assets/killua-ai/killua-idle.png'
+import killuaDizzySprite from '../assets/killua-ai/killua-dizzy.png'
 import './AiAssistant.css'
 
 const initialMessages = [
@@ -16,13 +18,19 @@ const suggestions = [
   'How can I contact Rahmat?'
 ]
 
-const AssistantMark = ({ compact = false }) => (
-  <span className={`ai-mark ${compact ? 'compact' : ''}`} aria-hidden="true">
-    <svg viewBox="0 0 48 48" fill="none">
-      <path d="M24 5 40.5 14.5v19L24 43 7.5 33.5v-19L24 5Z" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round"/>
-      <path d="M17 31V18.8c0-1 .8-1.8 1.8-1.8h10.4c1 0 1.8.8 1.8 1.8V31M17 25h14" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"/>
-      <path d="M14 14.5 9.5 12M34 14.5l4.5-2.5M14 33.5 9.5 36M34 33.5l4.5 2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
+const DIZZY_DURATION_MS = 2300
+const SHAKE_RESET_MS = 520
+
+const AssistantMark = ({ compact = false, isDizzy = false }) => (
+  <span
+    className={`ai-mark killua-ai-mark ${compact ? 'compact' : ''} ${isDizzy ? 'is-dizzy' : 'is-idle'}`}
+    style={{
+      '--killua-idle-sheet': `url(${killuaIdleSprite})`,
+      '--killua-dizzy-sheet': `url(${killuaDizzySprite})`
+    }}
+    aria-hidden="true"
+  >
+    <span className="killua-sprite" />
   </span>
 )
 
@@ -51,7 +59,108 @@ const AiAssistant = () => {
   const [messages, setMessages] = useState(initialMessages)
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isDizzy, setIsDizzy] = useState(false)
   const inputRef = useRef(null)
+  const shakeRef = useRef({
+    lastX: null,
+    lastY: null,
+    lastAxis: 0,
+    turns: 0,
+    travel: 0,
+    resetTimeout: null,
+    dizzyTimeout: null,
+    blockClick: false,
+    blockClickTimeout: null
+  })
+
+  const resetShakeTracker = () => {
+    const tracker = shakeRef.current
+    tracker.lastX = null
+    tracker.lastY = null
+    tracker.lastAxis = 0
+    tracker.turns = 0
+    tracker.travel = 0
+
+    if (tracker.resetTimeout) {
+      window.clearTimeout(tracker.resetTimeout)
+      tracker.resetTimeout = null
+    }
+  }
+
+  const triggerDizzy = () => {
+    const tracker = shakeRef.current
+    resetShakeTracker()
+    tracker.blockClick = true
+
+    if (tracker.blockClickTimeout) window.clearTimeout(tracker.blockClickTimeout)
+    tracker.blockClickTimeout = window.setTimeout(() => {
+      tracker.blockClick = false
+    }, 420)
+
+    setIsDizzy(true)
+
+    if (tracker.dizzyTimeout) window.clearTimeout(tracker.dizzyTimeout)
+    tracker.dizzyTimeout = window.setTimeout(() => {
+      setIsDizzy(false)
+      tracker.dizzyTimeout = null
+    }, DIZZY_DURATION_MS)
+  }
+
+  const handleShakePointerDown = (event) => {
+    resetShakeTracker()
+    shakeRef.current.lastX = event.clientX
+    shakeRef.current.lastY = event.clientY
+  }
+
+  const handleShakePointerMove = (event) => {
+    const tracker = shakeRef.current
+
+    if (tracker.lastX === null || tracker.lastY === null) {
+      tracker.lastX = event.clientX
+      tracker.lastY = event.clientY
+      return
+    }
+
+    const dx = event.clientX - tracker.lastX
+    const dy = event.clientY - tracker.lastY
+    const distance = Math.hypot(dx, dy)
+
+    if (distance < 3) return
+
+    const axis = Math.abs(dx) >= Math.abs(dy) ? Math.sign(dx) : Math.sign(dy)
+    if (axis && tracker.lastAxis && axis !== tracker.lastAxis && distance > 4) {
+      tracker.turns += 1
+    }
+
+    tracker.lastAxis = axis || tracker.lastAxis
+    tracker.travel += distance
+    tracker.lastX = event.clientX
+    tracker.lastY = event.clientY
+
+    if (tracker.resetTimeout) window.clearTimeout(tracker.resetTimeout)
+    tracker.resetTimeout = window.setTimeout(resetShakeTracker, SHAKE_RESET_MS)
+
+    if ((tracker.turns >= 3 && tracker.travel > 42) || (tracker.turns >= 2 && tracker.travel > 88)) {
+      triggerDizzy()
+    }
+  }
+
+  const handleToggleClick = (event) => {
+    if (shakeRef.current.blockClick) {
+      event.preventDefault()
+      shakeRef.current.blockClick = false
+      return
+    }
+
+    openAssistant()
+  }
+
+  useEffect(() => () => {
+    const tracker = shakeRef.current
+    if (tracker.resetTimeout) window.clearTimeout(tracker.resetTimeout)
+    if (tracker.dizzyTimeout) window.clearTimeout(tracker.dizzyTimeout)
+    if (tracker.blockClickTimeout) window.clearTimeout(tracker.blockClickTimeout)
+  }, [])
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -149,7 +258,7 @@ const AiAssistant = () => {
             transition={{ duration: 0.22, ease: 'easeOut' }}
           >
             <div className="ai-panel-header">
-              <AssistantMark compact />
+              <AssistantMark compact isDizzy={isDizzy} />
               <div>
                 <h2>RahmatDev Assistant</h2>
               </div>
@@ -204,11 +313,14 @@ const AiAssistant = () => {
       <motion.button
         className="ai-toggle"
         type="button"
-        onClick={openAssistant}
+        onClick={handleToggleClick}
+        onPointerDown={handleShakePointerDown}
+        onPointerMove={handleShakePointerMove}
+        onPointerLeave={resetShakeTracker}
         whileTap={{ scale: 0.95 }}
         aria-label="Open AI assistant"
       >
-        <AssistantMark />
+        <AssistantMark isDizzy={isDizzy} />
         <span>Ask AI</span>
       </motion.button>
     </div>
