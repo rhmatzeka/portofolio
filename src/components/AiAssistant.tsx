@@ -352,7 +352,7 @@ const AiAssistant = () => {
     cancelLauncherAnimation()
     pendingWalkHomeRef.current = false
     resetShakeTracker()
-    setLauncherPhaseState('grabbed')
+    setLauncherPhaseState(isDizzyRef.current ? 'dizzy' : 'idle')
 
     const drag = dragRef.current
     const offset = launcherOffsetRef.current
@@ -611,7 +611,7 @@ const AiAssistant = () => {
       >
         <AssistantMark
           isDizzy={isDizzy}
-          isFloating={launcherPhase === 'falling' || launcherOffset.y < -8}
+          isFloating={launcherPhase === 'grabbed' || launcherPhase === 'falling' || launcherOffset.y < -8}
           isWalking={launcherPhase === 'walking'}
           walkDirection={walkDirection}
         />

@@ -15,9 +15,9 @@
 
 .ai-toggle {
   position: relative;
-  width: 104px;
+  width: 112px;
   min-width: 0;
-  height: 142px;
+  height: 152px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -42,9 +42,7 @@
 }
 
 .ai-toggle.is-lifted .killua-sprite {
-  filter:
-    drop-shadow(0 16px 14px rgba(0, 0, 0, 0.5))
-    drop-shadow(0 0 12px rgba(0, 209, 255, 0.14));
+  filter: drop-shadow(0 14px 13px rgba(0, 0, 0, 0.48));
 }
 
 .ai-toggle:focus-visible {
@@ -80,8 +78,8 @@
 .ai-toggle .ai-mark {
   position: relative;
   z-index: 2;
-  width: 96px;
-  height: 140px;
+  width: 104px;
+  height: 148px;
   flex: 0 0 auto;
 }
 
@@ -141,11 +139,9 @@
 
 .ai-toggle .killua-sprite {
   bottom: 0;
-  width: 90px;
-  height: 135px;
-  filter:
-    drop-shadow(0 11px 12px rgba(0, 0, 0, 0.52))
-    drop-shadow(0 0 10px rgba(0, 209, 255, 0.16));
+  width: 96px;
+  height: 144px;
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.48));
 }
 
 .ai-mark.is-dizzy .killua-sprite {
