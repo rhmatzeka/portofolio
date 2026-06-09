@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import killuaIdleOpen from '../assets/killua-ai/killua-idle-still.png'
 import killuaIdleBlink from '../assets/killua-ai/killua-idle-blink.png'
+import killuaFloatSprite from '../assets/killua-ai/killua-float-stable.png'
 import killuaWalkSprite from '../assets/killua-ai/killua-walk-stable.png'
 import killuaDizzySprite from '../assets/killua-ai/killua-dizzy-stable.png'
 import './AiAssistant.css'
@@ -29,12 +30,13 @@ const DRAG_START_DISTANCE = 6
 const LAUNCHER_GRAVITY = 2200
 const LAUNCHER_WALK_SPEED = 70
 
-const AssistantMark = ({ compact = false, isDizzy = false, isWalking = false, walkDirection = 'right' }) => (
+const AssistantMark = ({ compact = false, isDizzy = false, isFloating = false, isWalking = false, walkDirection = 'right' }) => (
   <span
-    className={`ai-mark killua-ai-mark ${compact ? 'compact' : ''} ${isDizzy ? 'is-dizzy' : 'is-idle'} ${isWalking ? 'is-walking' : ''} ${walkDirection === 'left' ? 'is-walking-left' : ''}`}
+    className={`ai-mark killua-ai-mark ${compact ? 'compact' : ''} ${isDizzy ? 'is-dizzy' : 'is-idle'} ${isFloating ? 'is-floating' : ''} ${isWalking ? 'is-walking' : ''} ${walkDirection === 'left' ? 'is-walking-left' : ''}`}
     style={{
       '--killua-idle-open': `url(${killuaIdleOpen})`,
       '--killua-idle-blink': `url(${killuaIdleBlink})`,
+      '--killua-float-sheet': `url(${killuaFloatSprite})`,
       '--killua-walk-sheet': `url(${killuaWalkSprite})`,
       '--killua-dizzy-sheet': `url(${killuaDizzySprite})`
     }}
@@ -42,6 +44,7 @@ const AssistantMark = ({ compact = false, isDizzy = false, isWalking = false, wa
   >
     <span className="killua-sprite killua-sprite-idle" />
     <span className="killua-sprite killua-sprite-blink" />
+    <span className="killua-sprite killua-sprite-float" />
     <span className="killua-sprite killua-sprite-walk" />
     <span className="killua-sprite killua-sprite-dizzy" />
   </span>
@@ -606,7 +609,12 @@ const AiAssistant = () => {
         onPointerLeave={handleLauncherPointerLeave}
         aria-label="Open AI assistant"
       >
-        <AssistantMark isDizzy={isDizzy} isWalking={launcherPhase === 'walking'} walkDirection={walkDirection} />
+        <AssistantMark
+          isDizzy={isDizzy}
+          isFloating={launcherPhase === 'falling' || launcherOffset.y < -8}
+          isWalking={launcherPhase === 'walking'}
+          walkDirection={walkDirection}
+        />
       </button>
     </div>
   )
