@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import killuaIdleSprite from '../assets/killua-ai/killua-idle.png'
+import killuaIdleStill from '../assets/killua-ai/killua-idle-still.png'
 import killuaDizzySprite from '../assets/killua-ai/killua-dizzy.png'
 import './AiAssistant.css'
 
@@ -25,7 +25,7 @@ const AssistantMark = ({ compact = false, isDizzy = false }) => (
   <span
     className={`ai-mark killua-ai-mark ${compact ? 'compact' : ''} ${isDizzy ? 'is-dizzy' : 'is-idle'}`}
     style={{
-      '--killua-idle-sheet': `url(${killuaIdleSprite})`,
+      '--killua-idle-image': `url(${killuaIdleStill})`,
       '--killua-dizzy-sheet': `url(${killuaDizzySprite})`
     }}
     aria-hidden="true"
@@ -310,18 +310,17 @@ const AiAssistant = () => {
         )}
       </AnimatePresence>
 
-      <motion.button
+      <button
         className="ai-toggle"
         type="button"
         onClick={handleToggleClick}
         onPointerDown={handleShakePointerDown}
         onPointerMove={handleShakePointerMove}
         onPointerLeave={resetShakeTracker}
-        whileTap={{ scale: 0.95 }}
         aria-label="Open AI assistant"
       >
         <AssistantMark isDizzy={isDizzy} />
-      </motion.button>
+      </button>
     </div>
   )
 }

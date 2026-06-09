@@ -28,11 +28,6 @@
   cursor: pointer;
   overflow: visible;
   touch-action: none;
-  transition: filter 0.24s ease;
-}
-
-.ai-toggle:hover {
-  filter: brightness(1.06);
 }
 
 .ai-toggle:focus-visible {
@@ -80,10 +75,10 @@
   z-index: 2;
   width: 31px;
   height: 46.5px;
-  background-image: var(--killua-idle-sheet);
+  background-image: var(--killua-idle-image);
   background-repeat: no-repeat;
-  background-size: 400% 400%;
-  background-position: 0% 0%;
+  background-size: contain;
+  background-position: center bottom;
   filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.48));
   pointer-events: none;
   transform: translateX(-50%);
@@ -108,6 +103,7 @@
 .ai-mark.is-dizzy .killua-sprite {
   background-image: var(--killua-dizzy-sheet);
   background-size: 400% 200%;
+  background-position: 0% 0%;
   animation:
     killuaDizzyFrames 0.72s steps(1, end) infinite,
     killuaDizzyWobble 0.44s ease-in-out infinite;
