@@ -73,9 +73,11 @@ const ChatIcon = () => (
 )
 
 const WalkIcon = () => (
-  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="m9 4 2.8 2.8-2.1 3.5 3.2 2.2 3.1-1.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12.4 12.7 10.8 17l-3.6 1.5M13.1 13.1 16 16.8l2.7 1.2M13.7 4.4a1.7 1.7 0 1 1-3.4 0 1.7 1.7 0 0 1 3.4 0Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M14.1 4.9a2.05 2.05 0 1 1-4.1 0 2.05 2.05 0 0 1 4.1 0Z" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M11.6 8.2 9.2 11.6l3.3 2.15 3-1.8" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M9.2 11.6 6.7 13.1M12.6 13.9l-1.9 4.4-3.35 1.25M13.2 14l3.1 3.7 2.75 1.25" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M5 18.9c.55-.45 1.25-.78 2.05-.96M16.7 20.35c1.05.14 1.88.05 2.55-.27" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" opacity="0.62"/>
   </svg>
 )
 
@@ -720,7 +722,7 @@ const AiAssistant = () => {
             <ChatIcon />
           </button>
           <button
-            className="ai-character-action"
+            className={`ai-character-action ai-walk-action ${launcherPhase === 'walking' ? 'is-active' : ''}`}
             type="button"
             onClick={handleRoamClick}
             title="Walk"

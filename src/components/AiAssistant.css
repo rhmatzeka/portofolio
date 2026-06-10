@@ -50,11 +50,33 @@
   transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease, opacity 0.18s ease;
 }
 
+.ai-character-action svg {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.ai-walk-action svg {
+  transform: translateX(0.5px);
+}
+
 .ai-character-action:hover:not(:disabled) {
   border-color: rgba(180, 237, 255, 0.52);
   background: radial-gradient(circle at 35% 25%, rgba(117, 214, 255, 0.24), transparent 44%), rgba(30, 39, 53, 0.96);
   color: #ffffff;
   transform: translateY(-1px);
+}
+
+.ai-walk-action.is-active:not(:disabled) {
+  border-color: rgba(0, 209, 255, 0.72);
+  background:
+    radial-gradient(circle at 34% 26%, rgba(0, 209, 255, 0.34), transparent 44%),
+    linear-gradient(145deg, rgba(3, 31, 43, 0.96), rgba(9, 19, 31, 0.96));
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34), 0 0 18px rgba(0, 209, 255, 0.28);
+}
+
+.ai-walk-action.is-active:not(:disabled) svg {
+  filter: drop-shadow(0 0 6px rgba(0, 209, 255, 0.45));
 }
 
 .ai-character-action:disabled {
