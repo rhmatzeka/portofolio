@@ -15,10 +15,10 @@
         "Sepolia"
       ],
       "mediaType": "image",
-      "mediaUrl": "/uploads/1781094007532-taniin-play-to-earn.png",
-      "image": "/uploads/1781094007532-taniin-play-to-earn.png",
+      "mediaUrl": "/uploads/1781094025203-taniin-play-to-earn.png",
+      "image": "/uploads/1781094025203-taniin-play-to-earn.png",
       "imageVariant": "desktop-shot",
-      "order": null,
+      "order": 1,
       "github": "https://github.com/rhmatzeka/TaniinPlaytoEarn",
       "demo": "https://taniin.rahmateka.my.id"
     },
