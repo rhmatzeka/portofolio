@@ -15,7 +15,6 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
 import * as THREE from 'three'
 import cardGLB from '../assets/lanyard/card.glb'
-import killuaIcon from '../assets/lanyard/killua-icon.png'
 import lanyardTextureSrc from '../assets/lanyard/lanyard.png'
 import killuaCard from '../assets/images/k.jpg'
 import './Lanyard.css'
@@ -202,7 +201,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const j2 = useRef()
   const j3 = useRef()
   const card = useRef()
-  const decorations = useRef([])
+  const bandVisualReady = useRef(false)
   const vec = new THREE.Vector3()
   const ang = new THREE.Vector3()
   const rot = new THREE.Vector3()
@@ -210,7 +209,13 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const cardAnchor = new THREE.Vector3()
   const cardAnchorOffset = new THREE.Vector3()
   const cardRotation = new THREE.Quaternion()
-  const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 }
+  const segmentProps = {
+    type: 'dynamic',
+    canSleep: true,
+    colliders: false,
+    angularDamping: isMobile ? 7.5 : 8.5,
+    linearDamping: isMobile ? 6.5 : 7.5
+  }
   const cardScale = isMobile ? 1.92 : 2.14
   const colliderScale = cardScale / 1.05
   const anchorPosition = isMobile ? [0.02, 2.25, 0] : [0.02, 3.16, 0]
@@ -220,13 +225,13 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const rigX = isMobile ? 0 : 0.22
   const cardStartY = -(jointStep * 3 + cardHookY)
   const visualHookX = 0
-  const decorationPoints = isMobile ? [0.42, 0.64, 0.86] : [0.38, 0.6, 0.82]
   const { nodes, materials } = useGLTF(cardGLB)
   const lanyardTexture = useTexture(lanyardTextureSrc)
   const killuaTexture = useTexture(killuaCard)
-  const killuaIconTexture = useTexture(killuaIcon)
   const frontCardTexture = useMemo(() => createFrontCardTexture(killuaTexture), [killuaTexture])
   const backCardTexture = useMemo(() => createBackCardTexture(), [])
+  const visualCardAnchor = useMemo(() => new THREE.Vector3(), [])
+  const visualJ3 = useMemo(() => new THREE.Vector3(), [])
   const [curve] = useState(
     () =>
       new THREE.CatmullRomCurve3([
@@ -292,8 +297,18 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
         .copy(cardAnchorOffset.set(visualHookX, cardHookY, 0))
         .applyQuaternion(cardRotation.set(cardQuaternion.x, cardQuaternion.y, cardQuaternion.z, cardQuaternion.w))
         .add(cardTranslation)
-      curve.points[0].copy(cardAnchor)
-      curve.points[1].copy(j3.current.translation())
+      const j3Translation = j3.current.translation()
+      if (!bandVisualReady.current || dragged) {
+        visualCardAnchor.copy(cardAnchor)
+        visualJ3.copy(j3Translation)
+        bandVisualReady.current = true
+      } else {
+        const smoothing = Math.min(1, delta * 14)
+        visualCardAnchor.lerp(cardAnchor, smoothing)
+        visualJ3.lerp(j3Translation, smoothing)
+      }
+      curve.points[0].copy(visualCardAnchor)
+      curve.points[1].copy(visualJ3)
       curve.points[2].copy(j2.current.lerped)
       curve.points[3].copy(j1.current.lerped)
       curve.points[4].copy(fixed.current.translation())
@@ -301,22 +316,11 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
         point.z = -0.2
       })
       band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32))
-      decorationPoints.forEach((point, index) => {
-        const decoration = decorations.current[index]
-        if (decoration) {
-          if (!decoration.lerped) decoration.lerped = new THREE.Vector3().copy(curve.getPoint(point))
-          if (!decoration.target) decoration.target = new THREE.Vector3()
-          curve.getPoint(point, decoration.target)
-          decoration.target.z += 0.06
-          decoration.lerped.lerp(decoration.target, Math.min(1, delta * 18))
-          decoration.position.copy(decoration.lerped)
-        }
-      })
       ang.copy(card.current.angvel())
       rot.copy(card.current.rotation())
       card.current.setAngvel({
         x: ang.x,
-        y: ang.y - rot.y * 0.25,
+        y: ang.y - rot.y * 0.35,
         z: ang.z
       })
     }
@@ -326,7 +330,6 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   lanyardTexture.wrapS = lanyardTexture.wrapT = THREE.RepeatWrapping
   lanyardTexture.anisotropy = 16
   killuaTexture.colorSpace = THREE.SRGBColorSpace
-  killuaIconTexture.colorSpace = THREE.SRGBColorSpace
 
   useEffect(() => {
     return () => {
@@ -411,25 +414,6 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           </group>
         </RigidBody>
       </group>
-      {decorationPoints.map((_, index) => (
-        <sprite
-          key={index}
-          ref={(element) => {
-            decorations.current[index] = element
-          }}
-          scale={isMobile ? [0.28, 0.24, 1] : [0.34, 0.29, 1]}
-          renderOrder={20}
-        >
-          <spriteMaterial
-            map={killuaIconTexture}
-            transparent
-            alphaTest={0.04}
-            depthTest={false}
-            depthWrite={false}
-            toneMapped={false}
-          />
-        </sprite>
-      ))}
       <mesh ref={band} renderOrder={0}>
         <meshLineGeometry />
         <meshLineMaterial
@@ -450,6 +434,5 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
 }
 
 useGLTF.preload(cardGLB)
-useTexture.preload(killuaIcon)
 useTexture.preload(lanyardTextureSrc)
 useTexture.preload(killuaCard)
