@@ -155,10 +155,6 @@ const About = () => {
         </motion.div>
       </div>
 
-      <motion.div className="about-killua-sequence" variants={itemRight}>
-        <ScrollFrameScene />
-      </motion.div>
-
       <motion.div className="about-presence" variants={itemRight}>
         <LivePresence />
       </motion.div>
@@ -183,6 +179,10 @@ const About = () => {
             </div>
           ))}
         </div>
+      </motion.div>
+
+      <motion.div className="about-killua-sequence" variants={itemRight}>
+        <ScrollFrameScene />
       </motion.div>
     </motion.section>
   )

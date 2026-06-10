@@ -27,7 +27,7 @@
 
 .about-killua-sequence {
   width: 100vw;
-  margin: -0.25rem 0 0 calc(50% - 50vw);
+  margin: clamp(1rem, 2.8vw, 2.4rem) 0 0 calc(50% - 50vw);
   overflow: hidden;
   pointer-events: none;
 }
@@ -440,7 +440,7 @@ body.is-lanyard-dragging .about-lanyard-stage {
   }
 
   .about-killua-sequence {
-    margin-top: 0.25rem;
+    margin-top: 1rem;
   }
   
   .about-content {
@@ -527,7 +527,7 @@ body.is-lanyard-dragging .about-lanyard-stage {
   }
 
   .about-killua-sequence {
-    margin-top: 0;
+    margin-top: 0.8rem;
   }
   
   .about-content {
