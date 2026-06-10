@@ -1,6 +1,28 @@
 {
   "projects": [
     {
+      "id": "admin-project-1781094008492",
+      "title": "Taniin Play to Earn",
+      "tech": "WEB3 \\ GAME",
+      "desc": "A Web3 farming game prototype built with Flutter and Flame, featuring land ownership, crop economy, wallet sync, and Sepolia integration.",
+      "fullDesc": "Taniin is a landscape farming game prototype for Android and Web built with Flutter and Flame. Players can buy land, purchase seeds, plant crops, harvest, sell items, and keep their game progress locally.\n\nThe project includes Web3 integration on Sepolia with wallet sync, ERC-20 TANI balance reading, transaction history, backend signer actions, and Solidity contracts for land, items, and token rewards.",
+      "stack": [
+        "Flutter",
+        "Flame",
+        "Dart",
+        "Solidity",
+        "Hardhat",
+        "Sepolia"
+      ],
+      "mediaType": "image",
+      "mediaUrl": "/uploads/1781094007532-taniin-play-to-earn.png",
+      "image": "/uploads/1781094007532-taniin-play-to-earn.png",
+      "imageVariant": "desktop-shot",
+      "order": null,
+      "github": "https://github.com/rhmatzeka/TaniinPlaytoEarn",
+      "demo": "https://taniin.rahmateka.my.id"
+    },
+    {
       "id": "admin-project-1779241510878",
       "title": "App Absensi SDN 1 Bintaro",
       "tech": "WEB \\ ATTENDANCE",
