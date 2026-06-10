@@ -221,7 +221,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
     angularDamping: isMobile ? 4.8 : 4.2,
     linearDamping: isMobile ? 5.2 : 4.8
   }
-  const cardScale = isMobile ? 1.92 : 2.14
+  const cardScale = isMobile ? 2.06 : 2.14
   const colliderScale = cardScale / 1.05
   const anchorPosition = isMobile ? [0.02, 2.25, 0] : [0.02, 3.16, 0]
   const ropeSegmentLength = isMobile ? 0.48 : 0.68
@@ -471,7 +471,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           useMap
           map={lanyardTexture}
           repeat={[-4, 1]}
-          lineWidth={isMobile ? 1.65 : 2.05}
+          lineWidth={isMobile ? 1.78 : 2.05}
         />
       </mesh>
     </>
