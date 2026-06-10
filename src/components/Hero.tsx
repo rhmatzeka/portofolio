@@ -46,12 +46,21 @@ const Hero = memo(({ hasProjects = true }) => {
       <div className="hero-right">
         <motion.div variants={itemRight} className="hero-actions">
           {hasProjects && <a href="#projects" className="btn-ghost">View Projects</a>}
-          <a href="#contact" className="btn-glow">
-            Let's Talk
-            <span className="plus-circle">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
+          <a
+            href="https://cv.rahmateka.my.id"
+            className="btn-glow"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open Rahmat Eka Satria CV"
+          >
+            View CV
+            <span className="cv-circle" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path>
+                <path d="M14 3v5h5"></path>
+                <path d="M9 15h4"></path>
+                <path d="M9 11h2"></path>
+                <path d="M15 14.5 18 12l-3-2.5"></path>
               </svg>
             </span>
           </a>

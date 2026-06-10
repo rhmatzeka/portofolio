@@ -109,27 +109,34 @@
   display: inline-flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(0, 209, 255, 0.1);
+  min-width: 218px;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(0, 209, 255, 0.13), rgba(0, 69, 92, 0.18));
   border: 1px solid #00d1ff;
   color: white;
   padding: 0.5rem 0.5rem 0.5rem 1.8rem;
   border-radius: 50px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 20px rgba(0, 209, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 209, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   pointer-events: auto;
 }
 
 .btn-glow:hover {
-  background: rgba(0, 209, 255, 0.2);
+  background: linear-gradient(135deg, rgba(0, 209, 255, 0.22), rgba(0, 92, 122, 0.26));
   box-shadow: 0 0 30px rgba(0, 209, 255, 0.4);
   transform: translateY(-2px);
 }
 
-.plus-circle {
+.btn-glow:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.92);
+  outline-offset: 4px;
+}
+
+.cv-circle {
   width: 40px;
   height: 40px;
   background-color: #00d1ff;
@@ -137,11 +144,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 8px 18px rgba(0, 209, 255, 0.32);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
 }
 
-.btn-glow:hover .plus-circle {
-  transform: rotate(90deg) scale(1.1);
+.btn-glow:hover .cv-circle {
+  box-shadow: 0 10px 24px rgba(0, 209, 255, 0.48);
+  transform: translateX(2px) scale(1.08);
 }
 
 @media (max-width: 992px) {
@@ -203,7 +212,7 @@
     padding: 0.4rem 0.4rem 0.4rem 1.5rem;
   }
   
-  .plus-circle {
+  .cv-circle {
     width: 35px;
     height: 35px;
   }
@@ -249,7 +258,7 @@
     padding: 0.4rem 0.4rem 0.4rem 1.2rem;
   }
   
-  .plus-circle {
+  .cv-circle {
     width: 32px;
     height: 32px;
   }
