@@ -707,7 +707,7 @@ const AdminPage = () => {
                 </label>
                 <label>
                   Tech Stack
-                  <input name="stack" value={projectForm.stack} onChange={updateProjectField} placeholder="React, Tailwind, Supabase" />
+                  <input name="stack" value={projectForm.stack} onChange={updateProjectField} placeholder="Flutter, Flame, Dart, Solidity, Hardhat, Sepolia" />
                 </label>
               </div>
               {projectStackPreview.length > 0 && (
