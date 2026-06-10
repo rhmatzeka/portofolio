@@ -62,13 +62,6 @@ const SendIcon = () => (
   </svg>
 )
 
-const SparkIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z" fill="currentColor"/>
-    <path d="m18 15 .8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8L18 15Z" fill="currentColor" opacity="0.72"/>
-  </svg>
-)
-
 const ChatIcon = () => (
   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path d="M5.3 18.5 4 22l4.2-2.1c1.1.4 2.4.6 3.8.6 5 0 9-3.1 9-7s-4-7-9-7-9 3.1-9 7c0 1.9.9 3.6 2.3 4.9Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -712,11 +705,6 @@ const AiAssistant = () => {
         className={`ai-launcher-rig ${launcherPhase === 'walking' ? 'is-roaming' : ''}`}
         style={{ transform: `translate3d(${launcherOffset.x}px, ${launcherOffset.y}px, 0)` }}
       >
-        <button className="ai-speech-bubble" type="button" onClick={handleBubbleClick} aria-label="Open AI assistant chat">
-          <span className="ai-speech-icon"><SparkIcon /></span>
-          <span>Ask AI</span>
-        </button>
-
         <div className="ai-character-controls" aria-label="AI assistant controls">
           <button className="ai-character-action" type="button" onClick={handleBubbleClick} title="Chat" aria-label="Open chat">
             <ChatIcon />
