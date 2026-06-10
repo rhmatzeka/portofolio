@@ -3,6 +3,7 @@ import { Component, Suspense, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import Lanyard from './Lanyard'
 import LivePresence from './LivePresence'
+import ScrollFrameScene from './ScrollFrameScene'
 import './About.css'
 
 const containerVariants = {
@@ -153,6 +154,10 @@ const About = () => {
 
         </motion.div>
       </div>
+
+      <motion.div className="about-killua-sequence" variants={itemRight}>
+        <ScrollFrameScene />
+      </motion.div>
 
       <motion.div className="about-presence" variants={itemRight}>
         <LivePresence />

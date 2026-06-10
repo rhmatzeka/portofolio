@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { KILUA_FRAME_ASPECT_RATIO, ensureKiluaFramesPreloaded } from '../utils/kiluaFrames'
+import { KILUA_FRAME_ASPECT_RATIO, ensureKiluaFramesPreloaded, loadKiluaFrameSources } from '../utils/kiluaFrames'
 import './ScrollFrameScene.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -13,16 +13,19 @@ const ScrollFrameScene = () => {
   const lastFrameRef = useRef(-1)
   const [frames, setFrames] = useState([])
   const [frameIndex, setFrameIndex] = useState(0)
+  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
     let isCancelled = false
 
     const loadFrames = async () => {
-      const sources = await ensureKiluaFramesPreloaded()
+      const sources = await loadKiluaFrameSources()
       if (isCancelled) return
+
       lastFrameRef.current = -1
       setFrameIndex(0)
       setFrames(sources)
+      ensureKiluaFramesPreloaded().catch(() => undefined)
     }
 
     loadFrames()
@@ -78,7 +81,8 @@ const ScrollFrameScene = () => {
             ref={imageRef}
             src={frames[frameIndex]}
             alt=""
-            className="scroll-frame-image is-ready"
+            className={`scroll-frame-image ${isReady ? 'is-ready' : ''}`}
+            onLoad={() => setIsReady(true)}
             draggable="false"
           />
         )}

@@ -25,6 +25,13 @@
   pointer-events: auto;
 }
 
+.about-killua-sequence {
+  width: 100vw;
+  margin: -0.25rem 0 0 calc(50% - 50vw);
+  overflow: hidden;
+  pointer-events: none;
+}
+
 /* Left - Lanyard */
 .about-lanyard-stage {
   flex-shrink: 0;
@@ -431,6 +438,10 @@ body.is-lanyard-dragging .about-lanyard-stage {
   .about-presence {
     margin-top: 0;
   }
+
+  .about-killua-sequence {
+    margin-top: 0.25rem;
+  }
   
   .about-content {
     gap: 1.8rem;
@@ -512,6 +523,10 @@ body.is-lanyard-dragging .about-lanyard-stage {
   }
 
   .about-presence {
+    margin-top: 0;
+  }
+
+  .about-killua-sequence {
     margin-top: 0;
   }
   
