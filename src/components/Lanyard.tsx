@@ -202,10 +202,15 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const j3 = useRef()
   const card = useRef()
   const bandVisualReady = useRef(false)
+  const draggedRef = useRef(false)
+  const dragMotionRef = useRef({ lastX: null, lastY: null, velocityX: 0, velocityY: 0 })
+  const releaseSpinRef = useRef(null)
   const vec = new THREE.Vector3()
   const ang = new THREE.Vector3()
   const rot = new THREE.Vector3()
   const dir = new THREE.Vector3()
+  const dragEuler = new THREE.Euler()
+  const dragQuaternion = new THREE.Quaternion()
   const cardAnchor = new THREE.Vector3()
   const cardAnchorOffset = new THREE.Vector3()
   const cardRotation = new THREE.Quaternion()
@@ -213,8 +218,8 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
     type: 'dynamic',
     canSleep: true,
     colliders: false,
-    angularDamping: isMobile ? 7.5 : 8.5,
-    linearDamping: isMobile ? 6.5 : 7.5
+    angularDamping: isMobile ? 4.8 : 4.2,
+    linearDamping: isMobile ? 5.2 : 4.8
   }
   const cardScale = isMobile ? 1.92 : 2.14
   const colliderScale = cardScale / 1.05
@@ -244,6 +249,23 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   )
   const [dragged, drag] = useState(false)
   const [hovered, hover] = useState(false)
+
+  const endDrag = () => {
+    if (!draggedRef.current) return
+
+    draggedRef.current = false
+    const motion = dragMotionRef.current
+    releaseSpinRef.current = {
+      x: THREE.MathUtils.clamp(-motion.velocityY * 8, -5.5, 5.5),
+      y: THREE.MathUtils.clamp(motion.velocityX * 10, -6.5, 6.5),
+      z: THREE.MathUtils.clamp(-motion.velocityX * 6, -4.5, 4.5)
+    }
+    motion.lastX = null
+    motion.lastY = null
+    motion.velocityX = 0
+    motion.velocityY = 0
+    drag(false)
+  }
 
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], ropeSegmentLength])
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], ropeSegmentLength])
@@ -275,14 +297,36 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       dir.copy(vec).sub(state.camera.position).normalize()
       vec.add(dir.multiplyScalar(state.camera.position.length()))
       ;[card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp())
+      const motion = dragMotionRef.current
+      const pointerDeltaX = motion.lastX === null ? 0 : state.pointer.x - motion.lastX
+      const pointerDeltaY = motion.lastY === null ? 0 : state.pointer.y - motion.lastY
+      motion.lastX = state.pointer.x
+      motion.lastY = state.pointer.y
+      motion.velocityX = THREE.MathUtils.lerp(motion.velocityX, pointerDeltaX / Math.max(delta, 0.001), 0.22)
+      motion.velocityY = THREE.MathUtils.lerp(motion.velocityY, pointerDeltaY / Math.max(delta, 0.001), 0.22)
       card.current?.setNextKinematicTranslation({
         x: vec.x - dragged.x,
         y: vec.y - dragged.y,
         z: vec.z - dragged.z
       })
+      dragEuler.set(
+        THREE.MathUtils.clamp(-state.pointer.y * 0.24 - motion.velocityY * 0.035, -0.48, 0.48),
+        THREE.MathUtils.clamp(state.pointer.x * 0.34 + motion.velocityX * 0.045, -0.62, 0.62),
+        THREE.MathUtils.clamp(-state.pointer.x * 0.18 - motion.velocityX * 0.035, -0.42, 0.42)
+      )
+      card.current?.setNextKinematicRotation(dragQuaternion.setFromEuler(dragEuler))
+    } else {
+      dragMotionRef.current.lastX = null
+      dragMotionRef.current.lastY = null
     }
 
     if (fixed.current) {
+      if (releaseSpinRef.current && card.current) {
+        ;[card, j1, j2, j3].forEach((ref) => ref.current?.wakeUp())
+        card.current.setAngvel(releaseSpinRef.current)
+        releaseSpinRef.current = null
+      }
+
       ;[j1, j2].forEach((ref) => {
         if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation())
         const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())))
@@ -320,7 +364,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       rot.copy(card.current.rotation())
       card.current.setAngvel({
         x: ang.x,
-        y: ang.y - rot.y * 0.35,
+        y: ang.y - rot.y * 0.18,
         z: ang.z
       })
     }
@@ -360,17 +404,18 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
             onPointerOut={() => hover(false)}
             onPointerUp={(event) => {
               event.target.releasePointerCapture?.(event.pointerId)
-              drag(false)
+              endDrag()
             }}
             onPointerCancel={() => {
-              drag(false)
+              endDrag()
             }}
             onLostPointerCapture={() => {
-              drag(false)
+              endDrag()
             }}
             onPointerDown={(event) => {
               event.stopPropagation()
               event.target.setPointerCapture?.(event.pointerId)
+              draggedRef.current = true
               drag(new THREE.Vector3().copy(event.point).sub(vec.copy(card.current.translation())))
             }}
           >
