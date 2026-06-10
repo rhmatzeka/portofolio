@@ -29,6 +29,9 @@ const SHAKE_REQUIRED_SAMPLES = 6
 const DRAG_START_DISTANCE = 6
 const LAUNCHER_GRAVITY = 2200
 const LAUNCHER_WALK_SPEED = 45
+const LAUNCHER_WALK_EDGE_GAP = 14
+const LAUNCHER_ROAM_PAUSE_MS = 620
+const LAUNCHER_ROAM_MAX_DURATION = 42000
 
 const AssistantMark = ({ compact = false, isDizzy = false, isFloating = false, isWalking = false, walkDirection = 'right' }) => (
   <span
@@ -263,23 +266,30 @@ const AiAssistant = () => {
 
     const viewportWidth = window.innerWidth || 1024
     const maxLeft = Math.max(0, viewportWidth - 132)
-    const farLeft = -Math.min(maxLeft, Math.max(150, Math.min(360, viewportWidth * 0.34)))
-    const midLeft = -Math.min(maxLeft, Math.max(80, Math.min(180, viewportWidth * 0.16)))
+    const leftEdge = -Math.max(0, maxLeft - LAUNCHER_WALK_EDGE_GAP)
     const startX = launcherOffsetRef.current.x
-    const targets = Math.abs(startX) < 24 ? [farLeft, midLeft, 0] : [0, farLeft, 0]
+
+    if (Math.abs(leftEdge) < 1) {
+      setLauncherPhaseState('idle')
+      return
+    }
+
+    const isNearHome = Math.abs(startX) < 24
+    const isNearLeftEdge = Math.abs(startX - leftEdge) < 24
+    const targets = isNearHome || !isNearLeftEdge ? [leftEdge, 0] : [0]
 
     const walkTarget = (index) => {
       const targetX = targets[index]
       startWalkTo(targetX, {
         minDuration: 2400,
-        maxDuration: 8500,
+        maxDuration: LAUNCHER_ROAM_MAX_DURATION,
         onComplete: () => {
           if (index >= targets.length - 1) {
             setLauncherPhaseState('idle')
             return
           }
 
-          roamTimeoutRef.current = window.setTimeout(() => walkTarget(index + 1), 360)
+          roamTimeoutRef.current = window.setTimeout(() => walkTarget(index + 1), LAUNCHER_ROAM_PAUSE_MS)
         }
       })
     }
