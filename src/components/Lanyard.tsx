@@ -37,6 +37,26 @@ function drawRoundedRect(context, x, y, width, height, radius) {
   context.closePath()
 }
 
+function drawImageCover(context, image, x, y, width, height, focalX = 0.5, focalY = 0.5) {
+  const sourceWidth = image.naturalWidth || image.width
+  const sourceHeight = image.naturalHeight || image.height
+  const sourceAspect = sourceWidth / sourceHeight
+  const targetAspect = width / height
+  let cropWidth = sourceWidth
+  let cropHeight = sourceHeight
+
+  if (sourceAspect > targetAspect) {
+    cropWidth = sourceHeight * targetAspect
+  } else {
+    cropHeight = sourceWidth / targetAspect
+  }
+
+  const cropX = (sourceWidth - cropWidth) * focalX
+  const cropY = (sourceHeight - cropHeight) * focalY
+
+  context.drawImage(image, cropX, cropY, cropWidth, cropHeight, x, y, width, height)
+}
+
 function createFrontCardTexture(sourceTexture) {
   const canvas = document.createElement('canvas')
   canvas.width = 1024
@@ -48,14 +68,14 @@ function createFrontCardTexture(sourceTexture) {
   context.clearRect(0, 0, canvas.width, canvas.height)
   drawRoundedRect(context, 0, 0, canvas.width, canvas.height, radius)
   context.clip()
-  const sourceWidth = image.naturalWidth || image.width
-  const sourceHeight = image.naturalHeight || image.height
-  const cropX = sourceWidth * 0.08
-  const cropY = sourceHeight * 0.035
-  const cropWidth = sourceWidth * 0.84
-  const cropHeight = sourceHeight * 0.9
+  drawImageCover(context, image, 0, 0, canvas.width, canvas.height, 0.52, 0.48)
 
-  context.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, canvas.width, canvas.height)
+  const vignette = context.createRadialGradient(512, 560, 180, 512, 704, 840)
+  vignette.addColorStop(0, 'rgba(0, 0, 0, 0)')
+  vignette.addColorStop(0.72, 'rgba(0, 0, 0, 0.02)')
+  vignette.addColorStop(1, 'rgba(0, 0, 0, 0.26)')
+  context.fillStyle = vignette
+  context.fillRect(0, 0, canvas.width, canvas.height)
 
   const texture = new THREE.CanvasTexture(canvas)
   texture.colorSpace = THREE.SRGBColorSpace
@@ -69,57 +89,150 @@ function createBackCardTexture() {
   canvas.width = 1024
   canvas.height = 1408
   const context = canvas.getContext('2d')
-  const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height)
+  const width = canvas.width
+  const height = canvas.height
+  const gradient = context.createLinearGradient(0, 0, width, height)
 
-  gradient.addColorStop(0, '#071114')
-  gradient.addColorStop(0.48, '#0b1820')
-  gradient.addColorStop(1, '#020304')
+  gradient.addColorStop(0, '#071419')
+  gradient.addColorStop(0.36, '#091b22')
+  gradient.addColorStop(1, '#010304')
   drawRoundedRect(context, 0, 0, canvas.width, canvas.height, 58)
   context.clip()
   context.fillStyle = gradient
-  context.fillRect(0, 0, canvas.width, canvas.height)
+  context.fillRect(0, 0, width, height)
 
-  context.strokeStyle = 'rgba(0, 209, 255, 0.52)'
-  context.lineWidth = 22
-  drawRoundedRect(context, 42, 42, canvas.width - 84, canvas.height - 84, 46)
+  const topGlow = context.createRadialGradient(260, 120, 0, 260, 120, 520)
+  topGlow.addColorStop(0, 'rgba(0, 209, 255, 0.22)')
+  topGlow.addColorStop(1, 'rgba(0, 209, 255, 0)')
+  context.fillStyle = topGlow
+  context.fillRect(0, 0, width, height)
+
+  const lowerGlow = context.createRadialGradient(800, 1160, 0, 800, 1160, 520)
+  lowerGlow.addColorStop(0, 'rgba(51, 102, 255, 0.12)')
+  lowerGlow.addColorStop(1, 'rgba(51, 102, 255, 0)')
+  context.fillStyle = lowerGlow
+  context.fillRect(0, 0, width, height)
+
+  context.save()
+  context.globalAlpha = 0.42
+  context.strokeStyle = 'rgba(0, 209, 255, 0.12)'
+  context.lineWidth = 2
+  for (let x = -height; x < width + height; x += 58) {
+    context.beginPath()
+    context.moveTo(x, 0)
+    context.lineTo(x + height, height)
+    context.stroke()
+  }
+  context.restore()
+
+  context.save()
+  context.globalAlpha = 0.32
+  context.strokeStyle = 'rgba(255, 255, 255, 0.08)'
+  context.lineWidth = 2
+  for (let y = 136; y < height - 120; y += 82) {
+    context.beginPath()
+    context.moveTo(90, y)
+    context.lineTo(width - 90, y)
+    context.stroke()
+  }
+  context.restore()
+
+  context.strokeStyle = 'rgba(0, 209, 255, 0.72)'
+  context.lineWidth = 18
+  drawRoundedRect(context, 48, 48, width - 96, height - 96, 46)
+  context.stroke()
+  context.strokeStyle = 'rgba(255, 255, 255, 0.12)'
+  context.lineWidth = 4
+  drawRoundedRect(context, 78, 78, width - 156, height - 156, 34)
   context.stroke()
 
-  context.fillStyle = 'rgba(0, 209, 255, 0.12)'
-  context.beginPath()
-  context.arc(512, 365, 170, 0, Math.PI * 2)
+  context.fillStyle = 'rgba(0, 209, 255, 0.1)'
+  drawRoundedRect(context, 122, 126, width - 244, 86, 24)
   context.fill()
-  context.strokeStyle = 'rgba(255, 255, 255, 0.16)'
-  context.lineWidth = 8
+  context.strokeStyle = 'rgba(0, 209, 255, 0.28)'
+  context.lineWidth = 3
   context.stroke()
 
-  context.fillStyle = '#ffffff'
-  context.font = '700 132px Arial, sans-serif'
+  context.fillStyle = 'rgba(235, 251, 255, 0.72)'
+  context.font = '700 30px Arial, sans-serif'
   context.textAlign = 'center'
   context.textBaseline = 'middle'
-  context.fillText('R', 512, 365)
+  context.fillText('RAHMATDEV ACCESS CARD', width / 2, 169)
 
-  context.fillStyle = '#00d1ff'
-  context.font = '800 78px Arial, sans-serif'
-  context.fillText('RAHMAT', 512, 675)
+  context.fillStyle = 'rgba(0, 209, 255, 0.14)'
+  context.beginPath()
+  context.arc(width / 2, 396, 178, 0, Math.PI * 2)
+  context.fill()
+  context.strokeStyle = 'rgba(0, 209, 255, 0.34)'
+  context.lineWidth = 8
+  context.stroke()
+  context.fillStyle = 'rgba(255, 255, 255, 0.055)'
+  context.beginPath()
+  context.arc(width / 2, 396, 118, 0, Math.PI * 2)
+  context.fill()
 
   context.fillStyle = '#ffffff'
-  context.font = '700 58px Arial, sans-serif'
-  context.fillText('EKA SATRIA', 512, 755)
+  context.font = '800 132px Arial, sans-serif'
+  context.fillText('R', width / 2, 396)
 
-  context.fillStyle = 'rgba(255, 255, 255, 0.7)'
-  context.font = '600 38px Arial, sans-serif'
-  context.fillText('FULLSTACK DEVELOPER', 512, 875)
-  context.fillText('WEB3  /  UI  /  AI', 512, 940)
+  context.fillStyle = 'rgba(0, 209, 255, 0.24)'
+  context.fillRect(214, 610, width - 428, 4)
 
-  context.fillStyle = 'rgba(0, 209, 255, 0.18)'
-  context.fillRect(185, 1070, 654, 3)
+  context.fillStyle = '#00d1ff'
+  context.font = '800 66px Arial, sans-serif'
+  context.fillText('RAHMAT EKA', width / 2, 692)
 
-  context.fillStyle = 'rgba(255, 255, 255, 0.82)'
-  context.font = '700 34px Arial, sans-serif'
-  context.fillText('RAHMATDEV PORTFOLIO', 512, 1165)
-  context.fillStyle = 'rgba(255, 255, 255, 0.48)'
-  context.font = '600 28px Arial, sans-serif'
-  context.fillText('github.com/rhmatzeka', 512, 1228)
+  context.fillStyle = '#ffffff'
+  context.font = '800 54px Arial, sans-serif'
+  context.fillText('SATRIA', width / 2, 756)
+
+  context.fillStyle = 'rgba(255, 255, 255, 0.74)'
+  context.font = '700 32px Arial, sans-serif'
+  context.fillText('FULLSTACK  /  WEB3  /  UI', width / 2, 852)
+
+  const chipY = 936
+  const chips = ['PORTFOLIO', 'AI', 'BLOCKCHAIN']
+  const chipWidths = [176, 92, 184]
+  const chipStartX = width / 2 - (chipWidths.reduce((total, current) => total + current, 0) + 48) / 2
+  context.font = '800 24px Arial, sans-serif'
+  chips.forEach((chip, index) => {
+    const chipWidth = chipWidths[index]
+    const x = chipStartX + chipWidths.slice(0, index).reduce((total, current) => total + current, 0) + index * 24
+    drawRoundedRect(context, x, chipY, chipWidth, 54, 18)
+    context.fillStyle = 'rgba(0, 209, 255, 0.1)'
+    context.fill()
+    context.strokeStyle = 'rgba(0, 209, 255, 0.26)'
+    context.lineWidth = 2
+    context.stroke()
+    context.fillStyle = 'rgba(235, 251, 255, 0.82)'
+    context.fillText(chip, x + chipWidth / 2, chipY + 29)
+  })
+
+  context.fillStyle = 'rgba(0, 209, 255, 0.16)'
+  context.fillRect(182, 1086, width - 364, 3)
+
+  context.fillStyle = 'rgba(255, 255, 255, 0.86)'
+  context.font = '800 32px Arial, sans-serif'
+  context.fillText('RAHMATDEV PORTFOLIO', width / 2, 1164)
+  context.fillStyle = 'rgba(255, 255, 255, 0.52)'
+  context.font = '700 25px Arial, sans-serif'
+  context.fillText('cv.rahmateka.my.id', width / 2, 1222)
+
+  context.save()
+  context.globalAlpha = 0.5
+  context.fillStyle = 'rgba(0, 209, 255, 0.32)'
+  for (let row = 0; row < 5; row += 1) {
+    for (let col = 0; col < 12; col += 1) {
+      if ((row + col) % 3 !== 1) {
+        context.fillRect(194 + col * 18, 1282 + row * 15, 8, 4)
+      }
+    }
+  }
+  context.restore()
+
+  context.fillStyle = 'rgba(255, 255, 255, 0.32)'
+  context.font = '700 20px Arial, sans-serif'
+  context.fillText('ID  2026  /  RHMT-EKA', width / 2, 1322)
 
   const texture = new THREE.CanvasTexture(canvas)
   texture.colorSpace = THREE.SRGBColorSpace

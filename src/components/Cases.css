@@ -30,17 +30,17 @@
 
 .cases-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 420px));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 326px));
   justify-content: center;
-  gap: 1.2rem;
+  gap: 1rem;
   width: 100%;
-  max-width: 1320px;
+  max-width: 1352px;
   align-items: stretch;
 }
 
 .case-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 326px;
   background: rgba(20, 20, 20, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
@@ -79,7 +79,7 @@
 .case-image {
   position: relative;
   width: 100%;
-  height: 190px;
+  height: 156px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -208,8 +208,8 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
-  padding: 1.2rem;
-  gap: 0.8rem;
+  padding: 1rem;
+  gap: 0.72rem;
   flex: 1;
 }
 
@@ -221,7 +221,7 @@
 
 .case-card h3 {
   color: white;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
   margin: 0;
   line-height: 1.3;
@@ -229,15 +229,15 @@
 
 .case-tech {
   color: #00d1ff;
-  font-size: 0.7rem;
-  letter-spacing: 2px;
+  font-size: 0.66rem;
+  letter-spacing: 1.8px;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .case-card p {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   line-height: 1.4;
   margin: 0;
   flex-grow: 1;
@@ -251,28 +251,28 @@
 .case-stack {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.42rem;
 }
 
 .stack-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  min-height: 28px;
+  gap: 0.32rem;
+  min-height: 26px;
   background: rgba(0, 209, 255, 0.1);
   border: 1px solid rgba(0, 209, 255, 0.24);
   color: rgba(255, 255, 255, 0.8);
-  padding: 0.25rem 0.7rem 0.25rem 0.35rem;
+  padding: 0.22rem 0.58rem 0.22rem 0.3rem;
   border-radius: 50px;
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   font-weight: 600;
   line-height: 1;
 }
 
 .stack-badge-icon {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 20px;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -282,8 +282,8 @@
 }
 
 .stack-badge-icon img {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
   display: block;
   object-fit: contain;
 }
@@ -291,8 +291,8 @@
 /* Links */
 .case-links {
   display: flex;
-  gap: 0.8rem;
-  margin-top: 0.5rem;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
 }
 
 .case-link-btn {
@@ -300,9 +300,9 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.56rem 0.9rem;
   border-radius: 50px;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.3s ease;
