@@ -36,6 +36,8 @@ const LAUNCHER_ROAM_RESUME_PAUSE_MS = 700
 const LAUNCHER_ROAM_MIN_TRAVEL = 82
 const LAUNCHER_ROAM_MAX_DURATION = 42000
 const LAUNCHER_ROAM_TARGET_RATIOS = [0.86, 0.48, 0.72, 0.18, 0.94, 0.34, 0.58, 0.08]
+const DESKTOP_PANEL_WIDTH = 380
+const PANEL_VIEWPORT_GUTTER = 16
 
 const AssistantMark = ({ compact = false, isDizzy = false, isFloating = false, isWalking = false, walkDirection = 'right' }) => (
   <span
@@ -111,6 +113,7 @@ const AiAssistant = () => {
   const [launcherOffset, setLauncherOffsetState] = useState({ x: 0, y: 0 })
   const [launcherPhase, setLauncherPhase] = useState('idle')
   const [walkDirection, setWalkDirection] = useState('right')
+  const [viewportWidth, setViewportWidth] = useState(() => (typeof window === 'undefined' ? 1024 : window.innerWidth))
   const inputRef = useRef(null)
   const isDizzyRef = useRef(false)
   const launcherPhaseRef = useRef('idle')
@@ -655,6 +658,19 @@ const AiAssistant = () => {
   }, [])
 
   useEffect(() => {
+    const syncViewportWidth = () => setViewportWidth(window.innerWidth || 1024)
+
+    syncViewportWidth()
+    window.addEventListener('resize', syncViewportWidth)
+    window.visualViewport?.addEventListener('resize', syncViewportWidth)
+
+    return () => {
+      window.removeEventListener('resize', syncViewportWidth)
+      window.visualViewport?.removeEventListener('resize', syncViewportWidth)
+    }
+  }, [])
+
+  useEffect(() => {
     if (!isOpen) return undefined
 
     const viewport = window.visualViewport
@@ -679,6 +695,26 @@ const AiAssistant = () => {
   const visibleMessages = useMemo(() => (
     messages.filter((message) => message.role === 'user' || message.role === 'assistant')
   ), [messages])
+
+  const panelShiftX = useMemo(() => {
+    if (!isOpen || viewportWidth <= 520) return 0
+
+    const panelWidth = Math.min(DESKTOP_PANEL_WIDTH, viewportWidth - PANEL_VIEWPORT_GUTTER * 2)
+    const launcherRightGap = Math.min(Math.max(16, viewportWidth * 0.03), 27.2)
+    const panelRight = viewportWidth - launcherRightGap + launcherOffset.x
+    const panelLeft = panelRight - panelWidth
+    let shiftX = 0
+
+    if (panelLeft < PANEL_VIEWPORT_GUTTER) {
+      shiftX = PANEL_VIEWPORT_GUTTER - panelLeft
+    }
+
+    if (panelRight + shiftX > viewportWidth - PANEL_VIEWPORT_GUTTER) {
+      shiftX -= panelRight + shiftX - (viewportWidth - PANEL_VIEWPORT_GUTTER)
+    }
+
+    return Math.round(shiftX)
+  }, [isOpen, launcherOffset.x, viewportWidth])
 
   const openAssistant = () => {
     setIsOpen(true)
@@ -740,72 +776,77 @@ const AiAssistant = () => {
 
   return (
     <div className={`ai-assistant ${isOpen ? 'is-open' : ''}`}>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className="ai-panel"
-            initial={{ opacity: 0, y: 18, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 18, scale: 0.96 }}
-            transition={{ duration: 0.22, ease: 'easeOut' }}
-          >
-            <div className="ai-panel-header">
-              <AssistantMark compact isDizzy={isDizzy} />
-              <div>
-                <h2>RahmatDev Assistant</h2>
-              </div>
-              <button className="ai-icon-btn" type="button" onClick={closeAssistant} aria-label="Close assistant">
-                <CloseIcon />
-              </button>
-            </div>
-
-            <div className="ai-messages" aria-live="polite">
-              {visibleMessages.map((message, index) => (
-                <div key={`${message.role}-${index}`} className={`ai-message ${message.role}`}>
-                  {message.role === 'assistant' ? cleanAssistantText(message.content) : message.content}
-                </div>
-              ))}
-
-              {isLoading && (
-                <div className="ai-message assistant loading">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-              )}
-            </div>
-
-            {messages.length === 1 && (
-              <div className="ai-suggestions">
-                {suggestions.map((suggestion) => (
-                  <button key={suggestion} type="button" onClick={() => sendMessage(suggestion)}>
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <form className="ai-input-row" onSubmit={handleSubmit}>
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                placeholder="Ask about Rahmat..."
-                maxLength={900}
-                disabled={isLoading}
-              />
-              <button type="submit" disabled={!input.trim() || isLoading} aria-label="Send message">
-                <SendIcon />
-              </button>
-            </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div
         className={`ai-launcher-rig ${isRoaming ? 'is-roaming' : ''}`}
-        style={{ transform: `translate3d(${launcherOffset.x}px, ${launcherOffset.y}px, 0)` }}
+        style={{
+          '--ai-panel-shift-x': `${panelShiftX}px`,
+          transform: `translate3d(${launcherOffset.x}px, ${launcherOffset.y}px, 0)`
+        }}
       >
+        <AnimatePresence>
+          {isOpen && (
+            <div className="ai-panel-anchor">
+              <motion.div
+                className="ai-panel"
+                initial={{ opacity: 0, y: 18, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 18, scale: 0.96 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+              >
+                <div className="ai-panel-header">
+                  <AssistantMark compact isDizzy={isDizzy} />
+                  <div>
+                    <h2>RahmatDev Assistant</h2>
+                  </div>
+                  <button className="ai-icon-btn" type="button" onClick={closeAssistant} aria-label="Close assistant">
+                    <CloseIcon />
+                  </button>
+                </div>
+
+                <div className="ai-messages" aria-live="polite">
+                  {visibleMessages.map((message, index) => (
+                    <div key={`${message.role}-${index}`} className={`ai-message ${message.role}`}>
+                      {message.role === 'assistant' ? cleanAssistantText(message.content) : message.content}
+                    </div>
+                  ))}
+
+                  {isLoading && (
+                    <div className="ai-message assistant loading">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  )}
+                </div>
+
+                {messages.length === 1 && (
+                  <div className="ai-suggestions">
+                    {suggestions.map((suggestion) => (
+                      <button key={suggestion} type="button" onClick={() => sendMessage(suggestion)}>
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <form className="ai-input-row" onSubmit={handleSubmit}>
+                  <input
+                    ref={inputRef}
+                    value={input}
+                    onChange={(event) => setInput(event.target.value)}
+                    placeholder="Ask about Rahmat..."
+                    maxLength={900}
+                    disabled={isLoading}
+                  />
+                  <button type="submit" disabled={!input.trim() || isLoading} aria-label="Send message">
+                    <SendIcon />
+                  </button>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
         <div className="ai-character-controls" aria-label="AI assistant controls">
           <button className="ai-character-action" type="button" onClick={handleBubbleClick} title="Chat" aria-label="Open chat">
             <ChatIcon />

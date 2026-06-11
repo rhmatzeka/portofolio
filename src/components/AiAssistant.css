@@ -9,6 +9,7 @@
 .ai-toggle,
 .ai-launcher-rig,
 .ai-character-action,
+.ai-panel-anchor,
 .ai-panel,
 .ai-panel button,
 .ai-panel input {
@@ -308,10 +309,18 @@
   75%, 100% { background-position: 100% 0%; }
 }
 
-.ai-panel {
+.ai-panel-anchor {
   position: absolute;
   right: 0;
   bottom: 154px;
+  z-index: 8;
+  transform: translate3d(var(--ai-panel-shift-x, 0px), 0, 0);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.ai-panel {
+  position: relative;
   width: min(380px, calc(100vw - 2rem));
   max-height: min(620px, calc(100dvh - 12.25rem));
   display: flex;
@@ -326,6 +335,7 @@
   box-shadow: 0 30px 72px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(20px);
   box-sizing: border-box;
+  pointer-events: auto;
 }
 
 .ai-panel *,
@@ -559,6 +569,17 @@
   }
 
   .ai-assistant.is-open .ai-launcher-rig {
+    position: static;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transform: none !important;
+  }
+
+  .ai-assistant.is-open .ai-character-controls,
+  .ai-assistant.is-open .ai-toggle {
     display: none;
   }
 
@@ -606,10 +627,17 @@
     height: 114px;
   }
 
+  .ai-panel-anchor {
+    position: static;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transform: none;
+  }
+
   .ai-panel {
-    position: absolute;
-    right: -0.15rem;
-    bottom: 132px;
     width: calc(100vw - 1.3rem);
     max-height: calc(var(--ai-viewport-height, 100dvh) - 9.8rem);
     border-radius: 16px;
@@ -617,8 +645,6 @@
 
   .ai-assistant.is-open .ai-panel {
     position: relative;
-    right: auto;
-    bottom: auto;
     width: min(100%, 420px);
     height: calc(var(--ai-viewport-height, 100dvh) - 1.4rem);
     max-height: calc(var(--ai-viewport-height, 100dvh) - 1.4rem);

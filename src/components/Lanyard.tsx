@@ -241,6 +241,81 @@ function createBackCardTexture() {
   return texture
 }
 
+function createReadableLanyardTexture(sourceTexture) {
+  const canvas = document.createElement('canvas')
+  canvas.width = 1024
+  canvas.height = 256
+  const context = canvas.getContext('2d')
+  const width = canvas.width
+  const height = canvas.height
+  const sourceImage = sourceTexture.image
+  const baseGradient = context.createLinearGradient(0, 0, 0, height)
+
+  baseGradient.addColorStop(0, '#1a5960')
+  baseGradient.addColorStop(0.2, '#0f3338')
+  baseGradient.addColorStop(0.5, '#102a2f')
+  baseGradient.addColorStop(0.8, '#0b272d')
+  baseGradient.addColorStop(1, '#154e56')
+  context.fillStyle = baseGradient
+  context.fillRect(0, 0, width, height)
+
+  if (sourceImage) {
+    context.save()
+    context.globalAlpha = 0.5
+    context.globalCompositeOperation = 'screen'
+    context.drawImage(sourceImage, 0, 0, width, height)
+    context.restore()
+  }
+
+  context.save()
+  context.lineWidth = 4
+  for (let x = -height; x < width + height; x += 42) {
+    context.strokeStyle = 'rgba(170, 245, 255, 0.22)'
+    context.beginPath()
+    context.moveTo(x, 0)
+    context.lineTo(x + height, height)
+    context.stroke()
+
+    context.strokeStyle = 'rgba(0, 0, 0, 0.28)'
+    context.beginPath()
+    context.moveTo(x + 17, 0)
+    context.lineTo(x + height + 17, height)
+    context.stroke()
+  }
+
+  for (let x = 0; x < width + height; x += 42) {
+    context.strokeStyle = 'rgba(150, 238, 255, 0.18)'
+    context.beginPath()
+    context.moveTo(x, height)
+    context.lineTo(x - height, 0)
+    context.stroke()
+  }
+  context.restore()
+
+  const centerGlow = context.createLinearGradient(0, 0, 0, height)
+  centerGlow.addColorStop(0, 'rgba(215, 255, 255, 0.26)')
+  centerGlow.addColorStop(0.12, 'rgba(55, 188, 205, 0.34)')
+  centerGlow.addColorStop(0.5, 'rgba(0, 0, 0, 0.16)')
+  centerGlow.addColorStop(0.88, 'rgba(55, 188, 205, 0.34)')
+  centerGlow.addColorStop(1, 'rgba(215, 255, 255, 0.28)')
+  context.fillStyle = centerGlow
+  context.fillRect(0, 0, width, height)
+
+  context.fillStyle = 'rgba(198, 250, 255, 0.7)'
+  context.fillRect(0, 11, width, 5)
+  context.fillRect(0, height - 16, width, 5)
+  context.fillStyle = 'rgba(0, 0, 0, 0.38)'
+  context.fillRect(0, 27, width, 4)
+  context.fillRect(0, height - 31, width, 4)
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+  texture.anisotropy = 16
+  texture.needsUpdate = true
+  return texture
+}
+
 export default function Lanyard({
   position = [0, 0, 42],
   gravity = [0, -40, 0],
@@ -348,6 +423,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const killuaTexture = useTexture(killuaCard)
   const frontCardTexture = useMemo(() => createFrontCardTexture(killuaTexture), [killuaTexture])
   const backCardTexture = useMemo(() => createBackCardTexture(), [])
+  const readableLanyardTexture = useMemo(() => createReadableLanyardTexture(lanyardTexture), [lanyardTexture])
   const visualCardAnchor = useMemo(() => new THREE.Vector3(), [])
   const visualJ3 = useMemo(() => new THREE.Vector3(), [])
   const [curve] = useState(
@@ -492,8 +568,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
     return () => {
       frontCardTexture.dispose()
       backCardTexture.dispose()
+      readableLanyardTexture.dispose()
     }
-  }, [frontCardTexture, backCardTexture])
+  }, [frontCardTexture, backCardTexture, readableLanyardTexture])
 
   return (
     <>
@@ -582,9 +659,10 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
           transparent
           opacity={1}
           useMap
-          map={lanyardTexture}
-          repeat={[-4, 1]}
-          lineWidth={isMobile ? 1.78 : 2.05}
+          map={readableLanyardTexture}
+          repeat={[-3.35, 1]}
+          lineWidth={isMobile ? 2.18 : 2.42}
+          toneMapped={false}
         />
       </mesh>
     </>
