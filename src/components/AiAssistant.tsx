@@ -32,6 +32,7 @@ const LAUNCHER_WALK_SPEED = 45
 const LAUNCHER_WALK_EDGE_GAP = 14
 const LAUNCHER_ROAM_PAUSE_MIN_MS = 1150
 const LAUNCHER_ROAM_PAUSE_MAX_MS = 2200
+const LAUNCHER_ROAM_RESUME_PAUSE_MS = 700
 const LAUNCHER_ROAM_MIN_TRAVEL = 82
 const LAUNCHER_ROAM_MAX_DURATION = 42000
 const LAUNCHER_ROAM_TARGET_RATIOS = [0.86, 0.48, 0.72, 0.18, 0.94, 0.34, 0.58, 0.08]
@@ -119,6 +120,7 @@ const AiAssistant = () => {
   const roamTimeoutRef = useRef(null)
   const roamTargetIndexRef = useRef(0)
   const pendingWalkHomeRef = useRef(false)
+  const pendingResumeRoamingRef = useRef(false)
   const dragRef = useRef({
     pointerId: null,
     startX: 0,
@@ -130,7 +132,8 @@ const AiAssistant = () => {
     lastTime: 0,
     vx: 0,
     vy: 0,
-    hasDragged: false
+    hasDragged: false,
+    resumeRoamingAfterDrop: false
   })
   const shakeRef = useRef({
     lastX: null,
@@ -286,6 +289,7 @@ const AiAssistant = () => {
 
   const startWalkHome = () => {
     stopRoaming()
+    pendingResumeRoamingRef.current = false
 
     const startX = launcherOffsetRef.current.x
 
@@ -316,6 +320,7 @@ const AiAssistant = () => {
     if (isRoamingRef.current) return
 
     pendingWalkHomeRef.current = false
+    pendingResumeRoamingRef.current = false
     resetShakeTracker()
     cancelLauncherAnimation()
     setLauncherOffset({ x: launcherOffsetRef.current.x, y: 0 })
@@ -352,23 +357,38 @@ const AiAssistant = () => {
     startNextRoamLeg()
   }
 
-  const finishLauncherLanding = (landingX) => {
+  const resumeRoamingFromLanding = () => {
+    if (roamTimeoutRef.current) window.clearTimeout(roamTimeoutRef.current)
+
+    roamTimeoutRef.current = window.setTimeout(() => {
+      roamTimeoutRef.current = null
+
+      if (isDizzyRef.current || dragRef.current.pointerId !== null) return
+      startRoamWalk()
+    }, LAUNCHER_ROAM_RESUME_PAUSE_MS)
+  }
+
+  const finishLauncherLanding = (landingX, { resumeRoaming = false } = {}) => {
     const x = clampLauncherOffset(landingX, 0).x
 
     setLauncherOffset({ x, y: 0 })
     dropAnimationRef.current = null
 
     if (isDizzyRef.current) {
-      pendingWalkHomeRef.current = Math.abs(x) >= 1
+      pendingResumeRoamingRef.current = resumeRoaming
+      pendingWalkHomeRef.current = !resumeRoaming && Math.abs(x) >= 1
       setLauncherPhaseState('dizzy')
       return
     }
 
     pendingWalkHomeRef.current = false
+    pendingResumeRoamingRef.current = false
     setLauncherPhaseState('idle')
+
+    if (resumeRoaming) resumeRoamingFromLanding()
   }
 
-  const startDropAnimation = ({ vy = 0 } = {}) => {
+  const startDropAnimation = ({ vy = 0, resumeRoaming = false } = {}) => {
     cancelLauncherAnimation()
 
     let x = launcherOffsetRef.current.x
@@ -379,7 +399,7 @@ const AiAssistant = () => {
     setLauncherPhaseState('falling')
 
     if (y >= 0) {
-      finishLauncherLanding(x)
+      finishLauncherLanding(x, { resumeRoaming })
       return
     }
 
@@ -392,7 +412,7 @@ const AiAssistant = () => {
 
       if (y >= 0) {
         y = 0
-        finishLauncherLanding(x)
+        finishLauncherLanding(x, { resumeRoaming })
         return
       }
 
@@ -439,7 +459,15 @@ const AiAssistant = () => {
       tracker.dizzyTimeout = null
 
       const shouldWalkHome = pendingWalkHomeRef.current
+      const shouldResumeRoaming = pendingResumeRoamingRef.current
       pendingWalkHomeRef.current = false
+      pendingResumeRoamingRef.current = false
+
+      if (shouldResumeRoaming && dragRef.current.pointerId === null) {
+        setLauncherPhaseState('idle')
+        resumeRoamingFromLanding()
+        return
+      }
 
       if (shouldWalkHome && dragRef.current.pointerId === null) {
         startWalkHome()
@@ -500,6 +528,8 @@ const AiAssistant = () => {
   }
 
   const handleLauncherPointerDown = (event) => {
+    const shouldResumeRoamingAfterDrop = isRoamingRef.current
+
     stopRoaming()
     cancelLauncherAnimation()
     pendingWalkHomeRef.current = false
@@ -519,6 +549,7 @@ const AiAssistant = () => {
     drag.vx = 0
     drag.vy = 0
     drag.hasDragged = false
+    drag.resumeRoamingAfterDrop = shouldResumeRoamingAfterDrop
 
     event.currentTarget.setPointerCapture?.(event.pointerId)
   }
@@ -559,6 +590,7 @@ const AiAssistant = () => {
   const handleLauncherPointerEnd = (event) => {
     const drag = dragRef.current
     const wasDragged = drag.pointerId === event.pointerId && drag.hasDragged
+    const shouldResumeRoaming = wasDragged && drag.resumeRoamingAfterDrop
 
     if (drag.pointerId === event.pointerId) {
       if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
@@ -571,12 +603,13 @@ const AiAssistant = () => {
 
     if (wasDragged) {
       blockNextClick(520)
-      startDropAnimation({ vy: drag.vy })
+      startDropAnimation({ vy: drag.vy, resumeRoaming: shouldResumeRoaming })
     } else {
       setLauncherPhaseState(isDizzyRef.current ? 'dizzy' : 'idle')
     }
 
     drag.hasDragged = false
+    drag.resumeRoamingAfterDrop = false
   }
 
   const handleLauncherPointerLeave = () => {
