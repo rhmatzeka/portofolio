@@ -21,7 +21,7 @@ const suggestions = [
   'How can I contact Rahmat?'
 ]
 
-const DIZZY_DURATION_MS = 2300
+const DIZZY_DURATION_MS = 3600
 const SHAKE_RESET_MS = 700
 const SHAKE_REQUIRED_TURNS = 5
 const SHAKE_REQUIRED_TRAVEL = 170
@@ -30,8 +30,11 @@ const DRAG_START_DISTANCE = 6
 const LAUNCHER_GRAVITY = 2200
 const LAUNCHER_WALK_SPEED = 45
 const LAUNCHER_WALK_EDGE_GAP = 14
-const LAUNCHER_ROAM_PAUSE_MS = 620
+const LAUNCHER_ROAM_PAUSE_MIN_MS = 720
+const LAUNCHER_ROAM_PAUSE_MAX_MS = 1480
+const LAUNCHER_ROAM_MIN_TRAVEL = 82
 const LAUNCHER_ROAM_MAX_DURATION = 42000
+const LAUNCHER_ROAM_TARGET_RATIOS = [0.86, 0.48, 0.72, 0.18, 0.94, 0.34, 0.58, 0.08]
 
 const AssistantMark = ({ compact = false, isDizzy = false, isFloating = false, isWalking = false, walkDirection = 'right' }) => (
   <span
@@ -103,6 +106,7 @@ const AiAssistant = () => {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isDizzy, setIsDizzy] = useState(false)
+  const [isRoaming, setIsRoaming] = useState(false)
   const [launcherOffset, setLauncherOffsetState] = useState({ x: 0, y: 0 })
   const [launcherPhase, setLauncherPhase] = useState('idle')
   const [walkDirection, setWalkDirection] = useState('right')
@@ -110,8 +114,10 @@ const AiAssistant = () => {
   const isDizzyRef = useRef(false)
   const launcherPhaseRef = useRef('idle')
   const launcherOffsetRef = useRef({ x: 0, y: 0 })
+  const isRoamingRef = useRef(false)
   const dropAnimationRef = useRef(null)
   const roamTimeoutRef = useRef(null)
+  const roamTargetIndexRef = useRef(0)
   const pendingWalkHomeRef = useRef(false)
   const dragRef = useRef({
     pointerId: null,
@@ -147,6 +153,20 @@ const AiAssistant = () => {
   const setLauncherPhaseState = (nextPhase) => {
     launcherPhaseRef.current = nextPhase
     setLauncherPhase(nextPhase)
+  }
+
+  const setRoamingState = (nextIsRoaming) => {
+    isRoamingRef.current = nextIsRoaming
+    setIsRoaming(nextIsRoaming)
+  }
+
+  const stopRoaming = () => {
+    setRoamingState(false)
+
+    if (roamTimeoutRef.current) {
+      window.clearTimeout(roamTimeoutRef.current)
+      roamTimeoutRef.current = null
+    }
   }
 
   const clampLauncherOffset = (x, y) => {
@@ -193,6 +213,37 @@ const AiAssistant = () => {
     }, duration)
   }
 
+  const getRoamLeftEdge = () => {
+    const viewportWidth = window.innerWidth || 1024
+    const maxLeft = Math.max(0, viewportWidth - 132)
+    return -Math.max(0, maxLeft - LAUNCHER_WALK_EDGE_GAP)
+  }
+
+  const getRoamPauseDuration = () => (
+    Math.round(
+      LAUNCHER_ROAM_PAUSE_MIN_MS +
+        Math.random() * (LAUNCHER_ROAM_PAUSE_MAX_MS - LAUNCHER_ROAM_PAUSE_MIN_MS)
+    )
+  )
+
+  const getNextRoamTargetX = () => {
+    const leftEdge = getRoamLeftEdge()
+    const currentX = launcherOffsetRef.current.x
+    const minimumTravel = Math.min(LAUNCHER_ROAM_MIN_TRAVEL, Math.abs(leftEdge) * 0.32)
+
+    if (Math.abs(leftEdge) < LAUNCHER_ROAM_MIN_TRAVEL) return 0
+
+    for (let attempt = 0; attempt < LAUNCHER_ROAM_TARGET_RATIOS.length; attempt += 1) {
+      const ratio = LAUNCHER_ROAM_TARGET_RATIOS[roamTargetIndexRef.current % LAUNCHER_ROAM_TARGET_RATIOS.length]
+      roamTargetIndexRef.current += 1
+
+      const targetX = Math.round(leftEdge * ratio)
+      if (Math.abs(targetX - currentX) >= minimumTravel) return targetX
+    }
+
+    return currentX < leftEdge * 0.5 ? Math.round(leftEdge * 0.12) : Math.round(leftEdge * 0.88)
+  }
+
   const startWalkTo = (targetX, { minDuration = 2200, maxDuration = 9000, onComplete } = {}) => {
     cancelLauncherAnimation()
 
@@ -234,6 +285,8 @@ const AiAssistant = () => {
   }
 
   const startWalkHome = () => {
+    stopRoaming()
+
     const startX = launcherOffsetRef.current.x
 
     if (isDizzyRef.current) {
@@ -260,43 +313,43 @@ const AiAssistant = () => {
 
   const startRoamWalk = () => {
     if (isDizzyRef.current || dragRef.current.pointerId !== null) return
+    if (isRoamingRef.current) return
 
     pendingWalkHomeRef.current = false
     resetShakeTracker()
     cancelLauncherAnimation()
     setLauncherOffset({ x: launcherOffsetRef.current.x, y: 0 })
+    setRoamingState(true)
 
-    const viewportWidth = window.innerWidth || 1024
-    const maxLeft = Math.max(0, viewportWidth - 132)
-    const leftEdge = -Math.max(0, maxLeft - LAUNCHER_WALK_EDGE_GAP)
-    const startX = launcherOffsetRef.current.x
+    const startNextRoamLeg = () => {
+      if (!isRoamingRef.current || isDizzyRef.current || dragRef.current.pointerId !== null) return
 
-    if (Math.abs(leftEdge) < 1) {
-      setLauncherPhaseState('idle')
-      return
-    }
+      const targetX = getNextRoamTargetX()
+      if (Math.abs(targetX - launcherOffsetRef.current.x) < 1) {
+        stopRoaming()
+        setLauncherPhaseState('idle')
+        return
+      }
 
-    const isNearHome = Math.abs(startX) < 24
-    const isNearLeftEdge = Math.abs(startX - leftEdge) < 24
-    const targets = isNearHome || !isNearLeftEdge ? [leftEdge, 0] : [0]
-
-    const walkTarget = (index) => {
-      const targetX = targets[index]
       startWalkTo(targetX, {
         minDuration: 2400,
         maxDuration: LAUNCHER_ROAM_MAX_DURATION,
         onComplete: () => {
-          if (index >= targets.length - 1) {
-            setLauncherPhaseState('idle')
-            return
-          }
+          if (!isRoamingRef.current) return
 
-          roamTimeoutRef.current = window.setTimeout(() => walkTarget(index + 1), LAUNCHER_ROAM_PAUSE_MS)
+          setLauncherPhaseState('idle')
+          roamTimeoutRef.current = window.setTimeout(startNextRoamLeg, getRoamPauseDuration())
         }
       })
     }
 
-    walkTarget(0)
+    if (Math.abs(getRoamLeftEdge()) < 1) {
+      stopRoaming()
+      setLauncherPhaseState('idle')
+      return
+    }
+
+    startNextRoamLeg()
   }
 
   const finishLauncherLanding = (landingX) => {
@@ -374,6 +427,7 @@ const AiAssistant = () => {
     resetShakeTracker()
     if (isDizzyRef.current) return
 
+    stopRoaming()
     blockNextClick()
 
     setDizzyState(true)
@@ -445,6 +499,7 @@ const AiAssistant = () => {
   }
 
   const handleLauncherPointerDown = (event) => {
+    stopRoaming()
     cancelLauncherAnimation()
     pendingWalkHomeRef.current = false
     resetShakeTracker()
@@ -714,7 +769,7 @@ const AiAssistant = () => {
       </AnimatePresence>
 
       <div
-        className={`ai-launcher-rig ${launcherPhase === 'walking' ? 'is-roaming' : ''}`}
+        className={`ai-launcher-rig ${isRoaming ? 'is-roaming' : ''}`}
         style={{ transform: `translate3d(${launcherOffset.x}px, ${launcherOffset.y}px, 0)` }}
       >
         <div className="ai-character-controls" aria-label="AI assistant controls">
@@ -722,11 +777,11 @@ const AiAssistant = () => {
             <ChatIcon />
           </button>
           <button
-            className={`ai-character-action ai-walk-action ${launcherPhase === 'walking' ? 'is-active' : ''}`}
+            className={`ai-character-action ai-walk-action ${isRoaming || launcherPhase === 'walking' ? 'is-active' : ''}`}
             type="button"
             onClick={handleRoamClick}
-            title="Walk"
-            aria-label="Make character walk around"
+            title={isRoaming ? 'Roaming' : 'Walk'}
+            aria-label={isRoaming ? 'Character is walking around' : 'Make character walk around'}
             disabled={isDizzy || launcherPhase === 'grabbed' || launcherPhase === 'falling'}
           >
             <WalkIcon />
