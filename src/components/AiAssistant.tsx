@@ -364,7 +364,8 @@ const AiAssistant = () => {
       return
     }
 
-    startWalkHome()
+    pendingWalkHomeRef.current = false
+    setLauncherPhaseState('idle')
   }
 
   const startDropAnimation = ({ vy = 0 } = {}) => {
