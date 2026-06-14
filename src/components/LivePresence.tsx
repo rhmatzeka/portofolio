@@ -239,12 +239,18 @@ const buildStatusCards = (data, now) => {
   }
 
   if (data?.wakatime) {
+    const editorNames = (data.wakatime.editors || []).map(e => e.name).join(', ')
+    const langNames = (data.wakatime.languages || []).map(l => l.name).join(', ')
+    const detailParts = []
+    if (editorNames) detailParts.push(`Editor: ${editorNames}`)
+    if (langNames) detailParts.push(`Languages: ${langNames}`)
+    
     cards.push({
       key: 'wakatime',
       theme: 'wakatime',
       eyebrow: 'WakaTime',
-      label: 'All-time code statistics',
-      meta: `Total time coded: ${data.wakatime.text}`,
+      label: `Total time coded: ${data.wakatime.text}`,
+      meta: detailParts.join(' | ') || 'No active file tracking today',
       footerParts: ['Metrics logged since track start'],
       badge: 'wakatime',
       artwork: '',
