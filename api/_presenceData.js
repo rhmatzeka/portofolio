@@ -160,7 +160,7 @@ const fetchPresencePayload = async () => {
   const discordUserId = process.env.DISCORD_USER_ID
   const wakatimeApiKey = process.env.WAKATIME_API_KEY
 
-  const [githubEvents, lanyardPayload, wakatimeStats, wakatimeSummaries] = await Promise.all([
+  const [githubEvents, lanyardPayload, wakatimeStats] = await Promise.all([
     fetchJson(GITHUB_EVENTS_ENDPOINT, {
       headers: {
         Accept: 'application/vnd.github+json',
@@ -172,24 +172,10 @@ const fetchPresencePayload = async () => {
       headers: {
         Authorization: `Basic ${Buffer.from(wakatimeApiKey).toString('base64')}`
       }
-    }).catch(() => null) : Promise.resolve(null),
-    wakatimeApiKey ? fetchJson('https://wakatime.com/api/v1/users/current/summaries?range=Today', {
-      headers: {
-        Authorization: `Basic ${Buffer.from(wakatimeApiKey).toString('base64')}`
-      }
     }).catch(() => null) : Promise.resolve(null)
   ])
 
   const presence = lanyardPayload?.success ? lanyardPayload.data : null
-
-  // Process summaries languages and editors
-  let languages = []
-  let editors = []
-  if (wakatimeSummaries?.data && wakatimeSummaries.data.length > 0) {
-    const todayData = wakatimeSummaries.data[0]
-    languages = (todayData.languages || []).map(l => ({ name: l.name, percent: l.percent }))
-    editors = (todayData.editors || []).map(e => ({ name: e.name, percent: e.percent }))
-  }
 
   return {
     ok: true,
@@ -205,9 +191,7 @@ const fetchPresencePayload = async () => {
     lastCoding: getLastCodingEvent(githubEvents),
     wakatime: wakatimeStats?.data ? {
       text: wakatimeStats.data.text,
-      totalSeconds: wakatimeStats.data.total_seconds,
-      languages,
-      editors
+      totalSeconds: wakatimeStats.data.total_seconds
     } : null,
     updatedAt: Date.now()
   }
