@@ -158,15 +158,21 @@ const fetchJson = async (url, options = {}, fallback = null) => {
 
 const fetchPresencePayload = async () => {
   const discordUserId = process.env.DISCORD_USER_ID
+  const wakatimeApiKey = process.env.WAKATIME_API_KEY
 
-  const [githubEvents, lanyardPayload] = await Promise.all([
+  const [githubEvents, lanyardPayload, wakatimeStats] = await Promise.all([
     fetchJson(GITHUB_EVENTS_ENDPOINT, {
       headers: {
         Accept: 'application/vnd.github+json',
         'User-Agent': 'rahmatdev-portfolio'
       }
     }, []),
-    discordUserId ? fetchJson(`${LANYARD_BASE_ENDPOINT}${discordUserId}`) : Promise.resolve(null)
+    discordUserId ? fetchJson(`${LANYARD_BASE_ENDPOINT}${discordUserId}`) : Promise.resolve(null),
+    wakatimeApiKey ? fetchJson('https://wakatime.com/api/v1/users/current/all_time_since_today', {
+      headers: {
+        Authorization: `Basic ${Buffer.from(wakatimeApiKey).toString('base64')}`
+      }
+    }).catch(() => null) : Promise.resolve(null)
   ])
 
   const presence = lanyardPayload?.success ? lanyardPayload.data : null
@@ -183,6 +189,10 @@ const fetchPresencePayload = async () => {
       status: presence?.discord_status || 'offline'
     },
     lastCoding: getLastCodingEvent(githubEvents),
+    wakatime: wakatimeStats?.data ? {
+      text: wakatimeStats.data.text,
+      totalSeconds: wakatimeStats.data.total_seconds
+    } : null,
     updatedAt: Date.now()
   }
 }

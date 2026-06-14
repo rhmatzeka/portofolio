@@ -69,6 +69,10 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(146, 154, 168, 0.055) 44%, transparent 74%);
 }
 
+.dynamic-island-wakatime::before {
+  background: linear-gradient(135deg, rgba(0, 209, 255, 0.11), rgba(0, 150, 255, 0.055) 44%, transparent 74%);
+}
+
 .dynamic-island-spotify::before {
   background:
     radial-gradient(circle at 9% 14%, rgba(0, 209, 255, 0.16), transparent 36%),
@@ -145,6 +149,11 @@
 .dynamic-island-github .island-visual.icon {
   background: rgba(255, 255, 255, 0.08);
   color: #f5f7fa;
+}
+
+.dynamic-island-wakatime .island-visual.icon {
+  background: rgba(0, 209, 255, 0.08);
+  color: #00d1ff;
 }
 
 .dynamic-island-coding .island-visual.icon {
@@ -312,6 +321,12 @@
 }
 
 .dynamic-island-badge-live {
+  background: rgba(0, 209, 255, 0.12);
+  color: #00d1ff;
+  border: 1px solid rgba(0, 209, 255, 0.24);
+}
+
+.dynamic-island-badge-wakatime {
   background: rgba(0, 209, 255, 0.12);
   color: #00d1ff;
   border: 1px solid rgba(0, 209, 255, 0.24);
