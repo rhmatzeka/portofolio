@@ -6,12 +6,6 @@ import gameArtwork from '../assets/images/game.jpg'
 
 const POLL_INTERVAL = 15000
 
-const WakaTimeIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
-  </svg>
-)
-
 const GitHubIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.02c-3.22.7-3.9-1.37-3.9-1.37-.53-1.35-1.29-1.71-1.29-1.71-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.78 2.72 1.27 3.38.97.1-.75.41-1.27.75-1.56-2.57-.29-5.27-1.29-5.27-5.74 0-1.27.45-2.3 1.19-3.11-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.19a11 11 0 0 1 5.78 0c2.2-1.5 3.17-1.19 3.17-1.19.64 1.59.24 2.77.12 3.06.74.81 1.19 1.84 1.19 3.11 0 4.46-2.71 5.45-5.3 5.74.42.36.79 1.06.79 2.15v3.19c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5Z" />
@@ -235,21 +229,6 @@ const buildStatusCards = (data, now) => {
       artwork: '',
       status: discordStatus,
       icon: <DiscordIcon />
-    })
-  }
-
-  if (data?.wakatime) {
-    cards.push({
-      key: 'wakatime',
-      theme: 'wakatime',
-      eyebrow: 'WakaTime',
-      label: 'All-time code statistics',
-      meta: `Total time coded: ${data.wakatime.text}`,
-      footerParts: ['Metrics logged since track start'],
-      badge: 'wakatime',
-      artwork: '',
-      status: 'offline',
-      icon: <WakaTimeIcon />
     })
   }
 
