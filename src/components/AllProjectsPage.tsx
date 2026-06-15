@@ -147,7 +147,9 @@ const AllProjectsPage = ({ projects = [] }) => {
 
   return (
     <div className="all-projects-page">
-      <div className="all-projects-background" />
+      <div className="all-projects-background">
+        <div className="all-projects-background-grid" />
+      </div>
       
       <div className="all-projects-container">
         {/* Navigation / Header */}
