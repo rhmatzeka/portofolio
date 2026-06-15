@@ -27,7 +27,7 @@
     {
       "id": "admin-project-1781094008492",
       "title": "Taniin Play to Earn",
-      "tech": "WEB3 \\ GAME",
+      "tech": "WEB3 \\ MOBILE",
       "desc": "A Web3 farming game prototype built with Flutter and Flame, featuring land ownership, crop economy, wallet sync, and Sepolia integration.",
       "fullDesc": "Taniin is a landscape farming game prototype for Android and Web built with Flutter and Flame. Players can buy land, purchase seeds, plant crops, harvest, sell items, and keep their game progress locally.\n\nThe project includes Web3 integration on Sepolia with wallet sync, ERC-20 TANI balance reading, transaction history, backend signer actions, and Solidity contracts for land, items, and token rewards.",
       "stack": [
