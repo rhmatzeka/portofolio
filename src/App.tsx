@@ -14,6 +14,7 @@ const Certificates = lazy(() => import('./components/Certificates'))
 const Contact = lazy(() => import('./components/Contact'))
 const Footer = lazy(() => import('./components/Footer'))
 const AiAssistant = lazy(() => import('./components/AiAssistant'))
+const AllProjectsPage = lazy(() => import('./components/AllProjectsPage'))
 
 const getProjectOrder = (project, fallbackIndex = 0) => {
   const order = Number(project?.order)
@@ -30,7 +31,25 @@ const sortPortfolioProjects = (projects = []) => (
 )
 
 function App() {
-  const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+  const [currentPath, setCurrentPath] = useState(
+    typeof window !== 'undefined' ? window.location.pathname : '/'
+  )
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname)
+      window.scrollTo(0, 0)
+    }
+
+    window.addEventListener('popstate', handleLocationChange)
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange)
+    }
+  }, [])
+
+  const isAdminRoute = currentPath.startsWith('/admin')
+  const isProjectsRoute = currentPath === '/projects' || currentPath === '/projects/'
+
   const [pageLoading, setPageLoading] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
   const [showSpline, setShowSpline] = useState(false)
@@ -214,6 +233,15 @@ function App() {
   }
 
   const portfolioProjects = sortPortfolioProjects(adminContent.projects)
+
+  if (isProjectsRoute) {
+    return (
+      <Suspense fallback={<div className="loading-section">Loading...</div>}>
+        <AllProjectsPage projects={portfolioProjects} />
+      </Suspense>
+    )
+  }
+
   const hasProjects = portfolioProjects.length > 0
   const hasCertificates = adminContent.certificates.length > 0
 

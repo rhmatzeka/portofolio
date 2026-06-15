@@ -408,13 +408,13 @@
   }
   
   .cases-grid {
-    grid-template-columns: minmax(0, min(100%, 520px));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 326px));
     justify-content: center;
     gap: 1rem;
   }
 
   .case-card {
-    max-width: 520px;
+    max-width: 326px;
   }
   
   .case-image {
@@ -473,7 +473,7 @@
   }
   
   .case-image {
-    height: 190px;
+    height: 156px;
   }
 
   .case-image.phone-shot .case-image-main {

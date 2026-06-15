@@ -42,7 +42,7 @@ const modalVariants = {
   }
 }
 
-const StackBadge = ({ tech, className = '' }) => (
+export const StackBadge = ({ tech, className = '' }) => (
   <span className={`stack-badge ${className}`}>
     {getStackIcon(tech) && (
       <span className="stack-badge-icon">
@@ -129,7 +129,7 @@ const ProjectMedia = ({ project, context = 'card' }) => {
   )
 }
 
-const ProjectCard = memo(({ project, onClick }) => (
+export const ProjectCard = memo(({ project, onClick }) => (
   <motion.div
     className="case-card"
     variants={itemUp}
@@ -204,6 +204,12 @@ const Cases = ({ projects = [] }) => {
     }
   }, [selectedProject])
 
+  const handleViewAll = (e) => {
+    e.preventDefault()
+    window.history.pushState({}, '', '/projects')
+    window.dispatchEvent(new Event('popstate'))
+  }
+
   if (!projects.length) return null
 
   return (
@@ -231,7 +237,7 @@ const Cases = ({ projects = [] }) => {
         </motion.div>
 
         <motion.div variants={itemUp} className="view-all-container">
-          <a href="https://github.com/rhmatzeka" target="_blank" rel="noopener noreferrer" className="view-all-btn">
+          <a href="/projects" onClick={handleViewAll} className="view-all-btn">
             View All Projects
             <span className="arrow">→</span>
           </a>
