@@ -65,30 +65,6 @@
       "order": 2,
       "github": "https://github.com/rhmatzeka/AppAbsensiSDN1Bintaro.git",
       "demo": "https://www.absensisdnbintaro01.com/"
-    },
-    {
-      "id": "admin-project-1781234567890",
-      "title": "Reka Solana",
-      "tech": "SOLANA \\ RWA",
-      "desc": "A Solana-powered asset passport for second-hand student devices to verify ownership, repair history, and transfer records.",
-      "fullDesc": "Reka is a Solana-powered asset passport for second-hand student devices. It helps buyers verify used laptops, phones, or cameras before purchase by checking its identity hash, condition, service history, current ownership, and transfer trail. Backed by an Anchor/Rust program on Solana Devnet, every creation, history update, and ownership transfer is recorded as a low-cost, secure, public audit trail.",
-      "stack": [
-        "React",
-        "TypeScript",
-        "Solana Web3.js",
-        "Anchor",
-        "Rust",
-        "Vite",
-        "Tailwind",
-        "Bun"
-      ],
-      "mediaType": "image",
-      "mediaUrl": "",
-      "image": "",
-      "imageVariant": "desktop-shot",
-      "order": 3,
-      "github": "https://github.com/rhmatzeka/RekaSolana.git",
-      "demo": "#"
     }
   ],
   "certificates": []
