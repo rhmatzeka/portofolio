@@ -3,205 +3,258 @@
   min-height: 100vh;
   width: 100%;
   color: white;
-  background: #030406;
-  padding: 7rem 2rem 6rem 2rem;
+  background: #020203;
+  padding: 6rem 2rem 8rem 2rem;
   overflow-x: hidden;
   box-sizing: border-box;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Premium Background Blobs & Grid */
+/* Premium Ambient Background */
 .all-projects-background {
   position: fixed;
   inset: 0;
   z-index: 1;
-  background: #030406;
+  background: #020203;
   overflow: hidden;
   pointer-events: none;
 }
 
-.all-projects-background::before {
-  content: '';
+.all-projects-glowall-1 {
   position: absolute;
-  top: -10%;
-  left: -10%;
-  width: 50%;
-  height: 50%;
-  background: radial-gradient(circle, rgba(0, 209, 255, 0.08) 0%, transparent 70%);
-  filter: blur(80px);
-  pointer-events: none;
+  top: -15%;
+  left: 20%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(0, 209, 255, 0.08) 0%, transparent 60%);
+  filter: blur(120px);
+  animation: pulseGlow 12s infinite alternate ease-in-out;
 }
 
-.all-projects-background::after {
-  content: '';
+.all-projects-glowall-2 {
   position: absolute;
-  bottom: -10%;
-  right: -10%;
-  width: 60%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(153, 69, 255, 0.06) 0%, transparent 70%);
-  filter: blur(100px);
-  pointer-events: none;
+  bottom: -15%;
+  right: 15%;
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(circle, rgba(153, 69, 255, 0.05) 0%, transparent 65%);
+  filter: blur(140px);
+  animation: pulseGlow 16s infinite alternate-reverse ease-in-out;
 }
 
-/* Subtle Grid overlay */
-.all-projects-background-grid {
+@keyframes pulseGlow {
+  0% {
+    transform: scale(0.9) translateY(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.1) translateY(20px);
+    opacity: 1.1;
+  }
+}
+
+/* Dot matrix grid overlay */
+.all-projects-grid-overlay {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
   background-position: center top;
-  mask-image: radial-gradient(ellipse at 50% 50%, black 40%, transparent 85%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 40%, transparent 85%);
-  opacity: 0.8;
+  mask-image: radial-gradient(ellipse at 50% 50%, black 50%, transparent 95%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 50%, transparent 95%);
+  opacity: 0.95;
 }
 
 .all-projects-container {
   position: relative;
   z-index: 2;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 1100px;
   display: flex;
   flex-direction: column;
   gap: 3.5rem;
 }
 
-/* Header & Back Button */
-.all-projects-header {
+/* Floating Back Navigation */
+.all-projects-nav {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1.5rem;
+  justify-content: flex-start;
+  width: 100%;
 }
 
-.back-home-btn {
+.back-home-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.62rem;
-  padding: 0.7rem 1.4rem;
-  border-radius: 50px;
+  gap: 0.65rem;
+  padding: 0.65rem 1.3rem;
+  border-radius: 100px;
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.85rem;
-  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.82rem;
+  font-weight: 600;
   text-decoration: none;
+  letter-spacing: 0.2px;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
-.back-home-btn:hover {
-  background: rgba(0, 209, 255, 0.06);
+.back-home-link:hover {
+  background: rgba(0, 209, 255, 0.05);
   border-color: rgba(0, 209, 255, 0.3);
   color: #00d1ff;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 209, 255, 0.15);
+  transform: translateX(-4px);
+  box-shadow: 0 8px 30px rgba(0, 209, 255, 0.15);
 }
 
-.back-home-btn svg {
+.back-home-link svg {
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.back-home-btn:hover svg {
-  transform: translateX(-4px);
+.back-home-link:hover svg {
+  transform: translateX(-3px);
+}
+
+/* Centered Typography Header */
+.all-projects-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  margin-top: -0.5rem;
 }
 
 .all-projects-title {
-  font-size: 4rem;
-  font-weight: 700;
-  margin: 0.5rem 0 0 0;
-  letter-spacing: -1.5px;
-  background: linear-gradient(135deg, #ffffff 40%, rgba(255, 255, 255, 0.6) 100%);
+  font-size: 4.8rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -2px;
+  background: linear-gradient(to bottom, #ffffff 40%, #a3a3a3 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.all-projects-divider {
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #00d1ff, #9945ff);
+  border-radius: 99px;
+  margin: 0.5rem 0;
 }
 
 .all-projects-subtitle {
   font-size: 1.15rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.45);
   margin: 0;
-  max-width: 600px;
+  max-width: 640px;
   line-height: 1.6;
+  font-weight: 400;
 }
 
-/* Filter Pills - Clean Glassmorphism */
-.filter-pills-container {
+/* Center Dock Filter Bar */
+.filter-dock-wrapper {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.65rem;
-  padding: 0.4rem;
-  border-radius: 100px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  max-width: fit-content;
-  margin: 0 auto;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
 }
 
-.filter-pill {
-  padding: 0.65rem 1.5rem;
+.filter-dock {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem;
+  border-radius: 100px;
+  background: rgba(10, 10, 12, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.filter-dock-item {
+  padding: 0.65rem 1.4rem;
   border-radius: 50px;
   background: transparent;
   border: 1px solid transparent;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.filter-pill:hover {
+.filter-dock-item:hover {
   color: white;
   background: rgba(255, 255, 255, 0.04);
 }
 
-.filter-pill.active {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+.filter-dock-item.active {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
   color: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Grid Layout - Optimized & centered */
+/* Grid Layout */
 .all-projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 1.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 2rem;
   width: 100%;
-  justify-content: center;
 }
 
-/* Override Cases grid behavior on All Projects Page for full width alignment */
+/* Ensure card matches layout */
 .all-projects-grid .case-card {
-  max-width: 100%; /* allows card to expand to fill grid slot */
+  max-width: 100%;
   margin: 0 auto;
+  background: rgba(10, 10, 12, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.no-projects-found {
-  padding: 7rem 0;
+.all-projects-grid .case-card:hover {
+  border-color: rgba(0, 209, 255, 0.25);
+  box-shadow: 
+    0 15px 35px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(0, 209, 255, 0.08);
+}
+
+.no-projects-found-box {
+  padding: 6rem 0;
   text-align: center;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.3);
   font-size: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   background: rgba(255, 255, 255, 0.01);
   border: 1px dashed rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
+  border-radius: 24px;
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  width: 100%;
+}
+
+.no-projects-found-box svg {
+  opacity: 0.5;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .all-projects-page {
-    padding: 5rem 1.25rem 4rem 1.25rem;
+    padding: 5rem 1.25rem 5rem 1.25rem;
   }
   
   .all-projects-container {
@@ -209,22 +262,22 @@
   }
   
   .all-projects-title {
-    font-size: 2.8rem;
+    font-size: 3.2rem;
     letter-spacing: -1px;
   }
   
   .all-projects-subtitle {
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     padding: 0 1rem;
   }
   
   .all-projects-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 326px));
     justify-content: center;
-    gap: 1.25rem;
+    gap: 1.5rem;
   }
   
-  .filter-pills-container {
+  .filter-dock {
     border-radius: 20px;
     max-width: 100%;
     overflow-x: auto;
@@ -234,22 +287,22 @@
     scrollbar-width: none;
   }
   
-  .filter-pills-container::-webkit-scrollbar {
+  .filter-dock::-webkit-scrollbar {
     display: none;
   }
   
-  .filter-pill {
+  .filter-dock-item {
     padding: 0.55rem 1.25rem;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
   }
 }
 
 @media (max-width: 480px) {
   .all-projects-title {
-    font-size: 2.2rem;
+    font-size: 2.6rem;
   }
   
   .all-projects-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
   }
 }

@@ -9,35 +9,25 @@ const containerVariants = {
   initial: { opacity: 0 },
   in: { 
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.05 }
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 }
   },
   out: { opacity: 0, transition: { duration: 0.25 } }
 }
 
-const itemUp = {
-  initial: { opacity: 0, y: 24, scale: 0.98 },
-  in: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
-  }
-}
-
 const modalVariants = {
-  hidden: { opacity: 0, scale: 0.92, y: 24, filter: 'blur(8px)' },
+  hidden: { opacity: 0, scale: 0.93, y: 20, filter: 'blur(8px)' },
   visible: { 
     opacity: 1, 
     scale: 1,
     y: 0,
     filter: 'blur(0px)',
-    transition: { duration: 0.36, ease: [0.16, 1, 0.3, 1] }
+    transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] }
   },
   exit: { 
     opacity: 0, 
-    scale: 0.96,
-    y: 16,
-    filter: 'blur(6px)',
+    scale: 0.97,
+    y: 12,
+    filter: 'blur(4px)',
     transition: { duration: 0.2 }
   }
 }
@@ -112,6 +102,11 @@ const AllProjectsPage = ({ projects = [] }) => {
   const [selectedProject, setSelectedProject] = useState(null)
   const [activeFilter, setActiveFilter] = useState('ALL')
 
+  // Reset scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (selectedProject) {
@@ -124,10 +119,9 @@ const AllProjectsPage = ({ projects = [] }) => {
     }
   }, [selectedProject])
 
-  // Extract all categories dynamically and clean them
+  // Extract categories dynamically
   const filters = ['ALL', ...new Set(projects.flatMap(p => {
     if (!p.tech) return []
-    // Split "WEB3 \\ GAME" into ["WEB3", "GAME"] and trim
     return p.tech.split(/\\|\//).map(cat => cat.trim().toUpperCase())
   }))]
 
@@ -147,45 +141,56 @@ const AllProjectsPage = ({ projects = [] }) => {
 
   return (
     <div className="all-projects-page">
+      {/* Premium Ambient Background */}
       <div className="all-projects-background">
-        <div className="all-projects-background-grid" />
+        <div className="all-projects-glowall-1" />
+        <div className="all-projects-glowall-2" />
+        <div className="all-projects-grid-overlay" />
       </div>
       
       <div className="all-projects-container">
-        {/* Navigation / Header */}
-        <header className="all-projects-header">
-          <a href="/" onClick={handleBackToHome} className="back-home-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        {/* Floating Back Navigation */}
+        <nav className="all-projects-nav">
+          <a href="/" onClick={handleBackToHome} className="back-home-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            Back to Home
+            <span>Back to Home</span>
           </a>
-          
+        </nav>
+
+        {/* Centered Typography Header */}
+        <header className="all-projects-hero">
           <h1 className="all-projects-title">All Works</h1>
-          <p className="all-projects-subtitle">A complete archive of my web3, mobile, and full-stack development journey.</p>
+          <div className="all-projects-divider" />
+          <p className="all-projects-subtitle">
+            An curated archive of web3 games, decentralized applications, and full-stack solutions built with modern technology.
+          </p>
         </header>
 
-        {/* Categories Filter Pills */}
-        <div className="filter-pills-container">
-          {filters.map(filter => (
-            <button
-              key={filter}
-              className={`filter-pill ${activeFilter === filter ? 'active' : ''}`}
-              onClick={() => setActiveFilter(filter)}
-            >
-              {filter}
-            </button>
-          ))}
+        {/* Center Dock Filter Bar */}
+        <div className="filter-dock-wrapper">
+          <div className="filter-dock">
+            {filters.map(filter => (
+              <button
+                key={filter}
+                className={`filter-dock-item ${activeFilter === filter ? 'active' : ''}`}
+                onClick={() => setActiveFilter(filter)}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Grid of Projects */}
+        {/* Grid Section */}
         <motion.div 
           className="all-projects-grid"
           variants={containerVariants}
           initial="initial"
           animate="in"
-          key={activeFilter} // Re-animate when filter changes
+          key={activeFilter}
         >
           {filteredProjects.map((project) => (
             <ProjectCard 
@@ -197,13 +202,18 @@ const AllProjectsPage = ({ projects = [] }) => {
         </motion.div>
 
         {filteredProjects.length === 0 && (
-          <div className="no-projects-found">
+          <div className="no-projects-found-box">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
             <p>No projects found in this category.</p>
           </div>
         )}
       </div>
 
-      {/* Project Detail Modal (same logic as main page) */}
+      {/* Project Detail Modal */}
       {selectedProject && createPortal(
         <AnimatePresence>
           <motion.div 
