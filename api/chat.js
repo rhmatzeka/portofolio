@@ -2,7 +2,9 @@ const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions'
 const DEFAULT_MODEL = 'openai/gpt-oss-120b'
 const MAX_HISTORY_MESSAGES = 8
 const MAX_MESSAGE_LENGTH = 900
+const MAX_BODY_SIZE = 64 * 1024
 const { fetchPresencePayload, getPresencePromptContext } = require('./_presenceData')
+const { readJsonBody, sendJson } = require('./_http')
 
 const portfolioContext = `
 You are RahmatDev Assistant, the AI assistant for Rahmat Eka Satria's portfolio website.
@@ -68,12 +70,6 @@ Rules:
 - Never wrap words with ** or __.
 `
 
-const sendJson = (res, statusCode, payload) => {
-  res.statusCode = statusCode
-  res.setHeader('Content-Type', 'application/json')
-  res.end(JSON.stringify(payload))
-}
-
 const stripMarkdownDecorators = (value) => (
   value
     .replace(/\*\*(.*?)\*\*/g, '$1')
@@ -99,19 +95,6 @@ const sanitizeMessages = (messages) => {
     }))
 }
 
-const getRequestBody = async (req) => {
-  if (req.body && typeof req.body === 'object') return req.body
-  if (typeof req.body === 'string') return JSON.parse(req.body)
-
-  const chunks = []
-  for await (const chunk of req) {
-    chunks.push(chunk)
-  }
-
-  if (!chunks.length) return {}
-  return JSON.parse(Buffer.concat(chunks).toString('utf8'))
-}
-
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     sendJson(res, 405, { error: 'Method not allowed' })
@@ -128,9 +111,11 @@ module.exports = async (req, res) => {
 
   let body
   try {
-    body = await getRequestBody(req)
+    body = await readJsonBody(req, { maxBytes: MAX_BODY_SIZE })
   } catch (error) {
-    sendJson(res, 400, { error: 'Invalid JSON body.' })
+    sendJson(res, error.statusCode || 400, {
+      error: error.statusCode === 413 ? error.message : 'Invalid JSON body.'
+    })
     return
   }
 

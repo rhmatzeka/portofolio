@@ -4,6 +4,7 @@ import Hero from './components/Hero'
 import Navbar from './components/Navbar'
 import Loading from './components/Loading'
 import { getAdminContent } from './utils/portfolioContent'
+import { sortProjects } from './utils/projects'
 import './App.css'
 
 // Lazy load components that are below the fold
@@ -15,20 +16,6 @@ const Contact = lazy(() => import('./components/Contact'))
 const Footer = lazy(() => import('./components/Footer'))
 const AiAssistant = lazy(() => import('./components/AiAssistant'))
 const AllProjectsPage = lazy(() => import('./components/AllProjectsPage'))
-
-const getProjectOrder = (project, fallbackIndex = 0) => {
-  const order = Number(project?.order)
-  return Number.isFinite(order) && order > 0 ? order : fallbackIndex + 1
-}
-
-const sortPortfolioProjects = (projects = []) => (
-  [...projects].sort((firstProject, secondProject) => {
-    const firstOrder = getProjectOrder(firstProject, projects.indexOf(firstProject))
-    const secondOrder = getProjectOrder(secondProject, projects.indexOf(secondProject))
-    if (firstOrder !== secondOrder) return firstOrder - secondOrder
-    return String(firstProject.title || '').localeCompare(String(secondProject.title || ''))
-  })
-)
 
 function App() {
   const [currentPath, setCurrentPath] = useState(
@@ -49,6 +36,7 @@ function App() {
 
   const isAdminRoute = currentPath.startsWith('/admin')
   const isProjectsRoute = currentPath === '/projects' || currentPath === '/projects/'
+  const isStandaloneRoute = isAdminRoute || isProjectsRoute
 
   const [pageLoading, setPageLoading] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -72,7 +60,7 @@ function App() {
   }, [isAdminRoute])
 
   useEffect(() => {
-    if (isAdminRoute) {
+    if (isStandaloneRoute) {
       setPageLoading(false)
       return undefined
     }
@@ -87,10 +75,10 @@ function App() {
     return () => {
       isMounted = false
     }
-  }, [isAdminRoute])
+  }, [isStandaloneRoute])
 
   useEffect(() => {
-    if (isAdminRoute) return undefined
+    if (isStandaloneRoute) return undefined
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const desktop = window.matchMedia('(min-width: 769px)')
@@ -130,10 +118,10 @@ function App() {
       desktop.removeEventListener('change', handleChange)
       reducedMotion.removeEventListener('change', handleChange)
     }
-  }, [isAdminRoute])
+  }, [isStandaloneRoute])
 
   useEffect(() => {
-    if (isAdminRoute) return undefined
+    if (isStandaloneRoute) return undefined
 
     let didMount = false
     const mountAssistant = () => {
@@ -160,10 +148,10 @@ function App() {
         window.removeEventListener(eventName, mountAssistant)
       })
     }
-  }, [isAdminRoute])
+  }, [isStandaloneRoute])
 
   useEffect(() => {
-    if (isAdminRoute) return undefined
+    if (isStandaloneRoute) return undefined
 
     if (!('IntersectionObserver' in window)) {
       const elements = Array.from(document.querySelectorAll('.reveal-on-scroll'))
@@ -200,10 +188,10 @@ function App() {
       observer.disconnect()
       mutationObserver.disconnect()
     }
-  }, [pageLoading, isAdminRoute])
+  }, [pageLoading, isStandaloneRoute])
 
   useEffect(() => {
-    if (isAdminRoute) return undefined
+    if (isStandaloneRoute) return undefined
 
     let rafId = null
 
@@ -222,7 +210,7 @@ function App() {
       window.removeEventListener('scroll', handleScroll)
       if (rafId) cancelAnimationFrame(rafId)
     }
-  }, [isAdminRoute])
+  }, [isStandaloneRoute])
 
   if (isAdminRoute) {
     return (
@@ -232,7 +220,7 @@ function App() {
     )
   }
 
-  const portfolioProjects = sortPortfolioProjects(adminContent.projects)
+  const portfolioProjects = sortProjects(adminContent.projects)
 
   if (isProjectsRoute) {
     return (

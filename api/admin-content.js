@@ -1,5 +1,6 @@
 const fs = require('node:fs/promises')
 const path = require('node:path')
+const { readJsonBody, sendJson } = require('./_http')
 
 const CONTENT_REPO_PATH = 'public/content.json'
 const CONTENT_PATH = path.join(process.cwd(), CONTENT_REPO_PATH)
@@ -8,33 +9,9 @@ const MAX_BODY_SIZE = 12 * 1024 * 1024
 const MAX_MEDIA_SIZE = 8 * 1024 * 1024
 const MAX_FIELD_LENGTH = 4000
 
-const sendJson = (res, statusCode, payload) => {
-  res.statusCode = statusCode
-  res.setHeader('Content-Type', 'application/json')
-  res.setHeader('Cache-Control', 'no-store')
-  res.end(JSON.stringify(payload))
-}
-
-const getRequestBody = async (req) => {
-  if (req.body && typeof req.body === 'object') return req.body
-  if (typeof req.body === 'string') return JSON.parse(req.body)
-
-  const chunks = []
-  let size = 0
-
-  for await (const chunk of req) {
-    size += chunk.length
-    if (size > MAX_BODY_SIZE) {
-      const error = new Error('Request body is too large.')
-      error.statusCode = 413
-      throw error
-    }
-    chunks.push(chunk)
-  }
-
-  if (!chunks.length) return {}
-  return JSON.parse(Buffer.concat(chunks).toString('utf8'))
-}
+const sendAdminJson = (res, statusCode, payload) => (
+  sendJson(res, statusCode, payload, { cacheControl: 'no-store' })
+)
 
 const cleanText = (value, fallback = '') => (
   typeof value === 'string' ? value.trim().slice(0, MAX_FIELD_LENGTH) : fallback
@@ -370,39 +347,44 @@ const authorize = (password) => {
 module.exports = async (req, res) => {
   if (req.method === 'GET') {
     try {
-      sendJson(res, 200, await readContent())
+      sendAdminJson(res, 200, await readContent())
     } catch (error) {
-      sendJson(res, 500, { error: error.message || 'Content data is unavailable.' })
+      sendAdminJson(res, 500, { error: error.message || 'Content data is unavailable.' })
     }
     return
   }
 
   if (req.method !== 'POST') {
-    sendJson(res, 405, { error: 'Method not allowed' })
+    sendAdminJson(res, 405, { error: 'Method not allowed' })
     return
   }
 
   let body
   try {
-    body = await getRequestBody(req)
+    body = await readJsonBody(req, { maxBytes: MAX_BODY_SIZE })
   } catch (error) {
-    sendJson(res, error.statusCode || 400, { error: error.message || 'Invalid JSON body.' })
+    sendAdminJson(res, error.statusCode || 400, { error: error.message || 'Invalid JSON body.' })
     return
   }
 
   if (!authorize(body?.password)) {
-    sendJson(res, 401, { error: 'Invalid admin password or ADMIN_PASSWORD is not configured.' })
+    sendAdminJson(res, 401, { error: 'Invalid admin password or ADMIN_PASSWORD is not configured.' })
     return
   }
 
   if (body?.action === 'verify') {
-    sendJson(res, 200, { ok: true })
+    sendAdminJson(res, 200, { ok: true })
+    return
+  }
+
+  if (!['upsert', 'delete'].includes(body?.action)) {
+    sendAdminJson(res, 400, { error: 'Unknown content action.' })
     return
   }
 
   const collection = body?.collection
   if (!['projects', 'certificates'].includes(collection)) {
-    sendJson(res, 400, { error: 'Unknown content collection.' })
+    sendAdminJson(res, 400, { error: 'Unknown content collection.' })
     return
   }
 
@@ -411,9 +393,13 @@ module.exports = async (req, res) => {
 
     if (body?.action === 'delete') {
       const id = cleanText(body?.id)
+      if (!id) {
+        sendAdminJson(res, 400, { error: 'Content id is required.' })
+        return
+      }
       content[collection] = content[collection].filter((item) => item.id !== id)
       await writeContent(content)
-      sendJson(res, 200, content)
+      sendAdminJson(res, 200, content)
       return
     }
 
@@ -429,8 +415,8 @@ module.exports = async (req, res) => {
     }
 
     await writeContent(content)
-    sendJson(res, 200, content)
+    sendAdminJson(res, 200, content)
   } catch (error) {
-    sendJson(res, error.statusCode || 500, { error: error.message || 'Failed to save content.' })
+    sendAdminJson(res, error.statusCode || 500, { error: error.message || 'Failed to save content.' })
   }
 }

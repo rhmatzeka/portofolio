@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { memo } from 'react'
+import { memo } from 'react'
 import ConnectWallet from './ConnectWallet'
 import './Navbar.css'
 

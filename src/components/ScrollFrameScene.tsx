@@ -12,7 +12,6 @@ const ScrollFrameScene = () => {
   const imageRef = useRef(null)
   const lastFrameRef = useRef(-1)
   const [frames, setFrames] = useState([])
-  const [frameIndex, setFrameIndex] = useState(0)
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
@@ -23,12 +22,11 @@ const ScrollFrameScene = () => {
       if (isCancelled) return
 
       lastFrameRef.current = -1
-      setFrameIndex(0)
       setFrames(sources)
       ensureKiluaFramesPreloaded().catch(() => undefined)
     }
 
-    loadFrames()
+    loadFrames().catch(() => undefined)
 
     return () => {
       isCancelled = true
@@ -44,7 +42,6 @@ const ScrollFrameScene = () => {
       if (lastFrameRef.current !== nextFrame) {
         lastFrameRef.current = nextFrame
         imageRef.current.src = frames[nextFrame]
-        setFrameIndex(nextFrame)
       }
     }
 
@@ -79,9 +76,10 @@ const ScrollFrameScene = () => {
         {frames.length > 0 && (
           <img
             ref={imageRef}
-            src={frames[frameIndex]}
+            src={frames[0]}
             alt=""
             className={`scroll-frame-image ${isReady ? 'is-ready' : ''}`}
+            decoding="async"
             onLoad={() => setIsReady(true)}
             draggable="false"
           />

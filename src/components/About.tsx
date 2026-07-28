@@ -1,10 +1,11 @@
 // @ts-nocheck
-import { Component, Suspense, useEffect, useRef, useState } from 'react'
+import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import Lanyard from './Lanyard'
 import LivePresence from './LivePresence'
-import ScrollFrameScene from './ScrollFrameScene'
 import './About.css'
+
+const Lanyard = lazy(() => import('./Lanyard'))
+const ScrollFrameScene = lazy(() => import('./ScrollFrameScene'))
 
 const containerVariants = {
   initial: { opacity: 0 },
@@ -82,7 +83,9 @@ const AvatarFallback = () => (
 
 const About = () => {
   const aboutRef = useRef(null)
+  const sequenceRef = useRef(null)
   const [showLanyard, setShowLanyard] = useState(false)
+  const [showSequence, setShowSequence] = useState(false)
 
   useEffect(() => {
     if (!aboutRef.current || showLanyard) return undefined
@@ -100,6 +103,23 @@ const About = () => {
     observer.observe(aboutRef.current)
     return () => observer.disconnect()
   }, [showLanyard])
+
+  useEffect(() => {
+    if (!sequenceRef.current || showSequence) return undefined
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowSequence(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '100% 0px 100% 0px' }
+    )
+
+    observer.observe(sequenceRef.current)
+    return () => observer.disconnect()
+  }, [showSequence])
 
   return (
     <motion.section
@@ -181,8 +201,12 @@ const About = () => {
         </div>
       </motion.div>
 
-      <motion.div className="about-killua-sequence" variants={itemRight}>
-        <ScrollFrameScene />
+      <motion.div ref={sequenceRef} className="about-killua-sequence" variants={itemRight}>
+        {showSequence && (
+          <Suspense fallback={null}>
+            <ScrollFrameScene />
+          </Suspense>
+        )}
       </motion.div>
     </motion.section>
   )

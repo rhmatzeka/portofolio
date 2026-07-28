@@ -27,6 +27,7 @@
 
 .about-killua-sequence {
   width: 100vw;
+  aspect-ratio: 1920 / 1076;
   margin: clamp(1rem, 2.8vw, 2.4rem) 0 0 calc(50% - 50vw);
   overflow: hidden;
   pointer-events: none;

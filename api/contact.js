@@ -1,24 +1,7 @@
 const RESEND_ENDPOINT = 'https://api.resend.com/emails'
 const MAX_FIELD_LENGTH = 2000
-
-const sendJson = (res, statusCode, payload) => {
-  res.statusCode = statusCode
-  res.setHeader('Content-Type', 'application/json')
-  res.end(JSON.stringify(payload))
-}
-
-const getRequestBody = async (req) => {
-  if (req.body && typeof req.body === 'object') return req.body
-  if (typeof req.body === 'string') return JSON.parse(req.body)
-
-  const chunks = []
-  for await (const chunk of req) {
-    chunks.push(chunk)
-  }
-
-  if (!chunks.length) return {}
-  return JSON.parse(Buffer.concat(chunks).toString('utf8'))
-}
+const MAX_BODY_SIZE = 32 * 1024
+const { readJsonBody, sendJson } = require('./_http')
 
 const cleanField = (value) => (
   typeof value === 'string' ? value.trim().slice(0, MAX_FIELD_LENGTH) : ''
@@ -51,9 +34,11 @@ module.exports = async (req, res) => {
 
   let body
   try {
-    body = await getRequestBody(req)
+    body = await readJsonBody(req, { maxBytes: MAX_BODY_SIZE })
   } catch (error) {
-    sendJson(res, 400, { error: 'Invalid JSON body.' })
+    sendJson(res, error.statusCode || 400, {
+      error: error.statusCode === 413 ? error.message : 'Invalid JSON body.'
+    })
     return
   }
 

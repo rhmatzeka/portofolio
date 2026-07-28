@@ -70,6 +70,10 @@ const preloadImages = async (sources) => {
 export const loadKiluaFrameSources = () => {
   if (!frameSourcesPromise) {
     frameSourcesPromise = Promise.all(frameEntries.map(([, loadFrame]) => loadFrame()))
+      .catch((error) => {
+        frameSourcesPromise = null
+        throw error
+      })
   }
 
   return frameSourcesPromise
@@ -99,6 +103,10 @@ export const ensureKiluaFramesPreloaded = (onProgress) => {
         preloadedSources = sources
         notifyProgress({ loaded: sources.length, total: sources.length, percent: 100 })
         return sources
+      })
+      .catch((error) => {
+        preloadPromise = null
+        throw error
       })
   }
 

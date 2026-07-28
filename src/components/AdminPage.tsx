@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { getCanonicalStackName, getStackIcon } from '../data/projects'
 import { fileToDataUrl, getAdminContent, normalizeCsv } from '../utils/portfolioContent'
+import { getProjectOrder, sortProjects } from '../utils/projects'
 import './AdminPage.css'
 
 const projectMediaAccept = 'image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/ogg'
@@ -36,20 +37,6 @@ const getMediaTypeFromUrl = (value) => (
 
 const getMediaTypeFromFile = (file) => (
   file?.type?.startsWith('video/') ? 'video' : 'image'
-)
-
-const getProjectOrder = (project, fallbackIndex = 0) => {
-  const order = Number(project?.order)
-  return Number.isFinite(order) && order > 0 ? order : fallbackIndex + 1
-}
-
-const sortProjects = (projects = []) => (
-  [...projects].sort((firstProject, secondProject) => {
-    const firstOrder = getProjectOrder(firstProject, projects.indexOf(firstProject))
-    const secondOrder = getProjectOrder(secondProject, projects.indexOf(secondProject))
-    if (firstOrder !== secondOrder) return firstOrder - secondOrder
-    return String(firstProject.title || '').localeCompare(String(secondProject.title || ''))
-  })
 )
 
 const AdminPage = () => {
