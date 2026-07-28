@@ -363,6 +363,15 @@ const AiAssistant = () => {
     startNextRoamLeg()
   }
 
+  const stopRoamWalk = () => {
+    stopRoaming()
+    cancelLauncherAnimation()
+    pendingResumeRoamingRef.current = false
+    pendingWalkHomeRef.current = false
+    setLauncherOffset({ x: launcherOffsetRef.current.x, y: 0 })
+    setLauncherPhaseState('idle')
+  }
+
   const resumeRoamingFromLanding = () => {
     if (roamTimeoutRef.current) window.clearTimeout(roamTimeoutRef.current)
 
@@ -641,6 +650,12 @@ const AiAssistant = () => {
   const handleRoamClick = (event) => {
     event.preventDefault()
     event.stopPropagation()
+
+    if (isRoamingRef.current) {
+      stopRoamWalk()
+      return
+    }
+
     startRoamWalk()
   }
 
