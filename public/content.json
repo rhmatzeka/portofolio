@@ -1,30 +1,6 @@
 {
   "projects": [
     {
-      "id": "admin-project-1781500024954",
-      "title": "Reka Solana",
-      "tech": "WEB",
-      "desc": "A Solana-powered asset passport for student second-hand devices to verify identity, condition, repair history, and ownership transfers.",
-      "fullDesc": "Reka is a Solana-powered asset passport for second-hand student devices. It helps buyers verify a used laptop, phone, or camera before purchase by checking its identity hash, condition, service history, current ownership, and transfer trail.",
-      "stack": [
-        "React",
-        "TypeScript",
-        "Solana Web3.js",
-        "Anchor",
-        "Rust",
-        "Vite",
-        "Tailwind",
-        "Bun"
-      ],
-      "mediaType": "image",
-      "mediaUrl": "/uploads/1781500075647-reka-solana.png",
-      "image": "/uploads/1781500075647-reka-solana.png",
-      "imageVariant": "desktop-shot",
-      "order": 1,
-      "github": "https://github.com/rhmatzeka/RekaSolana.git",
-      "demo": "https://reka.rahmateka.my.id"
-    },
-    {
       "id": "admin-project-1781094008492",
       "title": "Taniin Play to Earn",
       "tech": "WEB3 \\ MOBILE",
