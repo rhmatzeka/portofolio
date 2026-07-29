@@ -340,6 +340,9 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const ropeSegmentLength = isMobile ? 0.48 : 0.68
   const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.2
+  const visualCardHookY = isMobile
+    ? -1.05 + cardScale * (1.075 + 0.155 + 0.115 + 0.024)
+    : cardHookY
   const rigX = isMobile ? 0 : 0.22
   const cardStartY = -(jointStep * 3 + cardHookY)
   const visualHookX = 0
@@ -451,7 +454,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
       const cardTranslation = card.current.translation()
       const cardQuaternion = card.current.rotation()
       cardAnchor
-        .copy(cardAnchorOffset.set(visualHookX, cardHookY, 0))
+        .copy(cardAnchorOffset.set(visualHookX, visualCardHookY, 0))
         .applyQuaternion(cardRotation.set(cardQuaternion.x, cardQuaternion.y, cardQuaternion.z, cardQuaternion.w))
         .add(cardTranslation)
       const j3Translation = j3.current.translation()
