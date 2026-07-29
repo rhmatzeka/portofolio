@@ -563,8 +563,27 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
                 toneMapped={false}
               />
             </mesh>
-            <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
-            <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
+            {isMobile ? (
+              <group position={[0, 1.075, 0.01]}>
+                <mesh position={[0, 0.155, 0]}>
+                  <torusGeometry args={[0.115, 0.024, 10, 28]} />
+                  <meshStandardMaterial color="#8b949c" metalness={0.88} roughness={0.24} />
+                </mesh>
+                <mesh position={[0, 0.015, 0]}>
+                  <capsuleGeometry args={[0.038, 0.13, 8, 16]} />
+                  <meshStandardMaterial color="#626b73" metalness={0.84} roughness={0.3} />
+                </mesh>
+                <mesh position={[0, -0.075, 0]}>
+                  <boxGeometry args={[0.19, 0.075, 0.055]} />
+                  <meshStandardMaterial color="#7a838b" metalness={0.86} roughness={0.27} />
+                </mesh>
+              </group>
+            ) : (
+              <>
+                <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
+                <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
+              </>
+            )}
             <mesh position={[0, 0.52, 0.08]} visible={false}>
               <planeGeometry args={[1.18, 1.35]} />
               <meshBasicMaterial transparent opacity={0} />
