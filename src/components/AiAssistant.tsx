@@ -80,21 +80,16 @@ const ChatIcon = () => (
 
 const WalkIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <circle cx="13.6" cy="4.15" r="1.85" stroke="currentColor" strokeWidth="1.9" />
     <path
-      d="m12.15 7.6-2.7 3.65 3 2.05 1.7-2.55 1.35 1.2c.72.64 1.58 1.08 2.52 1.27"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M8.42 12.05c-1.18-.37-1.84-1.5-1.56-2.66l.65-2.67c.29-1.17 1.41-1.9 2.59-1.68 1.2.22 2.02 1.33 1.88 2.54l-.34 2.74c-.16 1.3-1.97 2.12-3.22 1.73Z"
+      fill="currentColor"
     />
     <path
-      d="m12.35 13.2-2.45 3.25-3.75 1.45M12.7 13.35l2.75 2.35 1.3 4.15"
-      stroke="currentColor"
-      strokeWidth="2.15"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M14.7 19.12c-1.2-.3-1.94-1.38-1.75-2.57l.43-2.72c.19-1.19 1.25-2 2.45-1.86 1.22.14 2.11 1.18 2.04 2.4l-.15 2.75c-.07 1.31-1.74 2.31-3.02 2Z"
+      fill="currentColor"
     />
+    <circle cx="7.35" cy="14.38" r="1.05" fill="currentColor" opacity="0.78" />
+    <circle cx="11.98" cy="20.1" r="1.05" fill="currentColor" opacity="0.78" />
   </svg>
 )
 
