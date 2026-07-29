@@ -58,7 +58,8 @@
 
 .ai-walk-action svg {
   color: #f4fbff;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.42));
+  transform: translateY(-0.25px);
 }
 
 .ai-character-action:hover:not(:disabled) {
