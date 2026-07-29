@@ -79,17 +79,25 @@ const ChatIcon = () => (
 )
 
 const WalkIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M8.42 12.05c-1.18-.37-1.84-1.5-1.56-2.66l.65-2.67c.29-1.17 1.41-1.9 2.59-1.68 1.2.22 2.02 1.33 1.88 2.54l-.34 2.74c-.16 1.3-1.97 2.12-3.22 1.73Z"
-      fill="currentColor"
-    />
-    <path
-      d="M14.7 19.12c-1.2-.3-1.94-1.38-1.75-2.57l.43-2.72c.19-1.19 1.25-2 2.45-1.86 1.22.14 2.11 1.18 2.04 2.4l-.15 2.75c-.07 1.31-1.74 2.31-3.02 2Z"
-      fill="currentColor"
-    />
-    <circle cx="7.35" cy="14.38" r="1.05" fill="currentColor" opacity="0.78" />
-    <circle cx="11.98" cy="20.1" r="1.05" fill="currentColor" opacity="0.78" />
+  <svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <g transform="rotate(-24 8.2 9.4)">
+      <path
+        d="M7.95 6.55c1.38.08 2.32 1.24 2.2 2.68-.08.95-.53 1.72-.82 2.55-.35 1-.4 2.35-1.67 2.67-1.13.29-2.09-.6-2.18-1.75-.08-1.02.46-1.88.62-2.82.19-1.1-.12-2.04.3-2.72.31-.5.86-.65 1.55-.61Z"
+        fill="currentColor"
+      />
+      <circle cx="6.6" cy="5.45" r=".72" fill="currentColor" />
+      <circle cx="8.05" cy="4.9" r=".82" fill="currentColor" />
+      <circle cx="9.65" cy="5.3" r=".7" fill="currentColor" />
+    </g>
+    <g transform="rotate(-24 15.8 15.2)">
+      <path
+        d="M15.55 12.35c1.38.08 2.32 1.24 2.2 2.68-.08.95-.53 1.72-.82 2.55-.35 1-.4 2.35-1.67 2.67-1.13.29-2.09-.6-2.18-1.75-.08-1.02.46-1.88.62-2.82.19-1.1-.12-2.04.3-2.72.31-.5.86-.65 1.55-.61Z"
+        fill="currentColor"
+      />
+      <circle cx="14.2" cy="11.25" r=".72" fill="currentColor" />
+      <circle cx="15.65" cy="10.7" r=".82" fill="currentColor" />
+      <circle cx="17.25" cy="11.1" r=".7" fill="currentColor" />
+    </g>
   </svg>
 )
 
