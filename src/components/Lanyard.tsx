@@ -607,7 +607,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
         <meshLineGeometry />
         <meshLineMaterial
           color="white"
-          depthTest={false}
+          depthTest={isMobile}
           depthWrite={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           transparent
