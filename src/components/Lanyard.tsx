@@ -341,7 +341,7 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
   const jointStep = ropeSegmentLength
   const cardHookY = -1.05 + cardScale * 1.2
   const visualCardHookY = isMobile
-    ? -1.05 + cardScale * (1.075 + 0.155 + 0.115 + 0.024)
+    ? -1.05 + cardScale * (1.075 + 0.155)
     : cardHookY
   const rigX = isMobile ? 0 : 0.22
   const cardStartY = -(jointStep * 3 + cardHookY)
@@ -571,6 +571,15 @@ function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
                 <mesh position={[0, 0.155, 0]}>
                   <torusGeometry args={[0.115, 0.024, 10, 28]} />
                   <meshStandardMaterial color="#8b949c" metalness={0.88} roughness={0.24} />
+                </mesh>
+                <mesh position={[0, 0.155, 0.045]} renderOrder={12}>
+                  <boxGeometry args={[0.135, 0.052, 0.04]} />
+                  <meshStandardMaterial
+                    color="#a2aab1"
+                    metalness={0.9}
+                    roughness={0.2}
+                    depthTest={false}
+                  />
                 </mesh>
                 <mesh position={[0, 0.015, 0]}>
                   <capsuleGeometry args={[0.038, 0.13, 8, 16]} />
