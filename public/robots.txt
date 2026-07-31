@@ -4,3 +4,4 @@ Disallow: /admin
 Disallow: /api/
 
 Sitemap: https://www.rahmateka.my.id/sitemap.xml
+Sitemap: https://www.rahmateka.my.id/sitemap.txt
